@@ -39,7 +39,7 @@
 
   <header class="header-bg py-20 px-4">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
-      <div class="md:w-1/2 mb-10 md:mb-0">
+      <div class="md:w-full mb-10 md:mb-0 text-center">
         <h1 class="text-5xl sm:text-6xl font-extrabold leading-tight mb-4">
           ART5D: <span class="text-neon">Certificación Híbrida</span> del Arte Digital.
         </h1>
@@ -49,9 +49,6 @@
         <a href="#packs" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-full text-xl interactive-btn">
           Descubre Nuestros Packs
         </a>
-      </div>
-      <div class="md:w-1/2">
-        <img src="https://i.imgur.com/3vK8sL9.jpg" alt="Sello Van Gogh" class="w-full max-w-lg rounded-2xl glow-border">
       </div>
     </div>
   </header>
@@ -182,16 +179,4 @@
       }
     }
 
-    // === TU AUDIO CYBERPUNK (sin cambios) ===
-    let isAudioInitialized = false;
-    function initializeAudio() {
-      if (isAudioInitialized) { Tone.Transport.stop(); isAudioInitialized = false; 
-        document.getElementById('audio-indicator').innerText = "Activar Ambiente Cyberpunk (Click)"; return; }
-      Tone.start();
-      // CÓDIGO DE AUDIO VA AQUÍ
-      isAudioInitialized = true;
-      document.getElementById('audio-indicator').innerText = "Ambiente ACTIVO";
-    }
-  </script>
-</body>
-</html>
+    // === TU AUDIO CYBERPUNK
