@@ -7,7 +7,10 @@
     <script src="https://cdn.jsdelivr.net/npm/stripe@2/stripe.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tonejs/tone@14/build/Tone.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+  
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" as="style">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+  
   <script>
     tailwind.config = {
       theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } }}
@@ -185,7 +188,7 @@
       if (isAudioInitialized) { Tone.Transport.stop(); isAudioInitialized = false; 
         document.getElementById('audio-indicator').innerText = "Activar Ambiente Cyberpunk (Click)"; return; }
       Tone.start();
-      // ... (tu código de audio original aquí)
+      // CÓDIGO DE AUDIO VA AQUÍ
       isAudioInitialized = true;
       document.getElementById('audio-indicator').innerText = "Ambiente ACTIVO";
     }
