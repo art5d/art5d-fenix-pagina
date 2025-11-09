@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang='es'>
+<head>
+  <meta charset='UTF-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
+  <title>ART5D - Certificación Híbrida del Arte Digital</title>
+  <script src='https://cdn.jsdelivr.net/npm/stripe@2/stripe.js'></script>
+  <script src='https://cdn.jsdelivr.net/npm/@tonejs/tone@14/build/Tone.js'></script>
+  <style>
+    /* Reset y Base */
+    :root {
+      --color-primary: #FF5A5F;
+      --tw-bg-opacity: 1;
+      --tw-text-opacity: 1;
+    }
+    body {
+      background-color: rgb(17 24 39 / var(--tw-bg-opacity)); /* bg-gray-900 */
+      color: rgb(255 255 255 / var(--tw-text-opacity)); /* text-white */
+      font-family: 'Inter', sans-serif;
+    }
+    .header-bg { padding-top: 5rem; padding-bottom: 5rem; padding-left: 1rem; padding-right: 1rem; }
+    .max-w-7xl { max-width: 80rem; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .md\:flex-row { flex-direction: row; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .md\:w-full { width: 100%; }
+    .mb-10 { margin-bottom: 2.5rem; }
+    .md\:mb-0 { margin-bottom: 0px; }
+    .text-center { text-align: center; }
+    .text-5xl { font-size: 3rem; line-height: 1; }
+    .sm\:text-6xl { font-size: 3.75rem; line-height: 1; }
+    .font-extrabold { font-weight: 800; }
+    .leading-tight { line-height: 1.25; }
+    .mb-4 { margin-bottom: 1rem; }
+    .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+    .text-gray-300 { color: rgb(209 213 219 / var(--tw-text-opacity)); }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .bg-indigo-600 { background-color: rgb(79 70 229 / var(--tw-bg-opacity)); }
+    .hover\:bg-indigo-700\:hover { background-color: rgb(67 56 202 / var(--tw-bg-opacity)); }
+    .font-bold { font-weight: 700; }
+    .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+    .px-10 { padding-left: 2.5rem; padding-right: 2.5rem; }
+    .rounded-full { border-radius: 9999px; }
+    .interactive-btn { transition: transform 0.1s ease-in-out; }
+    .interactive-btn:active { transform: scale(0.98); }
+    .py-20 { padding-top: 5rem; padding-bottom: 5rem; }
+    .px-4 { padding-left: 1rem; padding-right: 1rem; }
+    .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+    .mb-16 { margin-bottom: 4rem; }
+    .grid { display: grid; }
+    .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .gap-10 { gap: 2.5rem; }
+    .service-card { padding: 2rem; border-radius: 1rem; }
+    .mb-8 { margin-bottom: 2rem; }
+    .w-full { width: 100%; }
+    .bg-gray-700 { background-color: rgb(55 65 81 / var(--tw-bg-opacity)); }
+    .hover\:bg-gray-600\:hover { background-color: rgb(75 85 99 / var(--tw-bg-opacity)); }
+    .text-left { text-align: left; }
+    .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; margin-bottom: 0.75rem; }
+    .p-10 { padding: 2.5rem; }
+    .scale-110 { transform: scale(1.1); }
+    .border-4 { border-width: 4px; }
+    .border-yellow-500 { border-color: rgb(245 158 11 / var(--tw-border-opacity)); }
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .-top-6 { top: -1.5rem; }
+    .left-1\/2 { left: 50%; }
+    .transform { transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
+    .-translate-x-1\/2 { --tw-translate-x: -50%; }
+    .bg-yellow-500 { background-color: rgb(245 158 11 / var(--tw-bg-opacity)); }
+    .text-black { color: rgb(0 0 0 / var(--tw-text-opacity)); }
+    .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .text-5xl { font-size: 3rem; line-height: 1; }
+    .text-yellow-400 { color: rgb(251 191 36 / var(--tw-text-opacity)); }
+    .text-7xl { font-size: 4.5rem; line-height: 1; }
+    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+    .text-gray-200 { color: rgb(229 231 235 / var(--tw-text-opacity)); }
+    .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; margin-bottom: 1rem; }
+    .mb-10 { margin-bottom: 2.5rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .p-3 { padding: 0.75rem; }
+    .rounded-lg { border-radius: 0.5rem; }
+    .bg-gray-800 { background-color: rgb(31 41 55 / var(--tw-bg-opacity)); }
+    .border { border-width: 1px; }
+    .border-gray-600 { border-color: rgb(75 85 99 / var(--tw-border-opacity)); }
+    .placeholder-gray-400 { color: rgb(156 163 175 / var(--tw-placeholder-opacity)); }
+    .focus\:outline-none\:focus { outline: 2px solid transparent; outline-offset: 2px; }
+    .focus\:ring-2\:focus { --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-shadow); }
+    .focus\:ring-yellow-500\:focus { --tw-ring-color: rgb(245 158 11 / var(--tw-ring-opacity)); }
+    .hidden-email { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; }
+    .email-active { max-height: 100px; }
+    .mt-2 { margin-top: 0.5rem; }
+    .bg-yellow-600 { background-color: rgb(202 138 4 / var(--tw-bg-opacity)); }
+    .hover\:bg-yellow-700\:hover { background-color: rgb(161 98 7 / var(--tw-bg-opacity)); }
+    .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+    .mt-6 { margin-top: 1.5rem; }
+    .text-indigo-400 { color: rgb(129 140 248 / var(--tw-text-opacity)); }
+    /* Estilos Neón y Glow */
+    .text-neon { color: var(--color-primary); text-shadow: 0 0 10px var(--color-primary); }
+    .glow-border { 
+      border: 2px solid rgba(255, 90, 95, 0.5);
+      box-shadow: 0 0 20px rgba(255, 90, 95, 0.7);
+      transition: all 0.3s ease;
+    }
+    .glow-border:hover { 
+      box-shadow: 0 0 30px var(--color-primary), 0 0 50px rgba(255, 90, 95, 0.6); 
+    }
+    /* Indicador de Audio */
+    #audio-indicator { 
+      position: fixed; bottom: 20px; right: 20px; z-index: 9999; 
+      padding: 12px 20px; border-radius: 9999px; font-weight: bold; cursor: pointer;
+      background-color: rgba(255, 90, 95, 0.9); color: white;
+    }
+  </style>
+  <link rel='preload' href='https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap' as='style'>
+  <link href='https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap' rel='stylesheet'>
+</head>
+<body class='bg-gray-900 text-white'>
+
+  <header class='header-bg py-20 px-4'>
+    <div class='max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between'>
+      <div class='md:w-full mb-10 md:mb-0 text-center'>
+        <h1 class='text-5xl sm:text-6xl font-extrabold leading-tight mb-4'>
+          ART5D: <span class='text-neon'>Certificación Híbrida</span> del Arte Digital.
+        </h1>
+        <p class='text-xl text-gray-300 mb-6'>
+          Validamos, curamos y certificamos la autoría, trazabilidad y valor del arte digital y la creación asistida por IA.
+        </p>
+        <a href='#packs' class='bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-full text-xl interactive-btn'>
+          Descubre Nuestros Packs
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <section id='packs' class='py-20 px-4'>
+    <div class='max-w-7xl mx-auto'>
+      <h2 class='text-5xl font-extrabold text-center mb-16'>Elige tu <span class='text-neon'>Certificación</span></h2>
+      
+      <div class='grid md:grid-cols-3 gap-10'>
+
+        <div class='service-card p-8 rounded-2xl glow-border text-center'>
+          <h3 class='text-4xl font-bold mb-4'>Pack BÁSICO</h3>
+          <p class='text-6xl font-extrabold text-neon mb-6'>$19<span class='text-xl'>.99</span></p>
+          <ul class='text-left text-gray-300 space-y-3 mb-8'>
+            <li>5 Imágenes certificadas</li>
+            <li>Certificado PDF + Blockchain</li>
+            <li>Catálogo Digital</li>
+          </ul>
+          <button onclick='pagar("BASICO")' class='w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-full text-xl interactive-btn glow-border'>
+            COMPRAR AHORA
+          </button>
+        </div>
+
+        <div class='service-card p-10 rounded-2xl glow-border scale-110 border-4 border-yellow-500 relative'>
+          <div class='absolute -top-6 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black px-6 py-2 rounded-full font-bold'>
+            MÁS VENDIDO
+          </div>
+          <h3 class='text-5xl font-bold mb-4 text-yellow-400'>Pack GOLD</h3>
+          <p class='text-7xl font-extrabold text-yellow-400 mb-6'>$69<span class='text-2xl'>.99</span></p>
+          <ul class='text-left text-gray-200 space-y-4 mb-10'>
+            <li>10 Imágenes + 5 IA certificadas</li>
+            <li>Galería VR 3D personalizada</li>
+            <li>NFT en Polygon</li>
+            <li>Promoción en redes</li>
+          </ul>
+          
+          <div class='mb-4'>
+            <input type='text' id='coupon-gold' placeholder='¿Tienes un código de cupón? (ej: ART5D-INFLUENCER-XX)' 
+              oninput='checkCouponInput()'
+              class='w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500'>
+          </div>
+          <div id='email-field' class='hidden-email'>
+            <input type='email' id='email-gold' placeholder='Tu Email para la entrega (Requerido para cupón)' 
+              class='w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 mt-2'>
+          </div>
+          <button onclick='pagar("GOLD")' class='w-full bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-5 rounded-full text-2xl interactive-btn glow-border mt-6'>
+            ¡LO QUIERO YA!
+          </button>
+        </div>
+
+        <div class='service-card p-8 rounded-2xl glow-border text-center'>
+          <h3 class='text-4xl font-bold mb-4 text-indigo-400'>Pack PLATINO</h3>
+          <p class='text-6xl font-extrabold text-indigo-400 mb-6'>$199<span class='text-xl'>.99</span></p>
+          <ul class='text-left text-gray-300 space-y-3 mb-8'>
+            <li>30 Imágenes premium</li>
+            <li>Mentoría 1:1</li>
+            <li>Exhibición en galería física</li>
+            <li>Edición física firmada</li>
+          </ul>
+          <button onclick='pagar("PLATINO")' class='w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-full text-xl interactive-btn glow-border'>
+            IR POR EL MAXIMO
+          </button>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+
+  <div id='audio-indicator' onclick='initializeAudio()'>Activar Ambiente Cyberpunk (Click)</div>
+
+  <script>
+    // Clave de prueba de Stripe. ¡Debes cambiar a la clave LIVE antes de lanzar!
+    const stripe = Stripe('pk_test_51SQGwGPX46VYof9ozyxcVVVlDBTxr4JI9pb28H9REi8XkRog9xFx2VooOV3M4rnw6YwXUHa79UlJwFSwuZDzPKoD0039xSTVd8');
+    
+    // URL de ejecución de tu Google Apps Script (Tu motor de backend)
+    const URL_EXEC = 'https://script.google.com/macros/s/AKfycbz07sqb06pTqF9tjolv7sMSVzOTPOjpVbF0_BZb24zOVzUwwUMELT9MhVXzG8vCZA/exec';
+    const VALID_COUPON = 'ART5D-INFLUENCER-XX'; 
+    
+    // Función para mostrar/ocultar el campo de email si se ingresa el cupón
+    function checkCouponInput() {
+      const couponInput = document.getElementById('coupon-gold').value.trim().toUpperCase();
+      const emailField = document.getElementById('email-field');
+      
+      if (couponInput === VALID_COUPON) {
+        emailField.classList.add('email-active');
+      } else {
+        emailField.classList.remove('email-active');
+      }
+    }
+
+    async function pagar(pack) {
+      let couponCode = null;
+      let email = null;
+      let dataToSend = { pack: pack };
+
+      if (pack === 'GOLD') {
+        couponCode = document.getElementById('coupon-gold').value.trim().toUpperCase();
+        if (couponCode === VALID_COUPON) {
+          email = document.getElementById('email-gold').value.trim();
+          if (!email) {
+            alert("Por favor, ingresa tu email para recibir la entrega con el cupón gratuito.");
+            return;
+          }
+          dataToSend.email = email;
+        }
+        dataToSend.coupon = couponCode;
+      }
+      
+      // Llamada a Apps Script con los datos (pack, cupón, y email si es gratis)
+      const res = await fetch(URL_EXEC, {
+        method: 'POST',
+        body: JSON.stringify({data: dataToSend})
+      });
+      
+      const responseData = await res.json();
+
+      // Lógica de Redirección: Si es orden gratuita, Apps Script devuelve una URL
+      if (responseData.id === "FREE_ORDER" && responseData.redirect_url) {
+          window.location.href = responseData.redirect_url; 
+          return; 
+      }
+
+      // Lógica Stripe: Si se requiere pago (id es la sessionId de Stripe)
+      if (responseData.id) {
+        stripe.redirectToCheckout({ sessionId: responseData.id });
+      } else {
+        alert("Ocurrió un error al iniciar la sesión de pago: " + JSON.stringify(responseData));
+      }
+    }
+
+    // === TU AUDIO CYBERPUNK (sin cambios) ===
+    let isAudioInitialized = false;
+    function initializeAudio() {
+      if (isAudioInitialized) { Tone.Transport.stop(); isAudioInitialized = false; 
+        document.getElementById('audio-indicator').innerText = "Activar Ambiente Cyberpunk (Click)"; return; }
+      Tone.start();
+      // CÓDIGO DE AUDIO VA AQUÍ
+      isAudioInitialized = true;
+      document.getElementById('audio-indicator').innerText = "Ambiente ACTIVO";
+    }
+  </script>
+</body>
+</html>
