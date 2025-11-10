@@ -76,12 +76,44 @@
             background-color: #333333;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
         }
+
+        /* Estilos para el Avatar/Perfil */
+        .avatar-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+        }
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid #FFD700; /* Borde dorado brillante */
+            cursor: pointer;
+            object-fit: cover;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px #FFD700;
+        }
+        .user-id-text {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.7);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body class="min-h-screen">
 
     <!-- Encabezado / Banner Principal -->
-    <header class="header-bg p-8 text-white shadow-xl">
+    <header class="header-bg p-8 text-white shadow-xl relative">
         <div class="max-w-4xl mx-auto text-center">
             <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight">
                 ART5D <span class="neon-text block sm:inline">Certificación Híbrida del Arte Digital</span>
@@ -90,6 +122,22 @@
                 Tu portal hacia la autenticación y revalorización de tu arte.
             </p>
         </div>
+
+        <!-- Contenedor del Avatar (NUEVO) -->
+        <div class="avatar-container">
+            <div class="flex flex-col items-end">
+                <span id="user-status" class="text-xs font-semibold">Cargando perfil...</span>
+                <span id="user-id-display" class="user-id-text"></span>
+            </div>
+            <img 
+                id="user-avatar" 
+                class="avatar" 
+                src="https://placehold.co/50x50/333333/FFD700?text=A" 
+                alt="Avatar del Usuario" 
+                onclick="promptForAvatarUpload()"
+            >
+        </div>
+
     </header>
 
     <!-- Sección de Packs / Oferta Principal -->
@@ -196,6 +244,29 @@
         Activar Ambiente Cyberpunk (Clic)
     </div>
 
+    <!-- Modal para Simulación de Subida de Avatar -->
+    <div id="avatar-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-[1010] flex items-center justify-center p-4" onclick="this.classList.add('hidden')">
+        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-bold mb-4 text-[#4B0082]">Actualizar Avatar</h3>
+            <p class="mb-4 text-gray-700">Selecciona tu nueva imagen de perfil. (Simulación de subida)</p>
+            <div class="flex flex-col space-y-3">
+                <input type="text" id="avatar-url-input" placeholder="Pega una URL de imagen aquí (e.g., placeholder.co)" class="p-2 border rounded-lg focus:ring-[#FF69B4] focus:border-[#FF69B4]">
+                <button 
+                    class="p-2 rounded-lg bg-[#FF69B4] text-white font-semibold hover:bg-[#D45A96] transition duration-200" 
+                    onclick="setNewAvatar()"
+                >
+                    Guardar Nuevo Avatar
+                </button>
+                <button 
+                    class="p-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition duration-200" 
+                    onclick="document.getElementById('avatar-modal').classList.add('hidden')"
+                >
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Pie de Página Básico -->
     <footer class="bg-gray-800 text-white text-center p-4 mt-12">
@@ -203,14 +274,31 @@
     </footer>
 
 
-    <script>
+    <script type="module">
+        // === Imports de Firebase (MANDATORIO) ===
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // === Variables Globales del Entorno ===
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-art5d-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app;
+        let db;
+        let auth;
+        let currentUserId = null;
+        let isAuthReady = false;
+
+        // Configuración para ver los logs de Firestore
+        setLogLevel('Debug');
+
+
         // === Lógica de Utilidades ===
 
         /**
          * Muestra un mensaje de estado temporal en la esquina inferior derecha.
-         * Reemplaza la función alert().
-         * @param {string} message - El mensaje a mostrar.
-         * @param {boolean} isError - Si es un mensaje de error (rojo) o éxito (verde).
          */
         function showMessage(message, isError = false) {
             console.log(isError ? "ERROR: " + message : "INFO: " + message);
@@ -222,33 +310,168 @@
             }
 
             const statusElement = document.createElement('div');
-            // Clase status-message activa la animación CSS de fade
             statusElement.className = `status-message fixed bottom-5 right-5 p-4 rounded-lg shadow-xl text-white font-bold text-sm sm:text-base ${isError ? 'bg-red-600' : 'bg-green-600'}`;
             statusElement.textContent = message;
             document.body.appendChild(statusElement);
             // El mensaje se auto-elimina vía CSS
         }
 
+
+        // === Lógica de Inicialización de Firebase y Perfil ===
+
+        /**
+         * Inicializa Firebase y establece el estado de autenticación.
+         */
+        async function setupAuthAndFirestore() {
+            if (!firebaseConfig) {
+                showMessage("ERROR: Configuración de Firebase no disponible.", true);
+                return;
+            }
+
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Autenticación: Priorizar token, sino anónimo.
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                    showMessage("Autenticación exitosa con token personalizado.", false);
+                } else {
+                    await signInAnonymously(auth);
+                    showMessage("Autenticación anónima iniciada.", false);
+                }
+
+                // Escucha el estado de autenticación para cargar el perfil
+                onAuthStateChanged(auth, (user) => {
+                    isAuthReady = true;
+                    if (user) {
+                        currentUserId = user.uid;
+                        document.getElementById('user-status').textContent = 'Conectado';
+                        document.getElementById('user-id-display').textContent = `ID: ${currentUserId}`;
+                        loadUserAvatar(currentUserId);
+                    } else {
+                        currentUserId = null;
+                        document.getElementById('user-status').textContent = 'No Conectado';
+                        document.getElementById('user-id-display').textContent = 'ID: N/A';
+                        console.error("Usuario desconectado. Las reglas de Firestore podrían fallar si no permiten acceso anónimo.");
+                    }
+                });
+
+            } catch (error) {
+                showMessage(`ERROR Fatal en Firebase: ${error.message}`, true);
+                console.error("Firebase Initialization Error:", error);
+            }
+        }
+
+        /**
+         * Devuelve la referencia al documento de perfil del usuario en Firestore.
+         */
+        function getUserProfileRef(userId) {
+            // Ruta de datos privados: /artifacts/{appId}/users/{userId}/profile_data/{documentId}
+            if (!db || !userId) return null;
+            return doc(db, 'artifacts', appId, 'users', userId, 'profile_data', 'profile');
+        }
+
+        /**
+         * Carga el avatar del usuario desde Firestore y lo muestra.
+         */
+        async function loadUserAvatar(userId) {
+            const profileRef = getUserProfileRef(userId);
+            if (!profileRef) return;
+
+            try {
+                const docSnap = await getDoc(profileRef);
+                const avatarImg = document.getElementById('user-avatar');
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.avatarUrl) {
+                        avatarImg.src = data.avatarUrl;
+                        showMessage("Avatar de perfil cargado desde Firestore.", false);
+                        return;
+                    }
+                }
+                
+                // Avatar por defecto si no existe o si no hay URL
+                avatarImg.src = "https://placehold.co/50x50/333333/FFD700?text=A";
+                showMessage("Usando avatar predeterminado.", false);
+
+            } catch (error) {
+                showMessage(`ERROR al cargar el perfil: ${error.message}`, true);
+                console.error("Error loading profile:", error);
+            }
+        }
+
+
+        // === Lógica de Avatar y Modal ===
+
+        /**
+         * Muestra el modal para la subida simulada de avatar.
+         */
+        window.promptForAvatarUpload = function() {
+            if (!currentUserId) {
+                showMessage("Debes estar conectado para cambiar tu avatar.", true);
+                return;
+            }
+            document.getElementById('avatar-modal').classList.remove('hidden');
+        }
+
+        /**
+         * Simula la actualización del avatar con una URL y la guarda en Firestore.
+         */
+        window.setNewAvatar = async function() {
+            const urlInput = document.getElementById('avatar-url-input');
+            let newUrl = urlInput.value.trim();
+
+            if (!newUrl) {
+                // Generar una URL de placeholder aleatoria como simulación
+                const randomColor = Math.floor(Math.random()*16777215).toString(16);
+                const randomText = ['A', 'B', 'C', 'G', 'P'][Math.floor(Math.random() * 5)];
+                newUrl = `https://placehold.co/50x50/${randomColor}/FFFFFF?text=${randomText}`;
+                showMessage("URL vacía. Usando URL de placeholder generada aleatoriamente.", true);
+            }
+
+            const profileRef = getUserProfileRef(currentUserId);
+            if (!profileRef) {
+                showMessage("ERROR: No se pudo obtener la referencia de Firestore.", true);
+                return;
+            }
+
+            try {
+                // 1. Actualiza el documento en Firestore
+                await setDoc(profileRef, { 
+                    avatarUrl: newUrl, 
+                    lastUpdated: new Date().toISOString() 
+                }, { merge: true });
+
+                // 2. Actualiza la UI
+                document.getElementById('user-avatar').src = newUrl;
+                document.getElementById('avatar-modal').classList.add('hidden');
+                showMessage("¡Avatar actualizado con éxito y guardado en la Nube!", false);
+                urlInput.value = ''; // Limpiar input
+            } catch (error) {
+                showMessage(`ERROR al guardar el avatar: ${error.message}`, true);
+                console.error("Error setting avatar:", error);
+            }
+        }
+        
         // === Lógica de Inicialización y Transacción de PayPal ===
         
-        // 1. Configura el precio y la descripción del producto
         const PRODUCT_NAME = "PACK GOLD ART5D";
         const PRODUCT_PRICE = "19.99"; // US Dollars
 
-        // 2. Función principal que se ejecuta al cargar la ventana
-        window.onload = function() {
-            // Verificar si la librería de PayPal se ha cargado correctamente
+        // Esta función se moverá a window.onload junto con el resto de la inicialización.
+        function initializePayPalButtons() {
             if (typeof paypal !== 'undefined') {
                 paypal.Buttons({
-                    // Estilo del botón
                     style: {
                         layout: 'vertical',
-                        color:  'gold',
-                        shape:  'pill',
-                        label:  'paypal',
+                        color: 'gold',
+                        shape: 'pill',
+                        label: 'paypal',
                     },
                     
-                    // 3. Configuración de la creación del pedido (Llamada al Servidor de PayPal)
                     createOrder: function(data, actions) {
                         return actions.order.create({
                             purchase_units: [{
@@ -261,25 +484,17 @@
                         });
                     },
 
-                    // 4. Configuración de la aprobación del pedido (El comprador completa el pago)
                     onApprove: function(data, actions) {
-                        // Capturar la transacción para finalizar el pago
                         return actions.order.capture().then(function(details) {
-                            // Obtención de datos de la transacción
                             const transactionId = details.id;
                             const payerName = details.payer.name.given_name;
                             
-                            // Mensajes de éxito
                             showMessage(`¡Pago de ${PRODUCT_PRICE} USD completado con éxito!`, false);
-                            
-                            // Simulación de concesión de acceso (usando datos de Sandbox)
-                            // **RECUERDA:** Para Producción, debes usar un Backend para esta lógica.
                             showMessage(`✅ Bienvenido ${payerName} al PACK GOLD! Transacción ID: ${transactionId}. Prueba exitosa en Sandbox.`, false);
                             
                         });
                     },
 
-                    // 5. Manejo de errores y cancelación
                     onCancel: function(data) {
                         showMessage("Transacción de PayPal cancelada por el usuario.", true);
                     },
@@ -288,23 +503,21 @@
                         console.error('Error de PayPal:', err);
                     }
 
-                }).render('#paypal-button-container'); // Renderiza el botón en el div
+                }).render('#paypal-button-container');
             } else {
-                // Mensaje si PayPal no se pudo cargar (ej. problema de red o Client ID)
                 showMessage("Error: El SDK de PayPal no se cargó correctamente.", true);
             }
-        };
+        }
 
 
         // === Lógica de Audio (Tone.js) ===
         let isAudioInitialized = false;
         
-        function initializeAudio() {
+        window.initializeAudio = function() {
             const audioIndicator = document.getElementById('audio-indicator');
             
             if (isAudioInitialized) {
-                // Si ya está activo, detiene el transporte (simulando apagado)
-                Tone.Transport.stop(); 
+                Tone.Transport.stop();  
                 isAudioInitialized = false;
                 audioIndicator.textContent = "Activar Ambiente Cyberpunk (Clic)";
                 audioIndicator.classList.remove('active');
@@ -312,10 +525,8 @@
                 return;
             }
 
-            // Inicia el contexto de audio (requerido por Tone.js para interacción del usuario)
             Tone.start().then(() => {
-                // **** AQUÍ VA EL CÓDIGO DE AUDIO CYBERPUNK ****
-                // Ejemplo de un simple dron o pulso:
+                // Inicialización del audio
                 const synth = new Tone.MembraneSynth().toDestination();
                 const loop = new Tone.Loop(time => {
                     synth.triggerAttackRelease("C1", "8n", time);
@@ -323,7 +534,6 @@
 
                 Tone.Transport.bpm.value = 80;
                 Tone.Transport.start(); 
-                // **********************************************
 
                 isAudioInitialized = true;
                 audioIndicator.textContent = "Ambiente ACTIVO";
@@ -334,6 +544,13 @@
                 console.error("Error al iniciar Tone.js:", e);
             });
         }
+        
+        // Ejecución al cargar la ventana
+        window.addEventListener('load', () => {
+            setupAuthAndFirestore();
+            initializePayPalButtons();
+        });
+
     </script>
 </body>
 </html>
