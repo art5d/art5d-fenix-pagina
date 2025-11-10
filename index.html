@@ -3,378 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ART5D - Certificación Híbrida del Arte Digital</title>
+    <title>ART5D - Paquetes de Servicio Premium</title>
     <!-- Carga de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Carga de Tone.js para la música ambiental (simulación de audio-ambiente.html) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <!-- Configuración de color y fuente personalizada -->
     <style>
-        /* Estilos personalizados */
-        .hero-bg {
-            /* Un fondo inmersivo para la cabecera */
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Fondo oscuro similar a GitHub */
         }
-        .hero-text {
-            /* Simulación de un efecto 3D o de neón para el título principal */
-            text-shadow: 0 0 10px rgba(139, 92, 246, 0.5), 0 0 20px rgba(139, 92, 246, 0.3);
-        }
-        .card-shadow {
-            /* Sombra suave para las tarjetas de galería y packs */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        .pack-card {
             transition: all 0.3s ease;
         }
-        .card-shadow:hover {
-            /* Efecto hover para destacar la tarjeta */
+        .pack-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(139, 92, 246, 0.3), 0 10px 10px -5px rgba(139, 92, 246, 0.1);
-        }
-        .gold-border {
-            /* Borde degradado para el Pack GOLD */
-            border: 4px solid;
-            border-image: linear-gradient(45deg, #fcd34d, #d97706) 1;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            z-index: 10;
         }
     </style>
-    <script>
-        // Configuración de Tailwind para colores de marca
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        'art-purple': '#8b5cf6',
-                        'art-blue': '#1e3a8a',
-                    }
-                }
-            }
-        }
-
-        // --- LÓGICA DEL SONIDO AMBIENTAL (Integración de audio-ambiente.html) ---
-        let audioIsPlaying = false;
-        let ambientSynth;
-
-        /**
-         * Inicializa y comienza el audio ambiental usando Tone.js.
-         * Se llama al hacer clic en el botón de "Entrar con Sonido".
-         */
-        async function startAmbientAudio() {
-            if (audioIsPlaying) return;
-
-            // Iniciar el contexto de audio (necesario por las políticas de navegadores)
-            await Tone.start();
-
-            // Configurar el sintetizador (un pad suave y espacial)
-            ambientSynth = new Tone.PolySynth(Tone.Synth, {
-                oscillator: { type: "triangle" },
-                envelope: {
-                    attack: 4, 
-                    decay: 0.1,
-                    sustain: 1,
-                    release: 6  
-                }
-            }).toDestination();
-
-            // Añadir un Reverb para darle un toque inmersivo (espacial)
-            const reverb = new Tone.Reverb(5).toDestination();
-            ambientSynth.connect(reverb);
-
-            // Crear un bucle de acordes suaves
-            Tone.Transport.scheduleRepeat(time => {
-                // Genera notas suaves y variadas
-                const notes = ["C4", "E4", "G4", "B4"].map(note => note.replace('4', Math.floor(Math.random() * 2) + 3));
-                ambientSynth.triggerAttackRelease(notes, "4m", time);
-            }, "8m"); 
-
-            Tone.Transport.start();
-            audioIsPlaying = true;
-            console.log("Audio Ambiental ART5D Iniciado.");
-
-            // Ocultar el prompt de inicio para que el usuario pueda ver la página
-            const audioPrompt = document.getElementById('audio-prompt-container');
-            audioPrompt.classList.add('opacity-0');
-            // Permite que la transición CSS se complete antes de ocultarlo por completo
-            setTimeout(() => audioPrompt.classList.add('hidden'), 500);
-
-            // Actualizar el ícono a sonido activo (Simulando el ícono de audio-ambiente.html)
-            document.getElementById('audio-toggle-icon').innerHTML = `
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.707 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.707l3.586-3.586a1 1 0 011.09-.338zM15.536 8.464a.5.5 0 010 .708L14.75 10l.786.786a.5.5 0 01-.708.708L14.043 11l-.707.707a.5.5 0 11-.708-.708l.707-.707-.707-.707a.5.5 0 01.708-.708l.707.707.707-.707z" clip-rule="evenodd"></path></svg>
-            `;
-        }
-
-        /**
-         * Simula el inicio de sesión del artista.
-         * En la implementación real, esta función haría una llamada a google.script.run
-         * para iniciar el flujo de autenticación de Google Apps Script (código.gs).
-         */
-        function handleArtistLogin() {
-            // Este es el punto donde el frontend llama a Google Apps Script (código.gs)
-            alertModal('Cargando Panel de Artista...', 
-                'Este botón simula la llamada al backend de Google Apps Script para iniciar el flujo de autenticación y acceso al panel.');
-        }
-
-        // --- FUNCIÓN DE MODAL DE ALERTA PERSONALIZADA (Reemplazo de alert()) ---
-        function alertModal(title, message) {
-            const modalHtml = `
-                <div id="custom-modal" class="fixed inset-0 bg-black bg-opacity-75 z-[101] flex items-center justify-center">
-                    <div class="bg-gray-800 rounded-lg p-6 max-w-sm mx-auto shadow-2xl border-t-4 border-art-purple">
-                        <h3 class="text-xl font-bold text-white mb-4">${title}</h3>
-                        <p class="text-gray-300 mb-6">${message}</p>
-                        <button onclick="document.getElementById('custom-modal').remove()" 
-                            class="w-full bg-art-purple text-white py-2 rounded-lg font-semibold hover:bg-violet-600 transition duration-300">
-                            Cerrar
-                        </button>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-        }
-    </script>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans">
+<body class="min-h-screen p-4 sm:p-8 flex items-center justify-center">
 
-    <!-- Bloque de Enlace para Iniciar Audio (Reemplaza bloque_enlace_audio.html) -->
-    <div id="audio-prompt-container" class="fixed inset-0 bg-gray-900/95 z-[100] flex flex-col items-center justify-center transition-opacity duration-500 opacity-100">
-        <h2 class="text-3xl font-bold text-white mb-6">Inicia tu Experiencia Inmersiva</h2>
-        <p class="text-gray-400 mb-8">El arte es mejor con audio ambiental. Clic para empezar.</p>
-        <button onclick="startAmbientAudio()" class="bg-art-purple text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-violet-600 transition duration-300 shadow-xl">
-            Entrar con Sonido
-        </button>
+    <div class="container max-w-6xl mx-auto">
+        <!-- Encabezado de la Sección -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-white mb-3">Descubre los Paquetes ART5D</h1>
+            <p class="text-xl text-gray-400 max-w-3xl mx-auto">Potencia tu portafolio artístico con la integración de la IA y la curaduría humana de expertos.</p>
+        </header>
+
+        <!-- Contenedor de Packs (Responsive Grid) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            <!-- PACK BRONCE -->
+            <div class="pack-card bg-gray-800 text-white rounded-xl p-6 flex flex-col shadow-2xl border border-gray-700">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold mb-2 text-gray-200">Pack Bronce</h2>
+                    <p class="text-gray-400">El inicio perfecto para tu presencia digital.</p>
+                </div>
+                <div class="text-4xl font-extrabold mb-6 text-green-400">
+                    Gratis
+                    <span class="text-lg font-normal text-gray-500">/ 30 días</span>
+                </div>
+                
+                <ul class="space-y-3 flex-grow mb-8 text-gray-300">
+                    <li class="flex items-start">
+                        <!-- Icono de Lucide: Check -->
+                        <svg class="w-6 h-6 mr-2 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span>5 Imágenes propias en Galería.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-6 h-6 mr-2 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span>Perfil de Artista Estándar.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-6 h-6 mr-2 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span>Soporte vía correo electrónico.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <!-- Icono de Lucide: X (para mostrar no incluido) -->
+                        <svg class="w-6 h-6 mr-2 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <span class="line-through text-gray-500">Bocetos IA Certificados.</span>
+                    </li>
+                </ul>
+
+                <button class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition duration-150 shadow-md shadow-green-600/50">
+                    Comenzar Gratis
+                </button>
+            </div>
+
+            <!-- PACK PLATA -->
+            <div class="pack-card bg-gray-800 text-white rounded-xl p-6 flex flex-col shadow-2xl border border-gray-700">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold mb-2 text-gray-200">Pack Plata</h2>
+                    <p class="text-gray-400">Para artistas que buscan un impacto significativo.</p>
+                </div>
+                <div class="text-4xl font-extrabold mb-6 text-blue-400">
+                    $19.99
+                    <span class="text-lg font-normal text-gray-500">/ mes</span>
+                </div>
+                
+                <ul class="space-y-3 flex-grow mb-8 text-gray-300">
+                    <li class="flex items-start">
+                        <svg class="w-6 h-6 mr-2 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span>10 Imágenes propias en Galería.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-6 h-6 mr-2 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span>Perfil de Artista Profesional.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-6 h-6 mr-2 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span>Soporte prioritario 24/7.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-6 h-6 mr-2 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <span class="line-through text-gray-500">Actualización Avanzada.</span>
+                    </li>
+                </ul>
+
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-150 shadow-md shadow-blue-600/50">
+                    Elegir Pack Plata
+                </button>
+            </div>
+
+            <!-- PACK ORO (Destacado) -->
+            <div class="pack-card bg-indigo-900 text-white rounded-xl p-8 flex flex-col shadow-2xl border-4 border-indigo-500 transform scale-105 relative">
+                <span class="absolute top-0 right-0 bg-yellow-500 text-gray-900 text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-xl">
+                    Más Popular
+                </span>
+                <div class="mb-6">
+                    <h2 class="text-4xl font-extrabold mb-2 text-indigo-200">Pack Oro</h2>
+                    <p class="text-indigo-300">La experiencia completa para artistas de élite.</p>
+                </div>
+                <div class="text-5xl font-extrabold mb-6 text-yellow-400">
+                    $49.99
+                    <span class="text-xl font-normal text-indigo-300">/ mes</span>
+                </div>
+                
+                <ul class="space-y-3 flex-grow mb-8 text-indigo-100">
+                    <li class="flex items-start">
+                        <svg class="w-6 h-6 mr-2 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span class="font-bold">15 Imágenes totales</span> (<span class="text-sm">10 Propias + 5 Bocetos IA Certificados</span>).
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-6 h-6 mr-2 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span>Perfil de Artista Destacado.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-6 h-6 mr-2 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span>Acceso a Actualización Avanzada.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-6 h-6 mr-2 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span class="font-semibold">Curaduría Personalizada.</span>
+                    </li>
+                </ul>
+
+                <button class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold py-4 rounded-lg transition duration-150 shadow-lg shadow-yellow-500/50">
+                    ¡Potencia tu Arte!
+                </button>
+            </div>
+
+        </div>
     </div>
 
-    <!-- Header / Navbar -->
-    <header class="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-sm shadow-xl">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex-shrink-0">
-                    <span class="text-2xl font-extrabold text-art-purple tracking-widest">ART5D</span>
-                </div>
-                <!-- Menú (Desktop) -->
-                <nav class="hidden md:flex items-center space-x-8">
-                    <a href="#inicio" class="text-sm font-medium hover:text-art-purple transition duration-150">Inicio</a>
-                    <a href="#packs" class="text-sm font-medium hover:text-art-purple transition duration-150">Packs de Certificación</a>
-                    <a href="#galerias" class="text-sm font-medium hover:text-art-purple transition duration-150">Galerías VR</a>
-                </nav>
-                <!-- Botones de Acción (Desktop) -->
-                <div class="flex items-center space-x-4">
-                    <!-- Icono de Sonido (Se activa después del inicio) -->
-                    <div class="p-2 rounded-full text-white" title="Estado del Audio">
-                        <span id="audio-toggle-icon">
-                            <!-- Icono de Volumen Muteado Inicial -->
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.707 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.707l3.586-3.586a1 1 0 011.09-.338zM13.414 11.06l1.06 1.06a1 1 0 001.414-1.414l-1.06-1.06zM15.536 8.464a.5.5 0 010 .708L14.75 10l.786.786a.5.5 0 01-.708.708L14.043 11l-.707.707a.5.5 0 11-.708-.708l.707-.707-.707-.707a.5.5 0 01.708-.708l.707.707.707-.707z" clip-rule="evenodd"></path></svg>
-                        </span>
-                    </div>
-                    <!-- Botón de Acceso Artista (Llama a Google Apps Script) -->
-                    <button onclick="handleArtistLogin()" class="bg-art-purple text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-violet-600 transition duration-300">
-                        Acceso Artista
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main>
-        <!-- Sección Hero (Inicio) -->
-        <section id="inicio" class="hero-bg h-[70vh] flex items-center justify-center text-center">
-            <div class="max-w-4xl px-4 sm:px-6 lg:px-8">
-                <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight leading-none text-white mb-4 hero-text">
-                    Tu Arte Certificado, en Realidad Virtual.
-                </h1>
-                <p class="mt-3 max-w-2xl mx-auto text-xl text-gray-300">
-                    ART5D combina la autenticación digital de obras con la inmersión 360º de tu galería personal.
-                </p>
-                <div class="mt-8">
-                    <a href="#packs" class="bg-art-purple text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-violet-600 shadow-xl transition duration-300">
-                        Certifica Ahora
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección de Packs de Certificación (ACTUALIZADA Y CORREGIDA) -->
-        <section id="packs" class="py-16 md:py-24 bg-gray-800">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-extrabold text-white">
-                        Packs de Certificación Híbrida
-                    </h2>
-                    <p class="mt-4 text-xl text-gray-400">
-                        Elige el nivel de inmersión y autenticación que necesita tu obra.
-                    </p>
-                </div>
-
-                <div class="flex flex-col lg:flex-row justify-center items-stretch gap-8">
-                    
-                    <!-- Pack GRATIS -->
-                    <div class="bg-gray-900 rounded-2xl p-8 card-shadow flex-1 max-w-sm mx-auto lg:max-w-none">
-                        <h3 class="text-2xl font-bold text-white mb-4">PACK GRATIS</h3>
-                        <p class="text-gray-400 mb-6">El inicio de tu viaje en ART5D.</p>
-                        <p class="text-4xl font-extrabold text-art-purple mb-8">$0 USD</p>
-                        <ul class="space-y-3 text-gray-300 text-left">
-                            <li class="flex items-center">
-                                <span class="text-green-400 mr-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                </span>
-                                1 Obra Propia
-                            </li>
-                            <li class="flex items-center">
-                                <span class="text-green-400 mr-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                </span>
-                                Acceso a Galería Pública Compartida
-                            </li>
-                            <li class="flex items-center">
-                                <span class="text-green-400 mr-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                </span>
-                                Certificación de 1 Boceto IA
-                            </li>
-                        </ul>
-                        <button onclick="handleArtistLogin()" class="w-full mt-10 bg-gray-700 text-gray-300 py-3 rounded-lg font-bold hover:bg-gray-600 transition duration-300">
-                            Empezar Gratis
-                        </button>
-                    </div>
-                    
-                    <!-- Pack GOLD (El principal y más completo) -->
-                    <div class="bg-gray-900 rounded-2xl p-8 card-shadow flex-1 max-w-sm mx-auto lg:max-w-none gold-border relative">
-                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-yellow-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
-                            RECOMENDADO
-                        </div>
-                        <h3 class="text-3xl font-bold text-yellow-500 mb-4 mt-2">PACK GOLD</h3>
-                        <p class="text-gray-300 mb-6">El desbloqueo total de la Matriz 5D.</p>
-                        <p class="text-5xl font-extrabold text-white mb-8">$19.99 USD</p>
-                        <ul class="space-y-3 text-gray-200 text-left">
-                            <li class="flex items-center font-semibold text-lg">
-                                <span class="text-yellow-400 mr-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                </span>
-                                **10 Obras Propias Certificadas**
-                            </li>
-                            <li class="flex items-center font-semibold text-lg">
-                                <span class="text-yellow-400 mr-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                </span>
-                                **5 Bocetos IA Certificados ART5D**
-                            </li>
-                            <li class="flex items-center font-semibold text-lg text-art-purple">
-                                <span class="text-yellow-400 mr-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                </span>
-                                **Galería VR 360º Personal (Total: 15 Espacios)**
-                            </li>
-                            <li class="flex items-center">
-                                <span class="text-yellow-400 mr-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                </span>
-                                Acceso al Panel de Subida Artista
-                            </li>
-                        </ul>
-                        <button onclick="handleArtistLogin()" class="w-full mt-10 bg-art-purple text-white py-3 rounded-lg font-bold text-lg hover:bg-violet-600 transition duration-300 shadow-lg">
-                            Comprar Pack Gold
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección de Galerías VR (galeria_vr.html integrado y con diseño) -->
-        <section id="galerias" class="py-16 md:py-24 bg-gray-900">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-extrabold text-white">
-                        Explora Galerías Inmersivas 360º
-                    </h2>
-                    <p class="mt-4 text-xl text-gray-400">
-                        La experiencia pública. Así es como se ve tu arte certificado con el Pack Gold.
-                    </p>
-                </div>
-
-                <!-- Simulación de la Galería VR con Avatares y Sonido (Vista Pública) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-                    <!-- Galería Card 1: Avatar Femenino Ejemplo -->
-                    <div class="bg-gray-800 rounded-xl overflow-hidden card-shadow">
-                        <div class="relative h-64">
-                            <!-- Placeholder de una vista 360 -->
-                            <img src="https://placehold.co/600x400/34d399/ffffff?text=GALERIA+VR+1+360" onerror="this.onerror=null; this.src='https://placehold.co/600x400/34d399/ffffff?text=VR+Ejemplo+1';" alt="Vista 360 de Galería" class="w-full h-full object-cover">
-                            <!-- Simulación de Avatar (Unificado con la tarjeta) -->
-                            <div class="absolute top-4 right-4 bg-gray-900/70 text-sm font-semibold p-2 rounded-full flex items-center">
-                                <span class="text-green-400 mr-2">
-                                    <!-- Icono Femenino (Simulación de la clase de avatar) -->
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7s2.243 5 5 5 5-2.243 5-5-2.243-5-5-5zM15 13H9v2h2v4h2v-4h2v-2z"></path></svg>
-                                </span> Avatar Femenino
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold text-white">Mundos Fractales</h3>
-                            <p class="mt-2 text-gray-400">
-                                Artista: Isabella R. | **15** Obras Certificadas
-                            </p>
-                            <a href="#" class="mt-4 inline-flex items-center text-art-purple font-semibold hover:text-violet-400 transition duration-150">
-                                Ver Galería VR 
-                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Galería Card 2: Avatar Masculino Ejemplo -->
-                    <div class="bg-gray-800 rounded-xl overflow-hidden card-shadow">
-                        <div class="relative h-64">
-                            <img src="https://placehold.co/600x400/f87171/ffffff?text=GALERIA+VR+2+360" onerror="this.onerror=null; this.src='https://placehold.co/600x400/f87171/ffffff?text=VR+Ejemplo+2';" alt="Vista 360 de Galería" class="w-full h-full object-cover">
-                            <div class="absolute top-4 right-4 bg-gray-900/70 text-sm font-semibold p-2 rounded-full flex items-center">
-                                <span class="text-blue-400 mr-2">
-                                    <!-- Icono Masculino -->
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7s2.243 5 5 5 5-2.243 5-5-2.243-5-5-5zM15 13H9v2h2v4h2v-4h2v-2z"></path></svg>
-                                </span> Avatar Masculino
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold text-white">Simetría Oscura</h3>
-                            <p class="mt-2 text-gray-400">
-                                Artista: Daniel A. | **15** Obras Certificadas
-                            </p>
-                            <a href="#" class="mt-4 inline-flex items-center text-art-purple font-semibold hover:text-violet-400 transition duration-150">
-                                Ver Galería VR 
-                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <!-- Galería Card 3: Avatar Robot/IA Ejemplo -->
-                    <div class="bg-gray-800 rounded-xl overflow-hidden card-shadow">
-                        <div class="relative h-64">
-                            <img src="https://placehold.co/600x400/a78bfa/ffffff?text=GALERIA+VR+3+360" onerror="this.onerror=null; this.src='https://placehold.co/600x400/a78bfa/ffffff?text=VR+Ejemplo+3';" alt="Vista 360 de Galería" class="w-full h-full object-cover">
-                            <div class="absolute top-4 right-4 bg-gray-900/70 text-sm font-semibold p-2 rounded-full flex items-center">
-                                <span class="text-art-purple mr-2">
-                                    <!-- Icono IA -->
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7s2.243 5 5 5 5-2.243 5-5-2.243-5-5-5zM15 13H9v2h2v4h2v-4h2v-2z"></path></svg>
-                                </span> Avatar IA
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold text-white">Ecos del Algoritmo</h3>
-                            <p class="mt-2 text-gray-400">
-                                Artista: ART5D Labs | **15** Obras Certificadas
-                            </p>
-                            <a href="#" class="mt-4 inline-flex items-center text-art-purple font-semibold hover:text-violet-400 transition duration-150">
-                                Ver Galería VR 
-                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <p class="text-center text-gray-400 text-sm">
-                ART5D - Inmersión y Certificación Híbrida. Todos los derechos reservados.
-            </p>
-        </div>
-    </footer>
 </body>
 </html>
