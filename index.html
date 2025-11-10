@@ -1,278 +1,339 @@
 <!DOCTYPE html>
-<html lang='es'>
+<html lang="es">
 <head>
-  <meta charset='UTF-8' />
-  <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
-  <title>ART5D - Certificación Híbrida del Arte Digital</title>
-  <script src='https://cdn.jsdelivr.net/npm/stripe@2/stripe.js'></script>
-  <script src='https://cdn.jsdelivr.net/npm/@tonejs/tone@14/build/Tone.js'></script>
-  <style>
-    /* Reset y Base */
-    :root {
-      --color-primary: #FF5A5F;
-      --tw-bg-opacity: 1;
-      --tw-text-opacity: 1;
-    }
-    body {
-      background-color: rgb(17 24 39 / var(--tw-bg-opacity)); /* bg-gray-900 */
-      color: rgb(255 255 255 / var(--tw-text-opacity)); /* text-white */
-      font-family: 'Inter', sans-serif;
-    }
-    .header-bg { padding-top: 5rem; padding-bottom: 5rem; padding-left: 1rem; padding-right: 1rem; }
-    .max-w-7xl { max-width: 80rem; }
-    .mx-auto { margin-left: auto; margin-right: auto; }
-    .flex { display: flex; }
-    .flex-col { flex-direction: column; }
-    .md\:flex-row { flex-direction: row; }
-    .items-center { align-items: center; }
-    .justify-between { justify-content: space-between; }
-    .md\:w-full { width: 100%; }
-    .mb-10 { margin-bottom: 2.5rem; }
-    .md\:mb-0 { margin-bottom: 0px; }
-    .text-center { text-align: center; }
-    .text-5xl { font-size: 3rem; line-height: 1; }
-    .sm\:text-6xl { font-size: 3.75rem; line-height: 1; }
-    .font-extrabold { font-weight: 800; }
-    .leading-tight { line-height: 1.25; }
-    .mb-4 { margin-bottom: 1rem; }
-    .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-    .text-gray-300 { color: rgb(209 213 219 / var(--tw-text-opacity)); }
-    .mb-6 { margin-bottom: 1.5rem; }
-    .bg-indigo-600 { background-color: rgb(79 70 229 / var(--tw-bg-opacity)); }
-    .hover\:bg-indigo-700\:hover { background-color: rgb(67 56 202 / var(--tw-bg-opacity)); }
-    .font-bold { font-weight: 700; }
-    .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-    .px-10 { padding-left: 2.5rem; padding-right: 2.5rem; }
-    .rounded-full { border-radius: 9999px; }
-    .interactive-btn { transition: transform 0.1s ease-in-out; }
-    .interactive-btn:active { transform: scale(0.98); }
-    .py-20 { padding-top: 5rem; padding-bottom: 5rem; }
-    .px-4 { padding-left: 1rem; padding-right: 1rem; }
-    .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-    .mb-16 { margin-bottom: 4rem; }
-    .grid { display: grid; }
-    .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .gap-10 { gap: 2.5rem; }
-    .service-card { padding: 2rem; border-radius: 1rem; }
-    .mb-8 { margin-bottom: 2rem; }
-    .w-full { width: 100%; }
-    .bg-gray-700 { background-color: rgb(55 65 81 / var(--tw-bg-opacity)); }
-    .hover\:bg-gray-600\:hover { background-color: rgb(75 85 99 / var(--tw-bg-opacity)); }
-    .text-left { text-align: left; }
-    .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; margin-bottom: 0.75rem; }
-    .p-10 { padding: 2.5rem; }
-    .scale-110 { transform: scale(1.1); }
-    .border-4 { border-width: 4px; }
-    .border-yellow-500 { border-color: rgb(245 158 11 / var(--tw-border-opacity)); }
-    .relative { position: relative; }
-    .absolute { position: absolute; }
-    .-top-6 { top: -1.5rem; }
-    .left-1\/2 { left: 50%; }
-    .transform { transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
-    .-translate-x-1\/2 { --tw-translate-x: -50%; }
-    .bg-yellow-500 { background-color: rgb(245 158 11 / var(--tw-bg-opacity)); }
-    .text-black { color: rgb(0 0 0 / var(--tw-text-opacity)); }
-    .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-    .text-5xl { font-size: 3rem; line-height: 1; }
-    .text-yellow-400 { color: rgb(251 191 36 / var(--tw-text-opacity)); }
-    .text-7xl { font-size: 4.5rem; line-height: 1; }
-    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
-    .text-gray-200 { color: rgb(229 231 235 / var(--tw-text-opacity)); }
-    .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; margin-bottom: 1rem; }
-    .mb-10 { margin-bottom: 2.5rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .p-3 { padding: 0.75rem; }
-    .rounded-lg { border-radius: 0.5rem; }
-    .bg-gray-800 { background-color: rgb(31 41 55 / var(--tw-bg-opacity)); }
-    .border { border-width: 1px; }
-    .border-gray-600 { border-color: rgb(75 85 99 / var(--tw-border-opacity)); }
-    .placeholder-gray-400 { color: rgb(156 163 175 / var(--tw-placeholder-opacity)); }
-    .focus\:outline-none\:focus { outline: 2px solid transparent; outline-offset: 2px; }
-    .focus\:ring-2\:focus { --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-shadow); }
-    .focus\:ring-yellow-500\:focus { --tw-ring-color: rgb(245 158 11 / var(--tw-ring-opacity)); }
-    .hidden-email { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; }
-    .email-active { max-height: 100px; }
-    .mt-2 { margin-top: 0.5rem; }
-    .bg-yellow-600 { background-color: rgb(202 138 4 / var(--tw-bg-opacity)); }
-    .hover\:bg-yellow-700\:hover { background-color: rgb(161 98 7 / var(--tw-bg-opacity)); }
-    .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
-    .mt-6 { margin-top: 1.5rem; }
-    .text-indigo-400 { color: rgb(129 140 248 / var(--tw-text-opacity)); }
-    /* Estilos Neón y Glow */
-    .text-neon { color: var(--color-primary); text-shadow: 0 0 10px var(--color-primary); }
-    .glow-border { 
-      border: 2px solid rgba(255, 90, 95, 0.5);
-      box-shadow: 0 0 20px rgba(255, 90, 95, 0.7);
-      transition: all 0.3s ease;
-    }
-    .glow-border:hover { 
-      box-shadow: 0 0 30px var(--color-primary), 0 0 50px rgba(255, 90, 95, 0.6); 
-    }
-    /* Indicador de Audio */
-    #audio-indicator { 
-      position: fixed; bottom: 20px; right: 20px; z-index: 9999; 
-      padding: 12px 20px; border-radius: 9999px; font-weight: bold; cursor: pointer;
-      background-color: rgba(255, 90, 95, 0.9); color: white;
-    }
-  </style>
-  <link rel='preload' href='https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap' as='style'>
-  <link href='https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap' rel='stylesheet'>
-</head>
-<body class='bg-gray-900 text-white'>
-
-  <header class='header-bg py-20 px-4'>
-    <div class='max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between'>
-      <div class='md:w-full mb-10 md:mb-0 text-center'>
-        <h1 class='text-5xl sm:text-6xl font-extrabold leading-tight mb-4'>
-          ART5D: <span class='text-neon'>Certificación Híbrida</span> del Arte Digital.
-        </h1>
-        <p class='text-xl text-gray-300 mb-6'>
-          Validamos, curamos y certificamos la autoría, trazabilidad y valor del arte digital y la creación asistida por IA.
-        </p>
-        <a href='#packs' class='bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-full text-xl interactive-btn'>
-          Descubre Nuestros Packs
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <section id='packs' class='py-20 px-4'>
-    <div class='max-w-7xl mx-auto'>
-      <h2 class='text-5xl font-extrabold text-center mb-16'>Elige tu <span class='text-neon'>Certificación</span></h2>
-      
-      <div class='grid md:grid-cols-3 gap-10'>
-
-        <div class='service-card p-8 rounded-2xl glow-border text-center'>
-          <h3 class='text-4xl font-bold mb-4'>Pack BÁSICO</h3>
-          <p class='text-6xl font-extrabold text-neon mb-6'>$19<span class='text-xl'>.99</span></p>
-          <ul class='text-left text-gray-300 space-y-3 mb-8'>
-            <li>5 Imágenes certificadas</li>
-            <li>Certificado PDF + Blockchain</li>
-            <li>Catálogo Digital</li>
-          </ul>
-          <button onclick='pagar("BASICO")' class='w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-full text-xl interactive-btn glow-border'>
-            COMPRAR AHORA
-          </button>
-        </div>
-
-        <div class='service-card p-10 rounded-2xl glow-border scale-110 border-4 border-yellow-500 relative'>
-          <div class='absolute -top-6 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black px-6 py-2 rounded-full font-bold'>
-            MÁS VENDIDO
-          </div>
-          <h3 class='text-5xl font-bold mb-4 text-yellow-400'>Pack GOLD</h3>
-          <p class='text-7xl font-extrabold text-yellow-400 mb-6'>$69<span class='text-2xl'>.99</span></p>
-          <ul class='text-left text-gray-200 space-y-4 mb-10'>
-            <li>10 Imágenes + 5 IA certificadas</li>
-            <li>Galería VR 3D personalizada</li>
-            <li>NFT en Polygon</li>
-            <li>Promoción en redes</li>
-          </ul>
-          
-          <div class='mb-4'>
-            <input type='text' id='coupon-gold' placeholder='¿Tienes un código de cupón? (ej: ART5D-INFLUENCER-XX)' 
-              oninput='checkCouponInput()'
-              class='w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500'>
-          </div>
-          <div id='email-field' class='hidden-email'>
-            <input type='email' id='email-gold' placeholder='Tu Email para la entrega (Requerido para cupón)' 
-              class='w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 mt-2'>
-          </div>
-          <button onclick='pagar("GOLD")' class='w-full bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-5 rounded-full text-2xl interactive-btn glow-border mt-6'>
-            ¡LO QUIERO YA!
-          </button>
-        </div>
-
-        <div class='service-card p-8 rounded-2xl glow-border text-center'>
-          <h3 class='text-4xl font-bold mb-4 text-indigo-400'>Pack PLATINO</h3>
-          <p class='text-6xl font-extrabold text-indigo-400 mb-6'>$199<span class='text-xl'>.99</span></p>
-          <ul class='text-left text-gray-300 space-y-3 mb-8'>
-            <li>30 Imágenes premium</li>
-            <li>Mentoría 1:1</li>
-            <li>Exhibición en galería física</li>
-            <li>Edición física firmada</li>
-          </ul>
-          <button onclick='pagar("PLATINO")' class='w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-full text-xl interactive-btn glow-border'>
-            IR POR EL MAXIMO
-          </button>
-        </div>
-      </div>
-      
-    </div>
-  </section>
-
-  <div id='audio-indicator' onclick='initializeAudio()'>Activar Ambiente Cyberpunk (Click)</div>
-
-  <script>
-    // Clave de prueba de Stripe. ¡Debes cambiar a la clave LIVE antes de lanzar!
-    const stripe = Stripe('pk_test_51SQGwGPX46VYof9ozyxcVVVlDBTxr4JI9pb28H9REi8XkRog9xFx2VooOV3M4rnw6YwXUHa79UlJwFSwuZDzPKoD0039xSTVd8');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ART5D - Certificación Híbrida del Arte Digital</title>
     
-    // URL de ejecución de tu Google Apps Script (Tu motor de backend)
-    const URL_EXEC = 'https://script.google.com/macros/s/AKfycbz07sqb06pTqF9tjolv7sMSVzOTPOjpVbF0_BZb24zOVzUwwUMELT9MhVXzG8vCZA/exec';
-    const VALID_COUPON = 'ART5D-INFLUENCER-XX'; 
+    <!-- Carga de Tailwind CSS para el diseño -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    // Función para mostrar/ocultar el campo de email si se ingresa el cupón
-    function checkCouponInput() {
-      const couponInput = document.getElementById('coupon-gold').value.trim().toUpperCase();
-      const emailField = document.getElementById('email-field');
-      
-      if (couponInput === VALID_COUPON) {
-        emailField.classList.add('email-active');
-      } else {
-        emailField.classList.remove('email-active');
-      }
-    }
+    <!-- Carga del SDK de PayPal (Usando Client ID de Sandbox/Pruebas) -->
+    <!-- NOTA IMPORTANTE: PARA PRODUCCIÓN, REEMPLAZA ESTE CLIENT ID POR EL REAL. -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AZ6F094119M09V1139N115Q29B2735C4A3P29S4N0P17S216K13T0&currency=USD&intent=capture"></script>
 
-    async function pagar(pack) {
-      let couponCode = null;
-      let email = null;
-      let dataToSend = { pack: pack };
+    <!-- Carga de Tone.js para la música -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 
-      if (pack === 'GOLD') {
-        couponCode = document.getElementById('coupon-gold').value.trim().toUpperCase();
-        if (couponCode === VALID_COUPON) {
-          email = document.getElementById('email-gold').value.trim();
-          if (!email) {
-            alert("Por favor, ingresa tu email para recibir la entrega con el cupón gratuito.");
-            return;
-          }
-          dataToSend.email = email;
+    <!-- Estilos CSS Personalizados con Tailwind -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            color: #1a1a1a;
         }
-        dataToSend.coupon = couponCode;
-      }
-      
-      // Llamada a Apps Script con los datos (pack, cupón, y email si es gratis)
-      const res = await fetch(URL_EXEC, {
-        method: 'POST',
-        body: JSON.stringify({data: dataToSend})
-      });
-      
-      const responseData = await res.json();
+        .header-bg {
+            background-color: #FF69B4; /* Rosa Vibrante */
+            background-image: linear-gradient(135deg, #FF69B4 0%, #4B0082 100%); /* Gradiente Magenta-Índigo */
+        }
+        .pack-card {
+            background-color: #ffffff;
+            transition: transform 0.3s, box-shadow 0.3s;
+            /* Aplicar un borde redondeado consistente a todas las tarjetas */
+            border-radius: 0.75rem; /* rounded-xl */
+        }
+        .pack-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        .neon-text {
+            color: #FFD700; /* Dorado */
+            text-shadow: 0 0 5px #FFA500, 0 0 10px #FF4500;
+        }
+        
+        /* Estilos para el mensaje de estado (modal temporal) */
+        .status-message {
+            z-index: 1000;
+            animation: fadeInOut 5s forwards;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(20px); }
+        }
 
-      // Lógica de Redirección: Si es orden gratuita, Apps Script devuelve una URL
-      if (responseData.id === "FREE_ORDER" && responseData.redirect_url) {
-          window.location.href = responseData.redirect_url; 
-          return; 
-      }
+        /* Estilos para el indicador de audio */
+        #audio-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #1a1a1a;
+            color: #FFD700;
+            border: 2px solid #FFD700;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            transition: background-color 0.3s, box-shadow 0.3s;
+            z-index: 999;
+        }
+        #audio-indicator:hover {
+            background-color: #333333;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
 
-      // Lógica Stripe: Si se requiere pago (id es la sessionId de Stripe)
-      if (responseData.id) {
-        stripe.redirectToCheckout({ sessionId: responseData.id });
-      } else {
-        alert("Ocurrió un error al iniciar la sesión de pago: " + JSON.stringify(responseData));
-      }
-    }
+    <!-- Encabezado / Banner Principal -->
+    <header class="header-bg p-8 text-white shadow-xl">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight">
+                ART5D <span class="neon-text block sm:inline">Certificación Híbrida del Arte Digital</span>
+            </h1>
+            <p class="mt-4 text-xl font-light opacity-90">
+                Tu portal hacia la autenticación y revalorización de tu arte.
+            </p>
+        </div>
+    </header>
 
-    // === TU AUDIO CYBERPUNK (sin cambios) ===
-    let isAudioInitialized = false;
-    function initializeAudio() {
-      if (isAudioInitialized) { Tone.Transport.stop(); isAudioInitialized = false; 
-        document.getElementById('audio-indicator').innerText = "Activar Ambiente Cyberpunk (Click)"; return; }
-      Tone.start();
-      // CÓDIGO DE AUDIO VA AQUÍ
-      isAudioInitialized = true;
-      document.getElementById('audio-indicator').innerText = "Ambiente ACTIVO";
-    }
-  </script>
+    <!-- Sección de Packs / Oferta Principal -->
+    <main class="py-12 px-4">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-10 text-[#4B0082]">
+                Descubre Nuestros Packs
+            </h2>
+
+            <!-- Contenedor de las Tarjetas de Packs -->
+            <div class="flex flex-col md:flex-row justify-center items-stretch gap-8">
+
+                <!-- Card: PACK GRATIS (BOCETO) -->
+                <div class="pack-card w-full md:w-1/3 p-6 rounded-xl border border-gray-200 shadow-lg flex flex-col">
+                    <h3 class="text-2xl font-bold mb-3 text-gray-800">PACK GRATIS</h3>
+                    <p class="text-sm font-medium text-gray-500 mb-6">El inicio de tu viaje</p>
+                    <p class="text-4xl font-extrabold text-teal-600 mb-6">$0 USD</p>
+                    
+                    <ul class="space-y-3 text-gray-600 flex-grow">
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 mr-2 text-teal-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span>1 Imagen Propia</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 mr-2 text-teal-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Acceso a Galería Pública</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 mr-2 text-red-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            <span class="text-gray-400 line-through">Bocetos IA Certificados</span>
+                        </li>
+                    </ul>
+                    
+                    <button class="mt-8 w-full p-3 rounded-lg bg-teal-600 text-white font-semibold hover:bg-teal-700 transition duration-200" onclick="showMessage('Funcionalidad de registro pendiente. ¡Prueba el PACK GOLD!', true)">
+                        Comenzar Gratis
+                    </button>
+                </div>
+
+                <!-- Card: PACK GOLD (EL CRÍTICO) - Objetivo de PayPal -->
+                <div class="pack-card w-full md:w-1/3 p-8 rounded-xl border-4 border-[#FFD700] shadow-2xl flex flex-col relative scale-105">
+                    <span class="absolute top-0 right-0 -mt-3 -mr-3 px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-full shadow-md transform rotate-3">MÁS POPULAR</span>
+                    
+                    <h3 class="text-3xl font-extrabold mb-3 text-[#4B0082]">PACK GOLD</h3>
+                    <p class="text-base font-semibold text-gray-700 mb-6">El desbloqueo total de la Matriz 5D</p>
+                    <p class="text-5xl font-black text-[#FFD700] mb-6">$19.99 USD</p>
+                    
+                    <ul class="space-y-4 text-gray-800 flex-grow">
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 mr-2 text-[#FFD700] mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            <span class="font-bold">10 Imágenes Propias del Artista</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 mr-2 text-[#FFD700] mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            <span class="font-bold">5 Bocetos IA Certificados por ART5D</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 mr-2 text-[#FFD700] mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            <span>TOTAL: 15 Entradas a la Galería</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 mr-2 text-[#FFD700] mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            <span>Acceso a Análisis 5D Avanzado (Próximamente)</span>
+                        </li>
+                    </ul>
+
+                    <!-- Contenedor del Botón de PayPal -->
+                    <div id="paypal-button-container" class="mt-8 w-full">
+                        <!-- El botón se renderizará aquí -->
+                    </div>
+                </div>
+
+                <!-- Card: PACK MASTER (FUTURO) -->
+                <div class="pack-card w-full md:w-1/3 p-6 rounded-xl border border-gray-200 shadow-lg flex flex-col">
+                    <h3 class="text-2xl font-bold mb-3 text-gray-800">PACK MASTER</h3>
+                    <p class="text-sm font-medium text-gray-500 mb-6">Máximo Desbloqueo (Próximamente)</p>
+                    <p class="text-4xl font-extrabold text-gray-400 mb-6">N/A</p>
+                    
+                    <ul class="space-y-3 text-gray-600 flex-grow">
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 mr-2 text-gray-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>Certificación Ilimitada</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 mr-2 text-gray-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>Acceso a Módulos Exclusivos</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 mr-2 text-gray-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>Soporte Prioritario 5D</span>
+                        </li>
+                    </ul>
+                    
+                    <button class="mt-8 w-full p-3 rounded-lg bg-gray-300 text-gray-700 font-semibold cursor-not-allowed" disabled>
+                        Próximamente...
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Indicador y Botón de Audio -->
+    <div id="audio-indicator" onclick="initializeAudio()">
+        Activar Ambiente Cyberpunk (Clic)
+    </div>
+
+
+    <!-- Pie de Página Básico -->
+    <footer class="bg-gray-800 text-white text-center p-4 mt-12">
+        <p>&copy; 2025 ART5D. Todos los derechos reservados.</p>
+    </footer>
+
+
+    <script>
+        // === Lógica de Utilidades ===
+
+        /**
+         * Muestra un mensaje de estado temporal en la esquina inferior derecha.
+         * Reemplaza la función alert().
+         * @param {string} message - El mensaje a mostrar.
+         * @param {boolean} isError - Si es un mensaje de error (rojo) o éxito (verde).
+         */
+        function showMessage(message, isError = false) {
+            console.log(isError ? "ERROR: " + message : "INFO: " + message);
+            
+            // Elimina mensajes anteriores para evitar acumulaciones
+            const existingMessage = document.querySelector('.status-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            const statusElement = document.createElement('div');
+            // Clase status-message activa la animación CSS de fade
+            statusElement.className = `status-message fixed bottom-5 right-5 p-4 rounded-lg shadow-xl text-white font-bold text-sm sm:text-base ${isError ? 'bg-red-600' : 'bg-green-600'}`;
+            statusElement.textContent = message;
+            document.body.appendChild(statusElement);
+            // El mensaje se auto-elimina vía CSS
+        }
+
+        // === Lógica de Inicialización y Transacción de PayPal ===
+        
+        // 1. Configura el precio y la descripción del producto
+        const PRODUCT_NAME = "PACK GOLD ART5D";
+        const PRODUCT_PRICE = "19.99"; // US Dollars
+
+        // 2. Función principal que se ejecuta al cargar la ventana
+        window.onload = function() {
+            // Verificar si la librería de PayPal se ha cargado correctamente
+            if (typeof paypal !== 'undefined') {
+                paypal.Buttons({
+                    // Estilo del botón
+                    style: {
+                        layout: 'vertical',
+                        color:  'gold',
+                        shape:  'pill',
+                        label:  'paypal',
+                    },
+                    
+                    // 3. Configuración de la creación del pedido (Llamada al Servidor de PayPal)
+                    createOrder: function(data, actions) {
+                        return actions.order.create({
+                            purchase_units: [{
+                                description: PRODUCT_NAME,
+                                amount: {
+                                    currency_code: "USD",
+                                    value: PRODUCT_PRICE
+                                }
+                            }]
+                        });
+                    },
+
+                    // 4. Configuración de la aprobación del pedido (El comprador completa el pago)
+                    onApprove: function(data, actions) {
+                        // Capturar la transacción para finalizar el pago
+                        return actions.order.capture().then(function(details) {
+                            // Obtención de datos de la transacción
+                            const transactionId = details.id;
+                            const payerName = details.payer.name.given_name;
+                            
+                            // Mensajes de éxito
+                            showMessage(`¡Pago de ${PRODUCT_PRICE} USD completado con éxito!`, false);
+                            
+                            // Simulación de concesión de acceso (usando datos de Sandbox)
+                            // **RECUERDA:** Para Producción, debes usar un Backend para esta lógica.
+                            showMessage(`✅ Bienvenido ${payerName} al PACK GOLD! Transacción ID: ${transactionId}. Prueba exitosa en Sandbox.`, false);
+                            
+                        });
+                    },
+
+                    // 5. Manejo de errores y cancelación
+                    onCancel: function(data) {
+                        showMessage("Transacción de PayPal cancelada por el usuario.", true);
+                    },
+                    onError: function(err) {
+                        showMessage("Ocurrió un error en la transacción de PayPal. Revisa la consola para más detalles.", true);
+                        console.error('Error de PayPal:', err);
+                    }
+
+                }).render('#paypal-button-container'); // Renderiza el botón en el div
+            } else {
+                // Mensaje si PayPal no se pudo cargar (ej. problema de red o Client ID)
+                showMessage("Error: El SDK de PayPal no se cargó correctamente.", true);
+            }
+        };
+
+
+        // === Lógica de Audio (Tone.js) ===
+        let isAudioInitialized = false;
+        
+        function initializeAudio() {
+            const audioIndicator = document.getElementById('audio-indicator');
+            
+            if (isAudioInitialized) {
+                // Si ya está activo, detiene el transporte (simulando apagado)
+                Tone.Transport.stop(); 
+                isAudioInitialized = false;
+                audioIndicator.textContent = "Activar Ambiente Cyberpunk (Clic)";
+                audioIndicator.classList.remove('active');
+                showMessage("Ambiente Cyberpunk desactivado.", false);
+                return;
+            }
+
+            // Inicia el contexto de audio (requerido por Tone.js para interacción del usuario)
+            Tone.start().then(() => {
+                // **** AQUÍ VA EL CÓDIGO DE AUDIO CYBERPUNK ****
+                // Ejemplo de un simple dron o pulso:
+                const synth = new Tone.MembraneSynth().toDestination();
+                const loop = new Tone.Loop(time => {
+                    synth.triggerAttackRelease("C1", "8n", time);
+                }, "1n").start(0); 
+
+                Tone.Transport.bpm.value = 80;
+                Tone.Transport.start(); 
+                // **********************************************
+
+                isAudioInitialized = true;
+                audioIndicator.textContent = "Ambiente ACTIVO";
+                audioIndicator.classList.add('active');
+                showMessage("Ambiente Cyberpunk activado. ¡Bienvenido a la Matriz!", false);
+            }).catch(e => {
+                showMessage("Error al iniciar el audio: " + e.message, true);
+                console.error("Error al iniciar Tone.js:", e);
+            });
+        }
+    </script>
 </body>
 </html>
