@@ -1,405 +1,485 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <base target="_top">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --color-primary: #FF5A5F;
-      --color-secondary: #007A87;
-    }
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f7f9fb;
-    }
-    .slot-bar-ia {
-      background-color: var(--color-primary);
-    }
-    .slot-bar-propio {
-      background-color: var(--color-secondary);
-    }
-    .btn-primary {
-      background-color: var(--color-primary);
-      transition: all 0.2s;
-    }
-    .btn-primary:hover {
-      background-color: #e54c50;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 6px rgba(255, 90, 95, 0.4);
-    }
-    .card {
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    }
-    /* Estilo para el icono de carga */
-    .spinner {
-      border: 4px solid rgba(255, 255, 255, 0.3);
-      border-top: 4px solid white;
-      border-radius: 50%;
-      width: 16px;
-      height: 16px;
-      animation: spin 1s linear infinite;
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 8px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ART5D Portal Híbrido: Gestión de Galería GOLD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0d1117; }
+        .card { background-color: #161b22; border-radius: 16px; border: 1px solid #2f363d; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); }
+        .slot-display { padding: 10px 15px; border-radius: 10px; font-weight: 700; text-align: center; }
+        .own-slots { background: linear-gradient(135deg, #374151, #1f2937); color: #9ca3af; } /* Gris Oscuro */
+        .ia-slots { background: linear-gradient(135deg, #5b21b6, #4c1d95); color: #e9d5ff; } /* Violeta Intenso */
+        .btn-action { transition: all 0.2s; }
+        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(139, 92, 246, 0.6); }
+        .progress-bar-own::-webkit-progress-value { background: #10b981; } /* Esmeralda */
+        .progress-bar-ia::-webkit-progress-value { background: #f97316; } /* Naranja */
+        .progress-bar-own { accent-color: #10b981; }
+        .progress-bar-ia { accent-color: #f97316; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .pulse-dot { animation: pulse-dot 1s infinite; }
+        .avatar { background-image: url('https://placehold.co/128x128/3b82f6/ffffff?text=AVATAR'); } /* Placeholder de Avatar */
+    </style>
 </head>
-<body class="p-4 sm:p-8 min-h-screen">
+<body class="p-4 sm:p-10 text-white min-h-screen">
 
-  <div id="app" class="max-w-4xl mx-auto">
+    <div class="max-w-6xl mx-auto" id="app-container">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-indigo-500">
+                ART5D: Portal Híbrido de Galería VR
+            </h1>
+            <p class="text-gray-400 mt-3 text-xl">Gestión de tu Pack GOLD: 10 Propios + 5 Bocetos IA</p>
+        </header>
 
-    <!-- Encabezado y Título -->
-    <header class="mb-8">
-      <h1 class="text-3xl font-extrabold text-gray-900 flex items-center">
-        <svg class="w-8 h-8 mr-2 text-red-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.414L14.586 5A2 2 0 0115 6.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
-        Panel de Artista FÉNIX v5.0
-      </h1>
-      <p class="text-gray-500 mt-1">Gestión de Slots, Certificación y Bocetos IA.</p>
-    </header>
+        <!-- Bloque Principal de la Aplicación -->
+        <div id="main-content">
+            <!-- Sección de Perfil y Acceso Rápido -->
+            <div class="card p-6 mb-8 flex flex-col md:flex-row items-center justify-between">
+                <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                    <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-3xl font-bold shadow-lg avatar">
+                        <i class="fas fa-user-astronaut"></i>
+                    </div>
+                    <div>
+                        <p class="text-xl font-bold text-teal-400">Bienvenido, <span id="user-uid-short" class="text-white">Artista</span></p>
+                        <p class="text-sm text-gray-500">Estado del Pack: <span id="pack-status" class="text-green-400">ACTIVO (GOLD)</span></p>
+                    </div>
+                </div>
+                
+                <!-- Acceso a Galería VR -->
+                <button onclick="simulateVRLink()" class="btn-action bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-lg shadow-blue-500/50 flex items-center space-x-2">
+                    <i class="fas fa-vr-cardboard"></i>
+                    <span>Acceder a Galería VR (ART5D)</span>
+                </button>
+            </div>
 
-    <!-- Sección de Alerta y Estado General -->
-    <div id="general-status" class="mb-6 card p-4 rounded-xl bg-white hidden">
-      <!-- El contenido de estado se inyectará aquí -->
+
+            <!-- Sección de Estado de Slots (Dinámico) -->
+            <div id="slot-status-section" class="card p-6 mb-10 hidden">
+                <h2 class="text-2xl font-semibold mb-4 border-b border-gray-700 pb-3 text-gray-300">
+                    <i class="fas fa-chart-bar text-teal-400 mr-2"></i> Capacidad de Galería Híbrida
+                </h2>
+                
+                <div id="slot-info" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Slots Propios -->
+                    <div>
+                        <div class="own-slots slot-display mb-3 flex justify-between items-center">
+                            <span>SLOTS PROPIOS (MAX 10)</span>
+                            <i class="fas fa-palette text-xl"></i>
+                        </div>
+                        <div class="flex justify-between items-center text-xl">
+                            <span class="text-gray-400">Usados: <span id="own-used" class="font-bold text-white">0</span></span>
+                            <span class="text-green-400">Disponibles: <span id="own-available" class="font-extrabold text-3xl">10</span></span>
+                        </div>
+                        <progress id="own-progress" class="w-full h-3 rounded-full mt-3 progress-bar-own" max="10" value="0"></progress>
+                    </div>
+
+                    <!-- Slots IA -->
+                    <div>
+                        <div class="ia-slots slot-display mb-3 flex justify-between items-center">
+                            <span>SLOTS BOCETOS IA (MAX 5)</span>
+                            <i class="fas fa-robot text-xl"></i>
+                        </div>
+                        <div class="flex justify-between items-center text-xl">
+                            <span class="text-gray-400">Usados: <span id="ia-used" class="font-bold text-white">0</span></span>
+                            <span class="text-green-400">Disponibles: <span id="ia-available" class="font-extrabold text-3xl">5</span></span>
+                        </div>
+                        <progress id="ia-progress" class="w-full h-3 rounded-full mt-3 progress-bar-ia" max="5" value="0"></progress>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de Acciones -->
+            <div id="actions-section" class="grid grid-cols-1 lg:grid-cols-2 gap-8 hidden">
+                
+                <!-- Acción 1: Subir Obra Propia -->
+                <div class="card p-6">
+                    <h3 class="text-2xl font-bold text-teal-400 mb-4 flex items-center">
+                        <i class="fas fa-upload mr-3"></i> Cargar Obra Propia
+                    </h3>
+                    <p class="text-gray-400 mb-4">Sube tu obra para certificación y exposición en la Galería RV.</p>
+                    
+                    <input type="file" id="own-file-input" accept="image/jpeg,image/png" class="block w-full text-sm text-gray-500
+                        file:mr-4 file:py-3 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-bold
+                        file:bg-teal-600 file:text-white
+                        hover:file:bg-teal-700 mb-4 cursor-pointer"
+                    />
+                    
+                    <button onclick="handleUploadOwnWork()" id="btn-upload-own" class="btn-action w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-teal-500/50" disabled>
+                        Subir y Certificar Obra Propia
+                    </button>
+                    <p id="upload-status" class="text-sm mt-3 text-center text-gray-500"></p>
+                </div>
+
+                <!-- Acción 2: Solicitar Boceto IA -->
+                <div class="card p-6">
+                    <h3 class="text-2xl font-bold text-violet-400 mb-4 flex items-center">
+                        <i class="fas fa-magic mr-3"></i> Solicitar Boceto IA Certificado
+                    </h3>
+                    <p class="text-gray-400 mb-4">Genera un boceto inicial de IA. Tienes 5 slots para esta función.</p>
+                    
+                    <textarea id="ia-prompt-input" rows="3" placeholder="Describe el boceto (ej: Retrato cyberpunk de un guerrero, estilo óleo)." 
+                        class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:ring-violet-500 focus:border-violet-500 mb-4 text-white resize-none"
+                        maxlength="250"></textarea>
+
+                    <button onclick="handleRequestIABoceto()" id="btn-request-ia" class="btn-action w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-violet-500/50" disabled>
+                        Generar Boceto IA Certificado
+                    </button>
+                    <p id="ia-status" class="text-sm mt-3 text-center text-gray-500"></p>
+                    
+                    <!-- Contenedor para la imagen generada -->
+                    <div id="ia-image-container" class="mt-4 p-4 border border-gray-700 rounded-xl hidden">
+                        <h4 class="text-sm font-semibold mb-3 text-gray-300 flex items-center">
+                            <i class="fas fa-file-image mr-2 text-orange-400"></i> Último Boceto Generado (Certificado)
+                        </h4>
+                        <img id="ia-generated-image" src="" alt="Boceto Generado por IA" class="w-full h-auto rounded-lg border border-orange-500 shadow-xl" />
+                        <p id="ia-image-prompt" class="text-xs text-gray-500 mt-2 italic truncate"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Indicadores de estado y debug -->
+        <div class="mt-12 pt-6 border-t border-gray-700 text-center text-xs text-gray-500">
+             <div id="auth-status" class="text-sm mb-2 font-mono text-white">
+                <span id="loading-indicator-small" class="inline-block w-3 h-3 bg-red-500 rounded-full pulse-dot mr-2"></span>
+                <span id="status-text">Iniciando sesión segura...</span>
+            </div>
+            Tu ID de Sesión (Necesario para Firestore): <span id="user-uid" class="font-mono text-gray-300 select-all">Cargando...</span>
+        </div>
     </div>
 
-    <!-- Contenedor Principal (Flex en desktop, Bloque en móvil) -->
-    <div class="lg:flex lg:space-x-8">
-
-      <!-- Columna Izquierda: Obra Propia (Flujo 3) -->
-      <section class="lg:w-1/2 mb-8 lg:mb-0 card p-6 rounded-xl bg-white border border-gray-100">
-        <h2 class="text-xl font-bold mb-4 text-color-secondary">Flujo 3: Certificar Obra Propia</h2>
-        <p class="text-sm text-gray-500 mb-4">Sube tu obra de arte digital para ser certificada en la Galería VR. Tienes <span id="slots-propio-disp" class="font-bold text-color-secondary">0</span> slots disponibles de 10.</p>
-
-        <div id="upload-form">
-          <label class="block mb-2 text-sm font-medium text-gray-900">Selecciona tu Obra (PNG/JPG, máx 5MB)</label>
-          <input type="file" id="file-input" accept="image/png, image/jpeg" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 p-3" required>
-          <button id="upload-button" onclick="handleUploadOwnWork()" class="btn-primary w-full text-white font-semibold py-3 px-4 rounded-lg mt-4 disabled:opacity-50" disabled>
-            Subir y Certificar Obra
-          </button>
+    <!-- Mensaje Modal de Simulación VR -->
+    <div id="vr-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden flex items-center justify-center p-4 z-50">
+        <div class="card p-8 max-w-md w-full text-center">
+            <i class="fas fa-cubes text-6xl text-blue-400 mb-4"></i>
+            <h3 class="text-3xl font-bold mb-3 text-white">¡Conexión VR Establecida!</h3>
+            <p class="text-gray-400 mb-6">
+                En la plataforma ART5D, serías redirigido a la Galería RV (Powered by A-Frame/Three.js).
+                Tu última obra/boceto estará visible en tu espacio designado.
+            </p>
+            <button onclick="document.getElementById('vr-modal').classList.add('hidden')" class="btn-action bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl">
+                Cerrar Simulación
+            </button>
         </div>
-        
-        <!-- Contenedor para la imagen previsualizada (opcional) -->
-        <div id="preview-container" class="mt-4 hidden">
-          <p class="text-xs text-gray-500 mb-2">Previsualización de la Obra:</p>
-          <img id="image-preview" class="w-full h-auto rounded-lg border border-gray-200 object-cover max-h-64" alt="Vista previa de la obra a subir">
-        </div>
-      </section>
-
-      <!-- Columna Derecha: Boceto IA (Flujo 4) -->
-      <section class="lg:w-1/2 card p-6 rounded-xl bg-white border border-gray-100">
-        <h2 class="text-xl font-bold mb-4 text-color-primary">Flujo 4: Generar Boceto IA</h2>
-        <p class="text-sm text-gray-500 mb-4">Genera un boceto conceptual usando Gemini (IA). Tienes <span id="slots-ia-disp" class="font-bold text-color-primary">0</span> slots disponibles de 5.</p>
-
-        <div id="ia-form">
-          <label for="ia-prompt" class="block mb-2 text-sm font-medium text-gray-900">Prompt / Descripción (Máx 250 caracteres)</label>
-          <textarea id="ia-prompt" rows="4" maxlength="250" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-red-500 focus:border-red-500" placeholder="Describe tu obra futurista..."></textarea>
-          <button id="ia-button" onclick="handleGenerateIA()" class="btn-primary w-full text-white font-semibold py-3 px-4 rounded-lg mt-4 disabled:opacity-50" disabled>
-            Generar Boceto IA y Consumir Slot
-          </button>
-        </div>
-
-        <!-- Resultados de la IA -->
-        <div id="ia-result-container" class="mt-6 border-t border-gray-100 pt-4 hidden">
-          <p class="text-sm font-semibold mb-2">Resultado del Boceto IA:</p>
-          <div id="ia-message" class="text-green-600 text-sm mb-2"></div>
-          <img id="ia-image-preview" class="w-full h-auto rounded-lg border border-gray-200 object-cover max-h-64" alt="Boceto IA generado">
-        </div>
-      </section>
     </div>
     
-    <!-- Contenedor para Modales/Mensajes -->
-    <div id="message-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden z-50 p-4 items-center justify-center">
-      <div class="bg-white p-6 rounded-xl w-full max-w-md card">
-        <h3 id="modal-title" class="text-xl font-bold mb-3">Título</h3>
-        <p id="modal-message" class="text-gray-700 mb-4"></p>
-        <div id="modal-details" class="text-sm p-3 bg-gray-50 rounded-lg mb-4 hidden"></div>
-        <button onclick="hideModal()" class="btn-primary px-4 py-2 text-white font-semibold rounded-lg w-full">Cerrar</button>
-      </div>
-    </div>
+    <!-- Script de Funcionalidad Híbrida (Firebase + Netlify Function) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, doc, onSnapshot, runTransaction, 
+            setLogLevel 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-  </div>
+        // Establecer nivel de log para depuración de Firebase
+        setLogLevel('error');
 
-  <script>
-    // Variables globales
-    let slotsState = null;
-    let currentUserId = 'ARTIST_12345'; // ID de prueba, cambiar para probar otros casos en codigo.gs
+        // Variables Globales (Disponibles en el entorno Canvas/Netlify)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-art5d-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-    // =========================================================
-    // UTILIDADES DE UI
-    // =========================================================
+        let app, db, auth, currentUserId = null;
 
-    /** Muestra un modal de mensaje (reemplaza alert/confirm) */
-    function showModal(title, message, details = null) {
-      document.getElementById('modal-title').textContent = title;
-      document.getElementById('modal-message').innerHTML = message;
-      const detailsDiv = document.getElementById('modal-details');
-      if (details) {
-        detailsDiv.innerHTML = details;
-        detailsDiv.classList.remove('hidden');
-      } else {
-        detailsDiv.classList.add('hidden');
-      }
-      document.getElementById('message-modal').classList.remove('hidden');
-      document.getElementById('message-modal').classList.add('flex');
-    }
-
-    /** Oculta el modal de mensaje */
-    function hideModal() {
-      document.getElementById('message-modal').classList.add('hidden');
-      document.getElementById('message-modal').classList.remove('flex');
-    }
-    
-    /** Habilita/Deshabilita botones de interacción */
-    function setButtonLoading(buttonId, isLoading, originalText) {
-      const button = document.getElementById(buttonId);
-      if (isLoading) {
-        button.setAttribute('data-original-text', originalText);
-        button.innerHTML = '<span class="spinner"></span> Procesando...';
-        button.disabled = true;
-      } else {
-        button.innerHTML = button.getAttribute('data-original-text') || originalText;
-        button.disabled = false;
-        button.removeAttribute('data-original-text');
-      }
-    }
-
-    // =========================================================
-    // LÓGICA DE SLOTS Y ESTADO
-    // =========================================================
-
-    /** Muestra el estado general del pack. */
-    function renderGeneralStatus() {
-      const statusDiv = document.getElementById('general-status');
-      if (!slotsState || !slotsState.isPackActive) {
-        statusDiv.classList.remove('hidden');
-        statusDiv.classList.add('bg-yellow-100', 'border-yellow-200');
-        statusDiv.innerHTML = `
-          <div class="flex items-center">
-            <svg class="w-6 h-6 mr-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.754 1.34-1.22 2.96-2.694 2.195L10 14.103l-4.58-2.488c-1.474-.765-.89-2.835.617-2.835h.001z" clip-rule="evenodd"></path></svg>
-            <p class="font-semibold text-yellow-700">Pack Gold Inactivo o no encontrado. Por favor, verifica tu estado.</p>
-          </div>
-        `;
-        document.getElementById('upload-button').disabled = true;
-        document.getElementById('ia-button').disabled = true;
-        return;
-      }
-
-      // Renderizar estado activo
-      statusDiv.classList.remove('hidden', 'bg-yellow-100', 'border-yellow-200');
-      statusDiv.classList.add('bg-green-50', 'border-green-100');
-      statusDiv.innerHTML = `
-        <div class="flex items-center mb-3">
-            <svg class="w-6 h-6 mr-3 text-green-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <p class="font-bold text-green-700">¡Pack Gold Activo! (ID: ${currentUserId})</p>
-        </div>
+        // Constantes del Pack GOLD 
+        const MAX_SLOTS_OWN = 10;
+        const MAX_SLOTS_IA = 5;
+        const COLLECTION_USERS = `artifacts/${appId}/users`;
         
-        <!-- Barras de progreso -->
-        <div class="space-y-3 mt-4">
-          <!-- Slots Propios -->
-          <div>
-            <div class="flex justify-between mb-1 text-xs font-medium text-gray-700">
-              <span>Slots Obra Propia:</span>
-              <span>${slotsState.slotsPropios.usados}/${slotsState.slotsPropios.maximo} (${slotsState.slotsPropios.disponibles} disponibles)</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-2.5">
-              <div class="slot-bar-propio h-2.5 rounded-full" style="width: ${slotsState.slotsPropios.usados / slotsState.slotsPropios.maximo * 100}%"></div>
-            </div>
-          </div>
-          <!-- Slots IA -->
-          <div>
-            <div class="flex justify-between mb-1 text-xs font-medium text-gray-700">
-              <span>Slots Boceto IA:</span>
-              <span>${slotsState.slotsIA.usados}/${slotsState.slotsIA.maximo} (${slotsState.slotsIA.disponibles} disponibles)</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-2.5">
-              <div class="slot-bar-ia h-2.5 rounded-full" style="width: ${slotsState.slotsIA.usados / slotsState.slotsIA.maximo * 100}%"></div>
-            </div>
-          </div>
-        </div>
-      `;
-      
-      // Actualizar contadores específicos
-      document.getElementById('slots-propio-disp').textContent = slotsState.slotsPropios.disponibles;
-      document.getElementById('slots-ia-disp').textContent = slotsState.slotsIA.disponibles;
-      
-      // Habilitar/deshabilitar botones según disponibilidad
-      const uploadButton = document.getElementById('upload-button');
-      uploadButton.disabled = slotsState.slotsPropios.disponibles <= 0;
-      if (uploadButton.disabled) uploadButton.textContent = 'Slots propios agotados';
-      else uploadButton.textContent = 'Subir y Certificar Obra';
+        // Referencias a elementos del DOM
+        const uidSpan = document.getElementById('user-uid');
+        const uidShortSpan = document.getElementById('user-uid-short');
+        const loadingDot = document.getElementById('loading-indicator-small');
+        const statusText = document.getElementById('status-text');
+        const slotStatusSection = document.getElementById('slot-status-section');
+        const actionsSection = document.getElementById('actions-section');
+        const mainContent = document.getElementById('main-content');
+        const iaImagePrompt = document.getElementById('ia-image-prompt');
 
-      const iaButton = document.getElementById('ia-button');
-      iaButton.disabled = slotsState.slotsIA.disponibles <= 0;
-      if (iaButton.disabled) iaButton.textContent = 'Slots IA agotados';
-      else iaButton.textContent = 'Generar Boceto IA y Consumir Slot';
-    }
 
-    /** Llama al backend para obtener el estado de los slots. */
-    function checkSlots() {
-      google.script.run
-        .withSuccessHandler(function(response) {
-          slotsState = response;
-          renderGeneralStatus();
-        })
-        .withFailureHandler(function(error) {
-          showModal("Error de Conexión", "No se pudo cargar el estado de los slots. Por favor, inténtalo de nuevo.", `Detalle: ${error}`);
-        })
-        .verificarSlotsDisponibles(currentUserId);
-    }
+        // =========================================================
+        // 1. INICIALIZACIÓN Y AUTENTICACIÓN
+        // =========================================================
 
-    // =========================================================
-    // FLÚJO 3: Subida de Obra Propia
-    // =========================================================
-
-    /** Maneja la previsualización del archivo seleccionado */
-    document.getElementById('file-input').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      const uploadButton = document.getElementById('upload-button');
-
-      if (!file) {
-        document.getElementById('preview-container').classList.add('hidden');
-        uploadButton.disabled = true;
-        return;
-      }
-
-      // Validación básica del lado del cliente
-      if (file.size > 5 * 1024 * 1024) { // 5MB
-        showModal("Error de Archivo", "El archivo excede el tamaño máximo permitido de 5MB.");
-        e.target.value = null; // Limpiar el input
-        document.getElementById('preview-container').classList.add('hidden');
-        uploadButton.disabled = true;
-        return;
-      }
-      
-      // Mostrar previsualización
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        document.getElementById('image-preview').src = event.target.result;
-        document.getElementById('preview-container').classList.remove('hidden');
-      };
-      reader.readAsDataURL(file);
-
-      // Si hay slots disponibles, habilitar el botón
-      if (slotsState && slotsState.slotsPropios.disponibles > 0) {
-        uploadButton.disabled = false;
-      }
-    });
-
-    /** Función principal para subir la obra propia */
-    function handleUploadOwnWork() {
-      const fileInput = document.getElementById('file-input');
-      const file = fileInput.files[0];
-      
-      if (!file) {
-        showModal("Advertencia", "Por favor, selecciona un archivo para subir.");
-        return;
-      }
-
-      setButtonLoading('upload-button', true, 'Subir y Certificar Obra');
-
-      try {
-        // Usar FileReader para obtener el Blob del archivo
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          // El resultado del reader.readAsArrayBuffer es un ArrayBuffer que se pasa al backend
-          // Google Apps Script lo convierte internamente a un Blob para su manejo.
-          const fileBlob = event.target.result; 
-
-          // Llamada al backend de Apps Script
-          google.script.run
-            .withSuccessHandler(function(result) {
-              setButtonLoading('upload-button', false, 'Subir y Certificar Obra');
-              showModal(
-                "¡Obra Certificada!", 
-                result.message,
-                `<strong>ID de Certificación:</strong> ${result.certificateId}`
-              );
-              // Limpiar y actualizar UI
-              fileInput.value = null;
-              document.getElementById('preview-container').classList.add('hidden');
-              checkSlots(); // Recargar el estado de los slots
-            })
-            .withFailureHandler(function(error) {
-              setButtonLoading('upload-button', false, 'Subir y Certificar Obra');
-              showModal("Error al Certificar", "Ocurrió un error durante la certificación de la obra.", `Detalle: ${error}`);
-            })
-            // Se envía el blob (ArrayBuffer) y el userId al backend
-            .subirObraPropia(fileBlob, currentUserId);
+        const displayStatus = (text, colorClass) => {
+            statusText.textContent = text;
+            loadingDot.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
+            loadingDot.classList.add(colorClass);
         };
-        // Leer el archivo como ArrayBuffer para asegurar que el backend lo pueda manejar como Blob
-        reader.readAsArrayBuffer(file); 
+        
+        const setupFirebase = async () => {
+            if (!firebaseConfig) {
+                displayStatus("Fallo de Configuración: Firebase no inicializado.", 'bg-red-500');
+                return;
+            }
 
-      } catch (e) {
-        setButtonLoading('upload-button', false, 'Subir y Certificar Obra');
-        showModal("Error Crítico", "Hubo un error al procesar el archivo en el navegador.", `Detalle: ${e.message}`);
-      }
-    }
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
 
+                displayStatus("Conectando...", 'bg-yellow-500');
 
-    // =========================================================
-    // FLÚJO 4: Generación de Boceto IA
-    // =========================================================
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        currentUserId = user.uid;
+                        uidSpan.textContent = currentUserId;
+                        uidShortSpan.textContent = "Artista " + currentUserId.substring(0, 4) + "...";
+                        displayStatus("Autenticado. Cargando datos...", 'bg-yellow-500');
+                        
+                        await loadUserData(currentUserId);
+                        
+                        // Una vez listos, mostramos la UI principal
+                        mainContent.classList.remove('hidden');
+                        slotStatusSection.classList.remove('hidden');
+                        actionsSection.classList.remove('hidden');
+                        displayStatus("ART5D Listo.", 'bg-green-500');
 
-    /** Función principal para generar el boceto IA */
-    function handleGenerateIA() {
-      const promptInput = document.getElementById('ia-prompt');
-      const prompt = promptInput.value.trim();
+                    } else {
+                        // Intentar inicio de sesión
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            // En Netlify, si el token no está, usamos Anónimo.
+                            await signInAnonymously(auth);
+                        }
+                    }
+                });
 
-      if (!prompt) {
-        showModal("Advertencia", "Por favor, ingresa una descripción para el boceto IA.");
-        return;
-      }
-      
-      const iaButton = document.getElementById('ia-button');
-      setButtonLoading('ia-button', true, 'Generar Boceto IA y Consumir Slot');
-      
-      // Ocultar resultados anteriores
-      document.getElementById('ia-result-container').classList.add('hidden');
+            } catch (error) {
+                console.error("Error en la inicialización o autenticación de Firebase:", error);
+                displayStatus(`ERROR: ${error.message.substring(0, 50)}...`, 'bg-red-500');
+            }
+        };
 
-      // Llamada al backend de Apps Script para la generación IA
-      google.script.run
-        .withSuccessHandler(function(result) {
-          setButtonLoading('ia-button', false, 'Generar Boceto IA y Consumir Slot');
-          
-          if (result.status === "SUCCESS") {
-            // Mostrar resultado de la IA
-            document.getElementById('ia-message').textContent = result.message;
-            document.getElementById('ia-image-preview').src = result.url;
-            document.getElementById('ia-result-container').classList.remove('hidden');
+        // =========================================================
+        // 2. LÓGICA DE FIRESTORE (Lectura en Tiempo Real)
+        // =========================================================
 
-            // Mostrar modal de éxito
-            showModal("¡Boceto IA Generado!", result.message, `
-              <p><strong>URL del Boceto:</strong> <a href="${result.url}" target="_blank" class="text-red-500 hover:underline">Ver Imagen</a></p>
-              <p class="mt-2 text-xs text-gray-500">Nota: Esta es una URL de placeholder. En producción se mostraría la imagen real.</p>
-            `);
+        const loadUserData = (userId) => {
+            const userDocRef = doc(db, COLLECTION_USERS, userId);
+
+            onSnapshot(userDocRef, (docSnapshot) => {
+                if (docSnapshot.exists()) {
+                    const userData = docSnapshot.data();
+                    updateSlotDisplay(userData);
+                } else {
+                    // Inicializar el documento (Asumimos Pack GOLD por defecto)
+                    const initialData = {
+                        slotsPropios: MAX_SLOTS_OWN,
+                        slotsIA: MAX_SLOTS_IA,
+                        lastGeneratedIA: null 
+                    };
+                    // Usar setDoc para crear el documento con los valores iniciales
+                    runTransaction(db, async (transaction) => {
+                        transaction.set(userDocRef, initialData);
+                    }).catch(error => {
+                        console.error("Error al inicializar documento:", error);
+                        // Mostrar error específico si es necesario.
+                    });
+                }
+            }, (error) => {
+                console.error("Error en onSnapshot:", error);
+                displayStatus(`Error de Firestore: ${error.message.substring(0, 50)}...`, 'bg-red-500');
+            });
+        };
+
+        // =========================================================
+        // 3. ACTUALIZACIÓN DE LA UI
+        // =========================================================
+
+        const updateSlotDisplay = (userData) => {
+            const currentOwn = userData.slotsPropios || 0;
+            const currentIA = userData.slotsIA || 0;
+
+            const ownUsed = MAX_SLOTS_OWN - currentOwn;
+            const iaUsed = MAX_SLOTS_IA - currentIA;
+
+            // 1. Slots Propios
+            document.getElementById('own-used').textContent = ownUsed;
+            document.getElementById('own-available').textContent = currentOwn;
+            document.getElementById('own-progress').setAttribute('value', ownUsed);
+
+            // 2. Slots IA
+            document.getElementById('ia-used').textContent = iaUsed;
+            document.getElementById('ia-available').textContent = currentIA;
+            document.getElementById('ia-progress').setAttribute('value', iaUsed);
+
+            // 3. Habilitar/Deshabilitar botones
+            const btnUploadOwn = document.getElementById('btn-upload-own');
+            const btnRequestIA = document.getElementById('btn-request-ia');
+            const fileInputOwn = document.getElementById('own-file-input');
+            const promptInputIA = document.getElementById('ia-prompt-input');
+
+            btnUploadOwn.disabled = currentOwn <= 0;
+            fileInputOwn.disabled = currentOwn <= 0;
+            btnUploadOwn.textContent = currentOwn <= 0 ? "Slots Propios Agotados" : "Subir y Certificar Obra Propia";
+
+            btnRequestIA.disabled = currentIA <= 0;
+            promptInputIA.disabled = currentIA <= 0;
+            btnRequestIA.textContent = currentIA <= 0 ? "Slots IA Agotados" : "Generar Boceto IA Certificado";
+
+            // 4. Mostrar última imagen si existe
+            const lastGeneratedIA = userData.lastGeneratedIA;
+            const iaImageContainer = document.getElementById('ia-image-container');
+            const iaGeneratedImage = document.getElementById('ia-generated-image');
+
+            if (lastGeneratedIA && lastGeneratedIA.url) {
+                iaGeneratedImage.src = lastGeneratedIA.url;
+                iaImagePrompt.textContent = `Prompt: ${lastGeneratedIA.prompt}`;
+                iaImageContainer.classList.remove('hidden');
+            } else {
+                 iaImageContainer.classList.add('hidden');
+            }
+        };
+
+        // =========================================================
+        // 4. LÓGICA DE ACCIONES
+        // =========================================================
+
+        window.simulateVRLink = () => {
+             document.getElementById('vr-modal').classList.remove('hidden');
+        }
+
+        window.handleUploadOwnWork = () => {
+            const uploadStatus = document.getElementById('upload-status');
+            const fileInput = document.getElementById('own-file-input');
+            const file = fileInput.files[0];
+            const btnUploadOwn = document.getElementById('btn-upload-own');
+            const originalText = btnUploadOwn.textContent;
+
+            if (!file) {
+                uploadStatus.textContent = "Por favor, selecciona un archivo (JPEG/PNG).";
+                return;
+            }
             
-            checkSlots(); // Recargar el estado de los slots
-          } else {
-            // Manejar error lógico del backend
-            showModal("Error de Generación", result.message);
-          }
-        })
-        .withFailureHandler(function(error) {
-          setButtonLoading('ia-button', false, 'Generar Boceto IA y Consumir Slot');
-          showModal("Error del Servidor", "No se pudo completar la solicitud de generación IA.", `Detalle: ${error}`);
-        })
-        .activarBocetoIA(prompt, currentUserId);
-    }
+            // 1. Bloquear UI
+            btnUploadOwn.disabled = true;
+            uploadStatus.textContent = `Subiendo ${file.name} y validando...`;
+            btnUploadOwn.textContent = "Procesando Certificación...";
 
-    // =========================================================
-    // INICIALIZACIÓN
-    // =========================================================
-    
-    // Ejecutar al cargar la página para obtener el estado de los slots
-    window.onload = function() {
-      checkSlots();
-    };
+            // Simulación de proceso de certificación y descuento de slot
+            setTimeout(async () => {
+                try {
+                     await runTransaction(db, async (transaction) => {
+                        const userDocRef = doc(db, COLLECTION_USERS, currentUserId);
+                        const userDoc = await transaction.get(userDocRef);
+                        
+                        if (!userDoc.exists()) { throw new Error("Documento de usuario no existe."); }
+                        
+                        const currentSlots = userDoc.data().slotsPropios || 0;
+                        if (currentSlots <= 0) { throw new Error("No quedan slots propios disponibles."); }
+                        
+                        transaction.update(userDocRef, { 
+                            slotsPropios: currentSlots - 1
+                            // En un entorno real: Añadir referencia al archivo subido en Storage
+                        });
+                    });
 
-  </script>
+                    uploadStatus.textContent = `¡Obra '${file.name}' certificada y en Galería RV!`;
+                    uploadStatus.classList.add('text-green-400');
+                    fileInput.value = ''; // Limpiar input
+
+                } catch(error) {
+                    uploadStatus.textContent = `ERROR al subir: ${error.message}`;
+                    uploadStatus.classList.remove('text-green-400');
+                    uploadStatus.classList.add('text-red-400');
+                    btnUploadOwn.textContent = originalText; // Restaurar texto si falla el descuento.
+                } finally {
+                    // La función updateSlotDisplay (onSnapshot) re-habilitará el botón
+                }
+
+            }, 3000); // 3 segundos para simular la subida
+        };
+
+
+        window.handleRequestIABoceto = async () => {
+            if (!currentUserId) {
+                displayStatus("La autenticación aún no está lista. Intente de nuevo.", 'bg-red-500');
+                return;
+            }
+
+            const iaStatus = document.getElementById('ia-status');
+            const prompt = document.getElementById('ia-prompt-input').value.trim();
+            const btnRequestIA = document.getElementById('btn-request-ia');
+            
+            if (prompt.length === 0) {
+                iaStatus.textContent = "El prompt no puede estar vacío.";
+                return;
+            }
+            
+            // 1. Bloquear UI
+            btnRequestIA.disabled = true;
+            const originalText = btnRequestIA.textContent;
+            btnRequestIA.textContent = "Generando Boceto... Esto podría tardar 30 segundos.";
+            iaStatus.textContent = `Iniciando generación para: "${prompt}"...`;
+            iaStatus.classList.add('text-yellow-400');
+            iaStatus.classList.remove('text-red-400', 'text-green-400');
+
+            const FUNCTION_URL = "/.netlify/functions/generar-boceto"; 
+            
+            try {
+                // Paso A: Llamar a la Netlify Function (Servidor Seguro)
+                const response = await fetch(FUNCTION_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt }) 
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Error desconocido en la Netlify Function.");
+                }
+
+                const imageUrl = data.imageUrl; // Imagen en base64
+
+                // Paso B: Ejecutar la transacción de Firestore para descontar el slot y guardar la URL
+                await runTransaction(db, async (transaction) => {
+                    const userDocRef = doc(db, COLLECTION_USERS, currentUserId);
+                    const userDoc = await transaction.get(userDocRef);
+                    
+                    if (!userDoc.exists()) { throw new Error("Documento de usuario no existe."); }
+                    
+                    const currentSlots = userDoc.data().slotsIA || 0;
+                    if (currentSlots <= 0) { throw new Error("No quedan slots IA disponibles."); }
+                    
+                    const newSlots = currentSlots - 1;
+                    transaction.update(userDocRef, { 
+                        slotsIA: newSlots,
+                        lastGeneratedIA: {
+                            url: imageUrl,
+                            prompt: prompt,
+                            timestamp: new Date().toISOString()
+                        }
+                    });
+                });
+
+                // Si todo es exitoso
+                iaStatus.textContent = `¡Boceto IA Generado, Slot Descontado y Certificado!`;
+                iaStatus.classList.add('text-green-400');
+                iaStatus.classList.remove('text-yellow-400');
+
+            } catch (error) {
+                console.error("Error en la generación de boceto:", error);
+                iaStatus.textContent = `ERROR: Fallo en la IA o Slot: ${error.message}`;
+                iaStatus.classList.add('text-red-400');
+                iaStatus.classList.remove('text-yellow-400');
+            } finally {
+                // Restaurar UI - onSnapshot se encarga de re-habilitar el botón
+                btnRequestIA.textContent = originalText; 
+            }
+        };
+
+        // Iniciar la aplicación de Firebase al cargar el script.
+        setupFirebase();
+
+    </script>
 </body>
 </html>
