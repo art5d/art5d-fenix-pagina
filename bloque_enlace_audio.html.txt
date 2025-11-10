@@ -1,0 +1,27 @@
+<!-- ============================================== -->
+<!-- BLOQUE DE ENLACE AL DISEÑADOR DE AUDIO ART5D -->
+<!-- COPIAR ESTE BLOQUE Y PEGARLO EN TU PÁGINA PRINCIPAL (GALERÍA/INDEX) -->
+<!-- ============================================== -->
+<a href="audio_designer_v2.html" 
+   target="_blank" 
+   style="
+       display: inline-flex;
+       align-items: center;
+       padding: 10px 20px;
+       margin: 10px 0;
+       border-radius: 8px;
+       font-family: Arial, sans-serif;
+       font-weight: bold;
+       text-decoration: none;
+       color: #FFFFFF; /* Texto blanco */
+       background-color: #4F46E5; /* Índigo */
+       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+       transition: background-color 0.3s, box-shadow 0.3s;
+   "
+   onmouseover="this.style.backgroundColor='#4338CA';"
+   onmouseout="this.style.backgroundColor='#4F46E5';"
+>
+    <span style="font-size: 1.2em; margin-right: 8px;">🎧</span> 
+    Diseñador de Entorno de Audio ART5D
+</a>
+<!-- ============================================== -->

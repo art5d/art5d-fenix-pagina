@@ -1,0 +1,340 @@
+
+    <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diseñador de Entorno de Audio (ART5D) - Corregido</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de la librería Tone.js para síntesis de audio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        /* Estilos de diseño: Limpio, profesional y centrado en el control. */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; 
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 4rem;
+        }
+        .designer-card {
+            max-width: 600px;
+            width: 95%;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+        }
+        /* Estilo base para los sliders */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #4f46e5;
+            cursor: pointer;
+            border-radius: 50%;
+            margin-top: -6px;
+        }
+        input[type=range]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #4f46e5;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        /* Color de enfoque para el botón activo */
+        .mode-active {
+            background-color: #4f46e5;
+            color: white;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.4);
+        }
+        /* Estilo de la pista del slider */
+        input[type=range] {
+            height: 4px;
+        }
+    </style>
+    <script>
+        // Objetos de audio globales (serán inicializados más tarde)
+        let masterGain = null;
+        let celtaSynth = null;
+        let gallerySynth = null;
+        let noiseRain = null;
+        let noiseWind = null;
+        let noiseBirds = null;
+        let synthsMap = {}; // Mapa para acceder a los objetos de audio por ID
+        let isStarted = false;
+
+        // Configuraciones de Volumen iniciales (en porcentaje 0-100)
+        // Estas son las que se usan antes de que el usuario interactúe
+        const initialPreset = { celta: 30, gallery: 75, rain: 10, wind: 0, birds: 5 };
+
+        // --- FUNCIONES DE INICIALIZACIÓN DE AUDIO ---
+
+        /** Convierte el valor del slider (0-100) a decibelios (dB). */
+        function sliderToDb(value) {
+            const normalizedValue = value / 100;
+            // -100 dB es silencio, 0 dB es máximo volumen (unidad).
+            return normalizedValue > 0.001 ? Tone.gainToDb(normalizedValue) : -100;
+        }
+        
+        /** Inicializa todos los sintetizadores y ruidos. */
+        function setupSynths() {
+            if (isStarted) return;
+            isStarted = true;
+
+            // 1. Master Gain
+            masterGain = new Tone.Gain(1).toDestination();
+
+            // 2. Capa Celta (Flauta Mística) - AM Synth
+            celtaSynth = new Tone.AMSynth({
+                harmonicity: 0.8,
+                oscillator: { type: "sine" },
+                envelope: { attack: 1, decay: 0.5, sustain: 0.8, release: 2 }
+            }).connect(masterGain);
+
+            const celtaMelody = ["G4", "A4", "C5", "A4", "F4", "D4", "G3", "C4", null, null, null, null];
+            let melodyIndex = 0;
+            new Tone.Loop(time => {
+                const note = celtaMelody[melodyIndex % celtaMelody.length];
+                if (note) { celtaSynth.triggerAttackRelease(note, "2n", time); }
+                melodyIndex++;
+            }, "2n").start(0);
+
+            // 3. Capa Galería (Piano Minimalista) - PolySynth
+            gallerySynth = new Tone.PolySynth(Tone.DuoSynth, {
+                voice0: { envelope: { attack: 0.01, release: 4 } },
+                voice1: { envelope: { attack: 0.01, release: 4 } }
+            }).connect(masterGain);
+
+            const galleryChords = [["C3", "G3", "C4"], null, null, null, ["F3", "C4", "F4"], null, null, null];
+            let chordIndex = 0;
+            new Tone.Loop(time => {
+                const chord = galleryChords[chordIndex % galleryChords.length];
+                if (chord) { gallerySynth.triggerAttackRelease(chord, "8m", time); }
+                chordIndex++;
+            }, "2m").start(0); 
+
+            // --- GENERACIÓN DE RUIDO DE NATURALEZA (TONE.NOISE) ---
+
+            // 4. Lluvia (Ruido Blanco Filtrado)
+            noiseRain = new Tone.Noise("white").connect(masterGain);
+            noiseRain.filter = new Tone.Filter(3000, "lowpass").connect(masterGain); 
+            noiseRain.connect(noiseRain.filter); 
+            noiseRain.start();
+
+            // 5. Viento (Ruido Marrón Suave)
+            noiseWind = new Tone.Noise("brown").connect(masterGain);
+            noiseWind.filter = new Tone.Filter(1000, "lowpass").connect(masterGain); 
+            noiseWind.connect(noiseWind.filter); 
+            noiseWind.start();
+
+            // 6. Aves/Bosque (Ruido Rosa Pulsante)
+            noiseBirds = new Tone.Noise("pink").connect(masterGain);
+            const lfo = new Tone.LFO("4n", -3, 3).start(); 
+            const birdGain = new Tone.Gain(0.01).connect(masterGain); 
+            lfo.connect(birdGain.gain);
+            
+            const panner = new Tone.AutoPanner(0.15).connect(birdGain); 
+            noiseBirds.connect(panner);
+            panner.start();
+            noiseBirds.start();
+
+            // Llenar el mapa de sintetizadores para fácil acceso
+            synthsMap = {
+                celta: celtaSynth,
+                gallery: gallerySynth,
+                rain: noiseRain,
+                wind: noiseWind,
+                birds: noiseBirds
+            };
+            
+            // Iniciar el Transporte Global
+            Tone.Transport.bpm.value = 60;
+            Tone.Transport.start();
+            
+            // Aplicar volumen inicial después de la configuración
+            applyPreset(initialPreset);
+        }
+
+        // --- LÓGICA DE CONTROL ---
+
+        /** Actualiza el volumen de un componente de audio. */
+        function updateVolume(id, value) {
+            const synth = synthsMap[id];
+            if (synth) {
+                synth.volume.value = sliderToDb(value);
+            }
+            // Siempre actualiza la etiqueta de volumen en la UI
+            document.getElementById(`vol-${id}`).innerText = `${value}%`;
+        }
+        
+        /** Aplica un conjunto de valores de porcentaje a todos los sliders y al audio. */
+        function applyPreset(presetValues) {
+            for (const id in presetValues) {
+                const value = presetValues[id];
+                const slider = document.getElementById(`${id}-slider`);
+                
+                if (slider) {
+                    slider.value = value;
+                    updateVolume(id, value); // Esto llama a updateVolume, que ajusta UI y Audio (si está inicializado)
+                }
+            }
+        }
+
+
+        /**
+         * Inicializa o actualiza el sistema de audio y aplica el modo de sonido.
+         */
+        async function toggleMusic(mode) {
+            // 1. Iniciar Tone.js en el primer clic
+            if (Tone.context.state !== 'running') {
+                await Tone.start();
+                setupSynths();
+            } else if (!isStarted) {
+                // Si el contexto ya está corriendo pero setup no se ha llamado (Edge case)
+                setupSynths();
+            }
+
+            // 2. Aplicar Preset
+            let presetValues = {};
+            switch (mode) {
+                case 'focus': // Enfoque (Galería): Música sutil, Ruido muy bajo
+                    presetValues = { celta: 30, gallery: 75, rain: 10, wind: 0, birds: 5 };
+                    break;
+                case 'inspiration': // Inspiración (Celta + Naturaleza): Mezcla equilibrada
+                    presetValues = { celta: 65, gallery: 40, rain: 45, wind: 25, birds: 35 };
+                    break;
+                case 'mystic': // Místico (Celta Puro): Celta dominante, Galería muy baja, Naturaleza apagada
+                    presetValues = { celta: 90, gallery: 20, rain: 5, wind: 0, birds: 5 };
+                    break;
+            }
+            
+            applyPreset(presetValues);
+            updateUI(mode);
+        }
+
+        // --- Funciones de UI ---
+        
+        window.onload = function() {
+            // 1. Inicializar la UI con los valores predeterminados (solo visual)
+            applyPreset(initialPreset);
+            updateUI('focus'); // Marca 'Enfoque' como activo por defecto
+            
+            // 2. Adjuntar event listeners a los sliders
+            const sliders = document.querySelectorAll('input[type="range"]');
+            sliders.forEach(slider => {
+                const id = slider.id.split('-')[0];
+                slider.oninput = (e) => {
+                    // Si no ha iniciado el audio, se inicia en el primer movimiento del slider
+                    if (Tone.context.state !== 'running') {
+                        toggleMusic('focus'); 
+                    }
+                    updateVolume(id, e.target.value);
+                };
+            });
+        };
+        
+        /** Actualiza el estado visual de los botones de modo. */
+        function updateUI(activeMode) {
+            ['focus', 'inspiration', 'mystic'].forEach(mode => {
+                const btn = document.getElementById(`btn-${mode}`);
+                if (btn) {
+                    btn.classList.remove('mode-active', 'bg-gray-100', 'text-gray-600', 'text-white', 'hover:bg-indigo-50', 'hover:text-indigo-700');
+                    
+                    if (mode === activeMode) {
+                        btn.classList.add('mode-active');
+                    } else {
+                        btn.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-indigo-50', 'hover:text-indigo-700');
+                    }
+                }
+            });
+        }
+        
+    </script>
+</head>
+<body>
+
+    <div class="designer-card p-6 rounded-xl">
+        
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-extrabold text-gray-800 border-b pb-2">
+                ✨ Entorno Sonoro: Bocetos IA ART5D
+            </h1>
+            <p class="text-sm text-gray-500 mt-1">
+                Ajusta el audio a tu fase creativa. **El audio comienza con el primer clic o movimiento de slider.**
+            </p>
+        </div>
+
+        <!-- SECCIÓN DE MODOS PREDEFINIDOS -->
+        <h2 class="text-lg font-semibold text-gray-700 mb-3">Modos de Experiencia</h2>
+        <div class="flex flex-wrap gap-2 mb-8">
+            <button 
+                id="btn-focus"
+                onclick="toggleMusic('focus')"
+                class="flex-1 min-w-[150px] py-3 px-4 rounded-lg transition duration-200 text-sm font-medium"
+            >
+                👁️ Enfoque (Galería)
+            </button>
+            <button 
+                id="btn-inspiration"
+                onclick="toggleMusic('inspiration')"
+                class="flex-1 min-w-[150px] py-3 px-4 rounded-lg transition duration-200 text-sm font-medium"
+            >
+                💡 Inspiración (Celta + Naturaleza)
+            </button>
+            <button 
+                id="btn-mystic"
+                onclick="toggleMusic('mystic')"
+                class="flex-1 min-w-[150px] py-3 px-4 rounded-lg transition duration-200 text-sm font-medium"
+            >
+                🔮 Místico (Celta Puro)
+            </button>
+        </div>
+
+        <!-- SECCIÓN DE MEZCLA PERSONALIZADA -->
+        <h2 class="text-lg font-semibold text-gray-700 mb-3 border-t pt-4">Mezcla Personalizada (Volumen 0-100)</h2>
+        
+        <!-- Controles de volumen dinámicos -->
+
+        <!-- 1. Celta -->
+        <div class="flex items-center mb-4">
+            <label class="w-32 text-sm font-medium text-gray-600">Arpa y Flauta (Celta)</label>
+            <input type="range" min="0" max="100" value="0" class="flex-1 h-2 bg-indigo-200 rounded-lg appearance-none cursor-pointer" id="celta-slider">
+            <span id="vol-celta" class="w-12 text-right text-sm text-indigo-700 font-bold">0%</span>
+        </div>
+        
+        <!-- 2. Galería -->
+        <div class="flex items-center mb-4">
+            <label class="w-32 text-sm font-medium text-gray-600">Piano (Galería)</label>
+            <input type="range" min="0" max="100" value="0" class="flex-1 h-2 bg-indigo-200 rounded-lg appearance-none cursor-pointer" id="gallery-slider">
+            <span id="vol-gallery" class="w-12 text-right text-sm text-indigo-700 font-bold">0%</span>
+        </div>
+
+        <!-- 3. Lluvia -->
+        <div class="flex items-center mb-4">
+            <label class="w-32 text-sm font-medium text-gray-600">Lluvia</label>
+            <input type="range" min="0" max="100" value="0" class="flex-1 h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer" id="rain-slider">
+            <span id="vol-rain" class="w-12 text-right text-sm text-gray-600 font-bold">0%</span>
+        </div>
+
+        <!-- 4. Viento -->
+        <div class="flex items-center mb-4">
+            <label class="w-32 text-sm font-medium text-gray-600">Viento</label>
+            <input type="range" min="0" max="100" value="0" class="flex-1 h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer" id="wind-slider">
+            <span id="vol-wind" class="w-12 text-right text-sm text-gray-600 font-bold">0%</span>
+        </div>
+
+        <!-- 5. Aves/Bosque -->
+        <div class="flex items-center mb-4">
+            <label class="w-32 text-sm font-medium text-gray-600">Aves / Bosque</label>
+            <input type="range" min="0" max="100" value="0" class="flex-1 h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer" id="birds-slider">
+            <span id="vol-birds" class="w-12 text-right text-sm text-gray-600 font-bold">0%</span>
+        </div>
+        
+    </div>
+
+</body>
+</html>
