@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control Artista - ART5D v5.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0d1117; }
+        .card { background-color: #161b22; border-radius: 12px; border: 1px solid #2f363d; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); }
+        .slot-display { padding: 10px 15px; border-radius: 8px; font-weight: 600; text-align: center; }
+        .own-slots { background-color: #1e3a8a; color: #bfdbfe; } /* Indigo */
+        .ia-slots { background-color: #8b5cf6; color: #f3e8ff; } /* Violet */
+        .btn-action { transition: all 0.2s; }
+        .btn-action:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(139, 92, 246, 0.4); }
+    </style>
+</head>
+<body class="p-4 sm:p-8 text-white min-h-screen">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-500">
+                Panel de Artista ART5D v5.0
+            </h1>
+            <p class="text-gray-400 mt-2">Gestión de Packs GOLD: 10 Propios + 5 Bocetos IA</p>
+        </header>
+
+        <!-- Sección de Estado de Slots (Dinámico) -->
+        <div id="slot-status-section" class="card p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">Tu Capacidad de Galería Híbrida</h2>
+            
+            <div id="loading-indicator" class="text-center p-4">
+                <div class="animate-spin inline-block w-6 h-6 border-4 border-t-transparent border-indigo-500 rounded-full"></div>
+                <p class="mt-2 text-gray-400">Cargando estado de slots...</p>
+            </div>
+
+            <div id="slot-info" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
+                <!-- Slots Propios -->
+                <div>
+                    <div class="own-slots slot-display mb-2">SLOTS PROPIOS (10 Máx)</div>
+                    <div class="flex justify-between items-center text-lg">
+                        <span class="text-gray-400">Usados: <span id="own-used" class="font-bold text-white">0</span></span>
+                        <span class="text-green-400">Disponibles: <span id="own-available" class="font-bold text-2xl">10</span></span>
+                    </div>
+                    <progress id="own-progress" class="w-full h-2 rounded-full mt-2" max="10" value="0" style="accent-color: #4f46e5;"></progress>
+                </div>
+
+                <!-- Slots IA -->
+                <div>
+                    <div class="ia-slots slot-display mb-2">SLOTS BOCETOS IA (5 Máx)</div>
+                    <div class="flex justify-between items-center text-lg">
+                        <span class="text-gray-400">Usados: <span id="ia-used" class="font-bold text-white">0</span></span>
+                        <span class="text-green-400">Disponibles: <span id="ia-available" class="font-bold text-2xl">5</span></span>
+                    </div>
+                    <progress id="ia-progress" class="w-full h-2 rounded-full mt-2" max="5" value="0" style="accent-color: #a855f7;"></progress>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Acciones -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Acción 1: Subir Obra Propia -->
+            <div class="card p-6">
+                <h3 class="text-2xl font-semibold text-indigo-400 mb-4">1. Cargar Obra Propia</h3>
+                <p class="text-gray-400 mb-4">Sube tu obra certificada. Se asignará automáticamente a tu Galería RV (Flujo 3). Tienes 10 slots disponibles.</p>
+                
+                <input type="file" id="own-file-input" accept="image/jpeg,image/png" class="block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-indigo-500 file:text-white
+                    hover:file:bg-indigo-600 mb-4"
+                />
+                
+                <button onclick="handleUploadOwnWork()" id="btn-upload-own" class="btn-action w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-indigo-500/50" disabled>
+                    Subir y Certificar Obra Propia
+                </button>
+                <p id="upload-status" class="text-sm mt-3 text-center text-gray-500"></p>
+            </div>
+
+            <!-- Acción 2: Solicitar Boceto IA -->
+            <div class="card p-6">
+                <h3 class="text-2xl font-semibold text-violet-400 mb-4">2. Solicitar Boceto IA (ART5D)</h3>
+                <p class="text-gray-400 mb-4">Genera un boceto inicial de IA. Tienes 5 slots. El prompt tiene un límite de 250 caracteres (v5.0).</p>
+                
+                <textarea id="ia-prompt-input" rows="3" placeholder="Describe el boceto que deseas generar (ej: Retrato cyberpunk de un guerrero, estilo óleo)." 
+                    class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:ring-violet-500 focus:border-violet-500 mb-4 text-white resize-none"
+                    maxlength="250"></textarea>
+
+                <button onclick="handleRequestIABoceto()" id="btn-request-ia" class="btn-action w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-violet-500/50" disabled>
+                    Generar Boceto IA Certificado
+                </button>
+                <p id="ia-status" class="text-sm mt-3 text-center text-gray-500"></p>
+            </div>
+        </div>
+        
+        <!-- UID de Usuario (CRÍTICO para Multi-usuario) -->
+        <div class="mt-8 pt-4 border-t border-gray-700 text-center text-xs text-gray-500">
+            Tu ID de Sesión (Necesario para Firestore): <span id="user-uid" class="font-mono text-gray-300 select-all">Cargando...</span>
+        </div>
+    </div>
+
+    <!-- Script de Apps Script y Lógica de V5.0 -->
+    <script>
+        // En un entorno de Apps Script, 'google.script.run' está disponible globalmente.
+        
+        let currentUserId = 'ARTIST_12345'; // Placeholder hasta que implementemos la autenticación real.
+
+        document.getElementById('user-uid').textContent = currentUserId;
+
+        /**
+         * Inicializa la interfaz al cargar el panel_artista.
+         */
+        window.onload = function() {
+            // Llama a la función de backend (codigo.gs) para obtener el estado de los slots.
+            google.script.run
+                .withSuccessHandler(updateSlotDisplay)
+                .withFailureHandler(handleSlotError)
+                .verificarSlotsDisponibles(currentUserId);
+        };
+
+        /**
+         * Actualiza el DOM con la información de slots devuelta por el backend (v5.0).
+         * @param {object} status El objeto de estado devuelto por verificarSlotsDisponibles.
+         */
+        function updateSlotDisplay(status) {
+            console.log("Estado de slots recibido:", status);
+            
+            // Ocultar indicador de carga y mostrar información
+            document.getElementById('loading-indicator').classList.add('hidden');
+            document.getElementById('slot-info').classList.remove('hidden');
+
+            if (!status || !status.isPackActive) {
+                // Manejar caso donde el Pack Gold no está activo
+                document.getElementById('slot-status-section').innerHTML = '<p class="text-red-400 text-center font-bold">¡PACK GOLD INACTIVO! Por favor, verifica tu pago en la página de inicio.</p>';
+                return;
+            }
+
+            // 1. Slots Propios
+            const ownUsed = status.slotsPropios.usados;
+            const ownMax = status.slotsPropios.maximo;
+            const ownAvailable = status.slotsPropios.disponibles;
+
+            document.getElementById('own-used').textContent = ownUsed;
+            document.getElementById('own-available').textContent = ownAvailable;
+            document.getElementById('own-progress').setAttribute('value', ownUsed);
+            document.getElementById('own-progress').setAttribute('max', ownMax);
+
+            // 2. Slots IA
+            const iaUsed = status.slotsIA.usados;
+            const iaMax = status.slotsIA.maximo;
+            const iaAvailable = status.slotsIA.disponibles;
+
+            document.getElementById('ia-used').textContent = iaUsed;
+            document.getElementById('ia-available').textContent = iaAvailable;
+            document.getElementById('ia-progress').setAttribute('value', iaUsed);
+            document.getElementById('ia-progress').setAttribute('max', iaMax);
+
+            // 3. Habilitar/Deshabilitar botones de acción basados en disponibilidad
+            const btnUploadOwn = document.getElementById('btn-upload-own');
+            const btnRequestIA = document.getElementById('btn-request-ia');
+            const fileInputOwn = document.getElementById('own-file-input');
+            const promptInputIA = document.getElementById('ia-prompt-input');
+
+            btnUploadOwn.disabled = ownAvailable <= 0;
+            fileInputOwn.disabled = ownAvailable <= 0;
+            if (ownAvailable <= 0) {
+                btnUploadOwn.textContent = "Slots Propios Agotados";
+            }
+
+            btnRequestIA.disabled = iaAvailable <= 0;
+            promptInputIA.disabled = iaAvailable <= 0;
+            if (iaAvailable <= 0) {
+                btnRequestIA.textContent = "Slots IA Agotados";
+            }
+        }
+
+        /**
+         * Maneja errores en la comunicación con el Apps Script.
+         * @param {Error} error Objeto de error.
+         */
+        function handleSlotError(error) {
+            console.error("Error al verificar slots:", error);
+            document.getElementById('loading-indicator').classList.add('hidden');
+            document.getElementById('slot-status-section').innerHTML = '<p class="text-red-400 text-center font-bold">Error de conexión con el backend: ' + error.message + '</p>';
+        }
+
+        // =========================================================
+        // LÓGICA DE MANEJO DE ACCIONES (PLACEHOLDERS)
+        // =========================================================
+
+        /**
+         * Simula la subida de la obra propia (Flujo 3 - parte de la tarea diaria).
+         */
+        function handleUploadOwnWork() {
+            const uploadStatus = document.getElementById('upload-status');
+            const fileInput = document.getElementById('own-file-input');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                uploadStatus.textContent = "Por favor, selecciona un archivo.";
+                return;
+            }
+            
+            uploadStatus.textContent = `Subiendo ${file.name}... (Simulación de 10 slots)`;
+            console.log("Iniciando subida de obra propia...");
+
+            // En un entorno real, se usaría google.script.run para subir el archivo
+            // y llamar a una función que inicie el proceso de certificación.
+            
+            // Simulación de éxito
+            setTimeout(() => {
+                uploadStatus.textContent = `¡Obra '${file.name}' certificada y en cola para la Galería RV!`;
+                // Después de un éxito real, se debería volver a llamar a verificarSlotsDisponibles
+                // google.script.run.withSuccessHandler(updateSlotDisplay).verificarSlotsDisponibles(currentUserId);
+            }, 2000);
+        }
+
+        /**
+         * Simula la solicitud de Boceto IA (Flujo 4 - Activa llamar a la IA).
+         */
+        function handleRequestIABoceto() {
+            const iaStatus = document.getElementById('ia-status');
+            const prompt = document.getElementById('ia-prompt-input').value.trim();
+
+            if (prompt.length === 0) {
+                iaStatus.textContent = "El prompt no puede estar vacío.";
+                return;
+            }
+
+            iaStatus.textContent = `Solicitando boceto IA para el prompt: "${prompt}"... (Simulación de 5 slots)`;
+            
+            // Llama a la nueva función de backend (v5.0)
+            google.script.run
+                .withSuccessHandler(handleIASuccess)
+                .withFailureHandler(handleIAError)
+                .activarBocetoIA(prompt, currentUserId);
+        }
+
+        /**
+         * Maneja el éxito de la solicitud IA.
+         */
+        function handleIASuccess(result) {
+            const iaStatus = document.getElementById('ia-status');
+            iaStatus.innerHTML = `<span class="text-green-400">¡Boceto IA Generado!</span> <a href="${result.url}" target="_blank" class="text-blue-400 underline">Ver Imagen</a>`;
+            // Recargar el estado de slots después del éxito
+            google.script.run
+                .withSuccessHandler(updateSlotDisplay)
+                .withFailureHandler(handleSlotError)
+                .verificarSlotsDisponibles(currentUserId);
+        }
+
+        /**
+         * Maneja el error de la solicitud IA.
+         */
+        function handleIAError(error) {
+            const iaStatus = document.getElementById('ia-status');
+            iaStatus.textContent = `ERROR IA: ${error.message}`;
+        }
+
+    </script>
+</body>
+</html>
