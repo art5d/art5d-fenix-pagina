@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ART5D FÉNIX - Paquetes de Certificación Híbrida</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.paypal.com/sdk/js?client-id=AZ6F094119M09V1139N115Q29B2735C4A3P29S4N0P17S216K13T0&currency=USD&intent=capture" async></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" defer></script>
@@ -21,36 +21,37 @@
     .avatar:hover { transform: scale(1.05); box-shadow: 0 0 10px #FFD700; }
     #vr-container, #audio-designer, #main-content { display: none; }
     #vr-container.active, #audio-designer.active, #main-content.active { display: block; }
-    .tab-btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 500; transition: 0.3s; }
-    .tab-btn.active { background: #4F46E5; color: white; }
+    .tab-btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 500; transition: 0.3s; border: 1px solid #d1d5db; }
+    .tab-btn.active { background: #4F46E5; color: white; border-color: #4F46E5; }
     .status-message { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); padding: 0.75rem 1.5rem; border-radius: 0.5rem; color: white; font-weight: bold; z-index: 1000; animation: fade 4s forwards; }
     @keyframes fade { 0%, 100% { opacity: 0; transform: translateX(-50%) translateY(10px); } 10%, 90% { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    input[type=range] { height: 4px; background: #e5e7eb; border-radius: 2px; }
+    input[type=range]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; background: #4F46E5; border-radius: 50%; cursor: pointer; }
   </style>
 </head>
 <body class="min-h-screen">
   <header class="header-bg p-6 text-white shadow-xl relative">
     <div class="max-w-6xl mx-auto text-center">
       <h1 class="text-4xl sm:text-5xl font-extrabold">ART5D <span class="neon-text">FÉNIX</span></h1>
-      <p class="mt-2 text-lg opacity-90">Potencia tu portafolio con IA y curaduría experta</p>
+      <p class="mt-2 text-lg opacity-90">Potencia tu portafolio artístico con la curaduría de expertos y la integración de la IA de última generación.</p>
     </div>
     <div class="absolute top-4 right-4 flex items-center gap-3">
-      <img id="user-avatar" class="avatar" src="https://placehold.co/50x50/333/FFD700?text=FP" alt="Avatar @FREDDYPINTOR" onclick="alert('Subida de avatar simulada')">
-      <span class="text-xs">Bienvenido, @FREDDYPINTOR (CL) – 10 Nov 2025</span>
+      <img id="user-avatar" class="avatar" src="https://placehold.co/50x50/333/FFD700?text=FP" alt="Avatar @FREDDYPINTOR" onclick="alert('Subida de avatar simulada - 10 Nov 2025')">
+      <span class="text-xs">Bienvenido, @FREDDYPINTOR (CL)</span>
     </div>
   </header>
 
-  <div class="max-w-6xl mx-auto mt-6 px-4">
+  <nav class="max-w-6xl mx-auto mt-6 px-4">
     <div class="flex flex-wrap gap-2 justify-center border-b pb-2">
       <button class="tab-btn active" onclick="showTab('main')">Paquetes</button>
-      <button class="tab-btn" onclick="showTab('audio')">Diseñador Audio</button>
+      <button class="tab-btn" onclick="showTab('audio')">Diseñador de Audio</button>
       <button class="tab-btn" onclick="showTab('vr')">Galería VR</button>
     </div>
-  </div>
+  </nav>
 
-  <!-- Paquetes (Main) -->
-  <div id="main-content" class="active max-w-6xl mx-auto p-6">
+  <!-- Main Content: Paquetes -->
+  <main id="main-content" class="active max-w-6xl mx-auto p-6">
     <h2 class="text-3xl font-bold text-center mb-8 text-[#4B0082]">Descubre los Paquetes ART5D Fénix</h2>
-    <p class="text-center text-gray-600 mb-6">Potencia tu portafolio artístico con la curaduría de expertos y la integración de la IA de última generación.</p>
     <div class="grid md:grid-cols-3 gap-6">
       <!-- Pack Bronce -->
       <div class="pack-card p-6 text-center">
@@ -58,10 +59,10 @@
         <p class="text-sm text-gray-500 mb-4">El inicio perfecto para tu presencia digital.</p>
         <p class="text-4xl font-extrabold text-teal-600 mb-6">Gratis / 30 días</p>
         <ul class="text-left space-y-2 text-gray-600 mb-6">
-          <li><svg class="w-5 h-5 inline mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><strong>5 Imágenes propias</strong> en Galería.</li>
-          <li><svg class="w-5 h-5 inline mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Perfil de Artista Estándar.</li>
-          <li><svg class="w-5 h-5 inline mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Soporte vía correo electrónico.</li>
-          <li><svg class="w-5 h-5 inline mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Bocetos IA Certificados.</li>
+          <li><svg class="w-5 h-5 inline mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><strong>5 Imágenes propias</strong> en Galería.</li>
+          <li><svg class="w-5 h-5 inline mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Perfil de Artista Estándar.</li>
+          <li><svg class="w-5 h-5 inline mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Soporte vía correo electrónico.</li>
+          <li><svg class="w-5 h-5 inline mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Bocetos IA Certificados.</li>
         </ul>
         <button class="w-full py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition">Empezar Gratis</button>
       </div>
@@ -73,10 +74,10 @@
         <p class="text-sm text-gray-500 mb-4">Para artistas que buscan un impacto significativo.</p>
         <p class="text-4xl font-extrabold text-yellow-600 mb-6">$19.99 / mes</p>
         <ul class="text-left space-y-2 text-gray-600 mb-6">
-          <li><svg class="w-5 h-5 inline mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><strong>10 Imágenes propias</strong> en Galería.</li>
-          <li><svg class="w-5 h-5 inline mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Perfil de Artista Profesional.</li>
-          <li><svg class="w-5 h-5 inline mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Soporte prioritario 24/7.</li>
-          <li><svg class="w-5 h-5 inline mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Funciones Avanzadas de IA.</li>
+          <li><svg class="w-5 h-5 inline mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><strong>10 Imágenes propias</strong> en Galería.</li>
+          <li><svg class="w-5 h-5 inline mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Perfil de Artista Profesional.</li>
+          <li><svg class="w-5 h-5 inline mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Soporte prioritario 24/7.</li>
+          <li><svg class="w-5 h-5 inline mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Funciones Avanzadas de IA.</li>
         </ul>
         <div id="paypal-button-container" class="mt-4"></div>
       </div>
@@ -87,18 +88,18 @@
         <p class="text-sm text-gray-500 mb-4">La experiencia completa para artistas de élite.</p>
         <p class="text-4xl font-extrabold text-purple-600 mb-6">$49.99 / mes</p>
         <ul class="text-left space-y-2 text-gray-600 mb-6">
-          <li><svg class="w-5 h-5 inline mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>15 Imágenes totales (10 Propias + 5 Bocetos IA Certificados).</li>
-          <li><svg class="w-5 h-5 inline mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Perfil de Artista Destacado.</li>
-          <li><svg class="w-5 h-5 inline mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Acceso a <strong>Funciones Avanzadas</strong> (Integración IA).</li>
-          <li><svg class="w-5 h-5 inline mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Curaduría Personalizada.</li>
+          <li><svg class="w-5 h-5 inline mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>15 Imágenes totales (10 Propias + 5 Bocetos IA Certificados).</li>
+          <li><svg class="w-5 h-5 inline mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Perfil de Artista Destacado.</li>
+          <li><svg class="w-5 h-5 inline mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Acceso a <strong>Funciones Avanzadas</strong> (Integración IA).</li>
+          <li><svg class="w-5 h-5 inline mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Curaduría Personalizada.</li>
         </ul>
         <button class="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">Comprar Oro</button>
       </div>
     </div>
-  </div>
+  </main>
 
   <!-- Audio Designer -->
-  <div id="audio-designer" class="max-w-2xl mx-auto p-6">
+  <section id="audio-designer" class="max-w-2xl mx-auto p-6">
     <div class="bg-white rounded-xl shadow-lg p-6">
       <h2 class="text-2xl font-bold text-center mb-4">Diseñador de Entorno de Audio ART5D</h2>
       <p class="text-sm text-center text-gray-600 mb-6">Ajusta sliders o elige modo (clic para sonido)</p>
@@ -108,20 +109,20 @@
         <button onclick="toggleMusic('mystic')" class="tab-btn text-sm">Místico</button>
       </div>
       <div class="space-y-4">
-        <div class="flex items-center"><label class="w-32 text-sm">Celta</label><input type="range" min="0" max="100" value="30" class="flex-1" id="celta-slider"><span id="vol-celta" class="w-12 text-right font-bold text-indigo-700">30%</span></div>
-        <div class="flex items-center"><label class="w-32 text-sm">Piano</label><input type="range" min="0" max="100" value="75" class="flex-1" id="gallery-slider"><span id="vol-gallery" class="w-12 text-right font-bold text-indigo-700">75%</span></div>
-        <div class="flex items-center"><label class="w-32 text-sm">Lluvia</label><input type="range" min="0" max="100" value="10" class="flex-1" id="rain-slider"><span id="vol-rain" class="w-12 text-right font-bold text-gray-600">10%</span></div>
+        <div class="flex items-center"><label class="w-32 text-sm font-medium text-gray-600">Celta</label><input type="range" min="0" max="100" value="30" class="flex-1" id="celta-slider"><span id="vol-celta" class="w-12 text-right font-bold text-indigo-700">30%</span></div>
+        <div class="flex items-center"><label class="w-32 text-sm font-medium text-gray-600">Piano</label><input type="range" min="0" max="100" value="75" class="flex-1" id="gallery-slider"><span id="vol-gallery" class="w-12 text-right font-bold text-indigo-700">75%</span></div>
+        <div class="flex items-center"><label class="w-32 text-sm font-medium text-gray-600">Lluvia</label><input type="range" min="0" max="100" value="10" class="flex-1" id="rain-slider"><span id="vol-rain" class="w-12 text-right font-bold text-gray-600">10%</span></div>
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- VR Gallery -->
-  <div id="vr-container" class="w-full h-screen bg-black">
-    <div id="info-overlay" class="absolute top-0 left-0 w-full p-4 text-center bg-black bg-opacity-70 text-white">
+  <section id="vr-container" class="w-full h-screen bg-black relative">
+    <div id="info-overlay" class="absolute top-0 left-0 w-full p-4 text-center bg-black bg-opacity-70 text-white z-10">
       <h1 class="text-xl font-bold">Galería VR ART5D Fénix</h1>
       <p class="text-sm">Arrastra mouse para rotar · Rueda para zoom</p>
     </div>
-  </div>
+  </section>
 
   <div id="audio-indicator" onclick="initializeAudio()">Ambiente Cyberpunk (Clic)</div>
 
@@ -141,16 +142,130 @@
       document.body.appendChild(div);
       setTimeout(() => div.remove(), 4000);
     }
-    paypal.Buttons({ createOrder: (data, actions) => actions.order.create({ purchase_units: [{ description: "Pack Plata ART5D", amount: { value: "19.99", currency_code: "USD" } }] }), onApprove: (data, actions) => actions.order.capture().then(d => showMessage(`¡Pago exitoso! ID: ${d.id}`)), onError: () => showMessage("Error PayPal", true) }).render('#paypal-button-container');
+    if (typeof paypal !== 'undefined') {
+      paypal.Buttons({
+        createOrder: (data, actions) => actions.order.create({
+          purchase_units: [{ description: "Pack Plata ART5D", amount: { value: "19.99", currency_code: "USD" } }]
+        }),
+        onApprove: (data, actions) => actions.order.capture().then(d => showMessage(`¡Pago exitoso! ID: ${d.id}`)),
+        onError: () => showMessage("Error PayPal", true)
+      }).render('#paypal-button-container');
+    }
     let isAudioOn = false;
-    window.initializeAudio = () => { if (isAudioOn) { Tone.Transport.stop(); isAudioOn = false; document.getElementById('audio-indicator').textContent = "Ambiente Cyberpunk (Clic)"; return; } Tone.start().then(() => { const synth = new Tone.MembraneSynth().toDestination(); new Tone.Loop(t => synth.triggerAttackRelease("C1", "8n", t), "1n").start(0); Tone.Transport.bpm.value = 80; Tone.Transport.start(); isAudioOn = true; document.getElementById('audio-indicator').textContent = "ACTIVO"; showMessage("Ambiente ON"); }); };
-    let masterGain, celtaSynth, gallerySynth, noiseRain; const initialPreset = { celta: 30, gallery: 75, rain: 10 };
-    function setupAudio() { if (masterGain) return; masterGain = new Tone.Gain(1).toDestination(); celtaSynth = new Tone.AMSynth().connect(masterGain); gallerySynth = new Tone.PolySynth(Tone.DuoSynth).connect(masterGain); noiseRain = new Tone.Noise("white").connect(new Tone.Filter(3000, "lowpass").connect(masterGain)); noiseRain.start(); new Tone.Loop(t => celtaSynth.triggerAttackRelease("C4", "2n", t), "2n").start(0); new Tone.Loop(t => gallerySynth.triggerAttackRelease(["C3", "G3"], "8m", t), "2m").start(0); Tone.Transport.bpm.value = 60; Tone.Transport.start(); applyPreset(initialPreset); document.querySelectorAll('#audio-designer input[type="range"]').forEach(s => { s.oninput = () => updateVolume(s.id.split('-')[0], s.value); }); }
-    function updateVolume(id, val) { const synth = { celta: celtaSynth, gallery: gallerySynth, rain: noiseRain }[id]; if (synth) synth.volume.value = val / 100 > 0.001 ? Tone.gainToDb(val / 100) : -100; document.getElementById(`vol-${id}`).textContent = val + '%'; }
-    function applyPreset(p) { Object.keys(p).forEach(k => { const s = document.getElementById(k + '-slider'); if (s) { s.value = p[k]; updateVolume(k, p[k]); } }); }
-    window.toggleMusic = mode => { if (!masterGain) setupAudio(); const presets = { focus: { celta: 30, gallery: 75, rain: 10 }, inspiration: { celta: 65, gallery: 40, rain: 45 }, mystic: { celta: 90, gallery: 20, rain: 5 } }; applyPreset(presets[mode]); };
-    function initVR() { if (window.vrInitialized) return; const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 1000); camera.position.set(0, 1.6, 5); const renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setSize(innerWidth, innerHeight); document.getElementById('vr-container').appendChild(renderer.domElement); scene.add(new THREE.AmbientLight(0x404040, 5)); const floor = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshLambertMaterial({ color: 0x222222 })); floor.rotation.x = -Math.PI / 2; scene.add(floor); const artGeo = new THREE.BoxGeometry(1.5, 1, 0.05); [-3, 0, 3].forEach((x, i) => { const mat = new THREE.MeshLambertMaterial({ color: i % 2 ? 0xA855F7 : 0xFDBA74 }); const art = new THREE.Mesh(artGeo, mat); art.position.set(x, 2, -4.9); scene.add(art); }); let isDragging = false, prev = { x: 0, y: 0 }; renderer.domElement.addEventListener('mousedown', e => { isDragging = true; prev = { x: e.clientX, y: e.clientY }; }); renderer.domElement.addEventListener('mouseup', () => isDragging = false); renderer.domElement.addEventListener('mousemove', e => { if (!isDragging) return; const dx = e.clientX - prev.x, dy = e.clientY - prev.y; camera.rotation.y -= dx * 0.005; camera.rotation.x = Math.max(-1.5, Math.min(1.5, camera.rotation.x - dy * 0.005)); prev = { x: e.clientX, y: e.clientY }; }); function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); } animate(); window.vrInitialized = true; }
-    window.onload = () => { showMessage("¡Bienvenido @FREDDYPINTOR! – 10 Nov 2025", false); };
+    window.initializeAudio = () => {
+      if (isAudioOn) {
+        Tone.Transport.stop();
+        isAudioOn = false;
+        document.getElementById('audio-indicator').textContent = "Ambiente Cyberpunk (Clic)";
+        return;
+      }
+      Tone.start().then(() => {
+        const synth = new Tone.MembraneSynth().toDestination();
+        new Tone.Loop(t => synth.triggerAttackRelease("C1", "8n", t), "1n").start(0);
+        Tone.Transport.bpm.value = 80;
+        Tone.Transport.start();
+        isAudioOn = true;
+        document.getElementById('audio-indicator').textContent = "ACTIVO";
+        showMessage("Ambiente Cyberpunk ON");
+      }).catch(e => showMessage("Error audio: " + e.message, true));
+    };
+    let masterGain, celtaSynth, gallerySynth, noiseRain;
+    const initialPreset = { celta: 30, gallery: 75, rain: 10 };
+    function setupAudio() {
+      if (masterGain) return;
+      masterGain = new Tone.Gain(1).toDestination();
+      celtaSynth = new Tone.AMSynth().connect(masterGain);
+      gallerySynth = new Tone.PolySynth(Tone.DuoSynth).connect(masterGain);
+      const filter = new Tone.Filter(3000, "lowpass").connect(masterGain);
+      noiseRain = new Tone.Noise("white").connect(filter);
+      noiseRain.start();
+      new Tone.Loop(t => celtaSynth.triggerAttackRelease("C4", "2n", t), "2n").start(0);
+      new Tone.Loop(t => gallerySynth.triggerAttackRelease(["C3", "G3"], "8m", t), "2m").start(0);
+      Tone.Transport.bpm.value = 60;
+      Tone.Transport.start();
+      applyPreset(initialPreset);
+      document.querySelectorAll('#audio-designer input[type="range"]').forEach(s => {
+        s.oninput = () => updateVolume(s.id.split('-')[0], s.value);
+      });
+    }
+    function updateVolume(id, val) {
+      const synth = { celta: celtaSynth, gallery: gallerySynth, rain: noiseRain }[id];
+      if (synth) synth.volume.value = val / 100 > 0.001 ? Tone.gainToDb(val / 100) : -100;
+      document.getElementById(`vol-${id}`).textContent = val + '%';
+    }
+    function applyPreset(p) {
+      Object.keys(p).forEach(k => {
+        const s = document.getElementById(k + '-slider');
+        if (s) { s.value = p[k]; updateVolume(k, p[k]); }
+      });
+    }
+    window.toggleMusic = mode => {
+      if (Tone.context.state !== 'running') Tone.start();
+      if (!masterGain) setupAudio();
+      const presets = {
+        focus: { celta: 30, gallery: 75, rain: 10 },
+        inspiration: { celta: 65, gallery: 40, rain: 45 },
+        mystic: { celta: 90, gallery: 20, rain: 5 }
+      };
+      applyPreset(presets[mode]);
+      showMessage(`Modo ${mode} activado`);
+    };
+    function initVR() {
+      if (window.vrInitialized) return;
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x111111);
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 1.6, 5);
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      document.getElementById('vr-container').appendChild(renderer.domElement);
+      scene.add(new THREE.AmbientLight(0x404040, 0.5));
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(5, 5, 5);
+      scene.add(directionalLight);
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshLambertMaterial({ color: 0x222222 }));
+      floor.rotation.x = -Math.PI / 2;
+      scene.add(floor);
+      const wallMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+      const backWall = new THREE.Mesh(new THREE.PlaneGeometry(10, 4), wallMaterial);
+      backWall.position.set(0, 2, -5);
+      scene.add(backWall);
+      const artGeo = new THREE.BoxGeometry(1.5, 1, 0.05);
+      [-3, 0, 3].forEach((x, i) => {
+        const mat = new THREE.MeshLambertMaterial({ color: i % 2 ? 0xA855F7 : 0xFDBA74 });
+        const art = new THREE.Mesh(artGeo, mat);
+        art.position.set(x, 2, -4.9);
+        scene.add(art);
+      });
+      let isDragging = false, prev = { x: 0, y: 0 };
+      renderer.domElement.addEventListener('mousedown', e => { isDragging = true; prev = { x: e.clientX, y: e.clientY }; });
+      renderer.domElement.addEventListener('mouseup', () => isDragging = false);
+      renderer.domElement.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        const dx = e.clientX - prev.x, dy = e.clientY - prev.y;
+        camera.rotation.y -= dx * 0.005;
+        camera.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, camera.rotation.x - dy * 0.005));
+        prev = { x: e.clientX, y: e.clientY };
+      });
+      renderer.domElement.addEventListener('wheel', e => {
+        camera.position.z += e.deltaY * 0.01;
+        camera.position.z = Math.max(1, Math.min(10, camera.position.z));
+      });
+      function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
+      animate();
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+      window.vrInitialized = true;
+      showMessage("Galería VR cargada – Explora el arte!");
+    }
+    window.onload = () => {
+      showMessage("¡Bienvenido @FREDDYPINTOR (CL)! – 10 Nov 2025", false);
+    };
   </script>
 </body>
 </html>
+
