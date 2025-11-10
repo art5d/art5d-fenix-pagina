@@ -4,553 +4,377 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ART5D - Certificación Híbrida del Arte Digital</title>
-    
-    <!-- Carga de Tailwind CSS para el diseño -->
+    <!-- Carga de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Carga del SDK de PayPal (Usando Client ID de Sandbox/Pruebas) -->
-    <!-- NOTA IMPORTANTE: PARA PRODUCCIÓN, REEMPLAZA ESTE CLIENT ID POR EL REAL. -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AZ6F094119M09V1139N115Q29B2735C4A3P29S4N0P17S216K13T0&currency=USD&intent=capture"></script>
-
-    <!-- Carga de Tone.js para la música -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-
-    <!-- Estilos CSS Personalizados con Tailwind -->
+    <!-- Carga de Tone.js para la música ambiental (simulación de audio-ambiente.html) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f7f7;
-            color: #1a1a1a;
+        /* Estilos personalizados */
+        .hero-bg {
+            /* Un fondo inmersivo para la cabecera */
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         }
-        .header-bg {
-            background-color: #FF69B4; /* Rosa Vibrante */
-            background-image: linear-gradient(135deg, #FF69B4 0%, #4B0082 100%); /* Gradiente Magenta-Índigo */
+        .hero-text {
+            /* Simulación de un efecto 3D o de neón para el título principal */
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.5), 0 0 20px rgba(139, 92, 246, 0.3);
         }
-        .pack-card {
-            background-color: #ffffff;
-            transition: transform 0.3s, box-shadow 0.3s;
-            /* Aplicar un borde redondeado consistente a todas las tarjetas */
-            border-radius: 0.75rem; /* rounded-xl */
+        .card-shadow {
+            /* Sombra suave para las tarjetas de galería y packs */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
         }
-        .pack-card:hover {
+        .card-shadow:hover {
+            /* Efecto hover para destacar la tarjeta */
             transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(139, 92, 246, 0.3), 0 10px 10px -5px rgba(139, 92, 246, 0.1);
         }
-        .neon-text {
-            color: #FFD700; /* Dorado */
-            text-shadow: 0 0 5px #FFA500, 0 0 10px #FF4500;
-        }
-        
-        /* Estilos para el mensaje de estado (modal temporal) */
-        .status-message {
-            z-index: 1000;
-            animation: fadeInOut 5s forwards;
-        }
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(20px); }
-            10% { opacity: 1; transform: translateY(0); }
-            90% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(20px); }
-        }
-
-        /* Estilos para el indicador de audio */
-        #audio-indicator {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            background-color: #1a1a1a;
-            color: #FFD700;
-            border: 2px solid #FFD700;
-            border-radius: 9999px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: bold;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-            transition: background-color 0.3s, box-shadow 0.3s;
-            z-index: 999;
-        }
-        #audio-indicator:hover {
-            background-color: #333333;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-        }
-
-        /* Estilos para el Avatar/Perfil */
-        .avatar-container {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 100;
-        }
-        .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 3px solid #FFD700; /* Borde dorado brillante */
-            cursor: pointer;
-            object-fit: cover;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .avatar:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 10px #FFD700;
-        }
-        .user-id-text {
-            font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.7);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 120px;
-            white-space: nowrap;
+        .gold-border {
+            /* Borde degradado para el Pack GOLD */
+            border: 4px solid;
+            border-image: linear-gradient(45deg, #fcd34d, #d97706) 1;
         }
     </style>
-</head>
-<body class="min-h-screen">
+    <script>
+        // Configuración de Tailwind para colores de marca
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'art-purple': '#8b5cf6',
+                        'art-blue': '#1e3a8a',
+                    }
+                }
+            }
+        }
 
-    <!-- Encabezado / Banner Principal -->
-    <header class="header-bg p-8 text-white shadow-xl relative">
-        <div class="max-w-4xl mx-auto text-center">
-            <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight">
-                ART5D <span class="neon-text block sm:inline">Certificación Híbrida del Arte Digital</span>
-            </h1>
-            <p class="mt-4 text-xl font-light opacity-90">
-                Tu portal hacia la autenticación y revalorización de tu arte.
-            </p>
-        </div>
+        // --- LÓGICA DEL SONIDO AMBIENTAL (Integración de audio-ambiente.html) ---
+        let audioIsPlaying = false;
+        let ambientSynth;
 
-        <!-- Contenedor del Avatar (NUEVO) -->
-        <div class="avatar-container">
-            <div class="flex flex-col items-end">
-                <span id="user-status" class="text-xs font-semibold">Cargando perfil...</span>
-                <span id="user-id-display" class="user-id-text"></span>
-            </div>
-            <img 
-                id="user-avatar" 
-                class="avatar" 
-                src="https://placehold.co/50x50/333333/FFD700?text=A" 
-                alt="Avatar del Usuario" 
-                onclick="promptForAvatarUpload()"
-            >
-        </div>
+        /**
+         * Inicializa y comienza el audio ambiental usando Tone.js.
+         * Se llama al hacer clic en el botón de "Entrar con Sonido".
+         */
+        async function startAmbientAudio() {
+            if (audioIsPlaying) return;
 
-    </header>
+            // Iniciar el contexto de audio (necesario por las políticas de navegadores)
+            await Tone.start();
 
-    <!-- Sección de Packs / Oferta Principal -->
-    <main class="py-12 px-4">
-        <div class="max-w-5xl mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-10 text-[#4B0082]">
-                Descubre Nuestros Packs
-            </h2>
+            // Configurar el sintetizador (un pad suave y espacial)
+            ambientSynth = new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: "triangle" },
+                envelope: {
+                    attack: 4, 
+                    decay: 0.1,
+                    sustain: 1,
+                    release: 6  
+                }
+            }).toDestination();
 
-            <!-- Contenedor de las Tarjetas de Packs -->
-            <div class="flex flex-col md:flex-row justify-center items-stretch gap-8">
+            // Añadir un Reverb para darle un toque inmersivo (espacial)
+            const reverb = new Tone.Reverb(5).toDestination();
+            ambientSynth.connect(reverb);
 
-                <!-- Card: PACK GRATIS (BOCETO) -->
-                <div class="pack-card w-full md:w-1/3 p-6 rounded-xl border border-gray-200 shadow-lg flex flex-col">
-                    <h3 class="text-2xl font-bold mb-3 text-gray-800">PACK GRATIS</h3>
-                    <p class="text-sm font-medium text-gray-500 mb-6">El inicio de tu viaje</p>
-                    <p class="text-4xl font-extrabold text-teal-600 mb-6">$0 USD</p>
-                    
-                    <ul class="space-y-3 text-gray-600 flex-grow">
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 mr-2 text-teal-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            <span>1 Imagen Propia</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 mr-2 text-teal-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            <span>Acceso a Galería Pública</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 mr-2 text-red-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            <span class="text-gray-400 line-through">Bocetos IA Certificados</span>
-                        </li>
-                    </ul>
-                    
-                    <button class="mt-8 w-full p-3 rounded-lg bg-teal-600 text-white font-semibold hover:bg-teal-700 transition duration-200" onclick="showMessage('Funcionalidad de registro pendiente. ¡Prueba el PACK GOLD!', true)">
-                        Comenzar Gratis
-                    </button>
-                </div>
+            // Crear un bucle de acordes suaves
+            Tone.Transport.scheduleRepeat(time => {
+                // Genera notas suaves y variadas
+                const notes = ["C4", "E4", "G4", "B4"].map(note => note.replace('4', Math.floor(Math.random() * 2) + 3));
+                ambientSynth.triggerAttackRelease(notes, "4m", time);
+            }, "8m"); 
 
-                <!-- Card: PACK GOLD (EL CRÍTICO) - Objetivo de PayPal -->
-                <div class="pack-card w-full md:w-1/3 p-8 rounded-xl border-4 border-[#FFD700] shadow-2xl flex flex-col relative scale-105">
-                    <span class="absolute top-0 right-0 -mt-3 -mr-3 px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-full shadow-md transform rotate-3">MÁS POPULAR</span>
-                    
-                    <h3 class="text-3xl font-extrabold mb-3 text-[#4B0082]">PACK GOLD</h3>
-                    <p class="text-base font-semibold text-gray-700 mb-6">El desbloqueo total de la Matriz 5D</p>
-                    <p class="text-5xl font-black text-[#FFD700] mb-6">$19.99 USD</p>
-                    
-                    <ul class="space-y-4 text-gray-800 flex-grow">
-                        <li class="flex items-start">
-                            <svg class="w-6 h-6 mr-2 text-[#FFD700] mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                            <span class="font-bold">10 Imágenes Propias del Artista</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="w-6 h-6 mr-2 text-[#FFD700] mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                            <span class="font-bold">5 Bocetos IA Certificados por ART5D</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="w-6 h-6 mr-2 text-[#FFD700] mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                            <span>TOTAL: 15 Entradas a la Galería</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="w-6 h-6 mr-2 text-[#FFD700] mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                            <span>Acceso a Análisis 5D Avanzado (Próximamente)</span>
-                        </li>
-                    </ul>
+            Tone.Transport.start();
+            audioIsPlaying = true;
+            console.log("Audio Ambiental ART5D Iniciado.");
 
-                    <!-- Contenedor del Botón de PayPal -->
-                    <div id="paypal-button-container" class="mt-8 w-full">
-                        <!-- El botón se renderizará aquí -->
+            // Ocultar el prompt de inicio para que el usuario pueda ver la página
+            const audioPrompt = document.getElementById('audio-prompt-container');
+            audioPrompt.classList.add('opacity-0');
+            // Permite que la transición CSS se complete antes de ocultarlo por completo
+            setTimeout(() => audioPrompt.classList.add('hidden'), 500);
+
+            // Actualizar el ícono a sonido activo (Simulando el ícono de audio-ambiente.html)
+            document.getElementById('audio-toggle-icon').innerHTML = `
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.707 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.707l3.586-3.586a1 1 0 011.09-.338zM15.536 8.464a.5.5 0 010 .708L14.75 10l.786.786a.5.5 0 01-.708.708L14.043 11l-.707.707a.5.5 0 11-.708-.708l.707-.707-.707-.707a.5.5 0 01.708-.708l.707.707.707-.707z" clip-rule="evenodd"></path></svg>
+            `;
+        }
+
+        /**
+         * Simula el inicio de sesión del artista.
+         * En la implementación real, esta función haría una llamada a google.script.run
+         * para iniciar el flujo de autenticación de Google Apps Script (código.gs).
+         */
+        function handleArtistLogin() {
+            // Este es el punto donde el frontend llama a Google Apps Script (código.gs)
+            alertModal('Cargando Panel de Artista...', 
+                'Este botón simula la llamada al backend de Google Apps Script para iniciar el flujo de autenticación y acceso al panel.');
+        }
+
+        // --- FUNCIÓN DE MODAL DE ALERTA PERSONALIZADA (Reemplazo de alert()) ---
+        function alertModal(title, message) {
+            const modalHtml = `
+                <div id="custom-modal" class="fixed inset-0 bg-black bg-opacity-75 z-[101] flex items-center justify-center">
+                    <div class="bg-gray-800 rounded-lg p-6 max-w-sm mx-auto shadow-2xl border-t-4 border-art-purple">
+                        <h3 class="text-xl font-bold text-white mb-4">${title}</h3>
+                        <p class="text-gray-300 mb-6">${message}</p>
+                        <button onclick="document.getElementById('custom-modal').remove()" 
+                            class="w-full bg-art-purple text-white py-2 rounded-lg font-semibold hover:bg-violet-600 transition duration-300">
+                            Cerrar
+                        </button>
                     </div>
                 </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+    </script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans">
 
-                <!-- Card: PACK MASTER (FUTURO) -->
-                <div class="pack-card w-full md:w-1/3 p-6 rounded-xl border border-gray-200 shadow-lg flex flex-col">
-                    <h3 class="text-2xl font-bold mb-3 text-gray-800">PACK MASTER</h3>
-                    <p class="text-sm font-medium text-gray-500 mb-6">Máximo Desbloqueo (Próximamente)</p>
-                    <p class="text-4xl font-extrabold text-gray-400 mb-6">N/A</p>
-                    
-                    <ul class="space-y-3 text-gray-600 flex-grow">
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 mr-2 text-gray-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span>Certificación Ilimitada</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 mr-2 text-gray-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span>Acceso a Módulos Exclusivos</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 mr-2 text-gray-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span>Soporte Prioritario 5D</span>
-                        </li>
-                    </ul>
-                    
-                    <button class="mt-8 w-full p-3 rounded-lg bg-gray-300 text-gray-700 font-semibold cursor-not-allowed" disabled>
-                        Próximamente...
+    <!-- Bloque de Enlace para Iniciar Audio (Reemplaza bloque_enlace_audio.html) -->
+    <div id="audio-prompt-container" class="fixed inset-0 bg-gray-900/95 z-[100] flex flex-col items-center justify-center transition-opacity duration-500 opacity-100">
+        <h2 class="text-3xl font-bold text-white mb-6">Inicia tu Experiencia Inmersiva</h2>
+        <p class="text-gray-400 mb-8">El arte es mejor con audio ambiental. Clic para empezar.</p>
+        <button onclick="startAmbientAudio()" class="bg-art-purple text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-violet-600 transition duration-300 shadow-xl">
+            Entrar con Sonido
+        </button>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-sm shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <span class="text-2xl font-extrabold text-art-purple tracking-widest">ART5D</span>
+                </div>
+                <!-- Menú (Desktop) -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#inicio" class="text-sm font-medium hover:text-art-purple transition duration-150">Inicio</a>
+                    <a href="#packs" class="text-sm font-medium hover:text-art-purple transition duration-150">Packs de Certificación</a>
+                    <a href="#galerias" class="text-sm font-medium hover:text-art-purple transition duration-150">Galerías VR</a>
+                </nav>
+                <!-- Botones de Acción (Desktop) -->
+                <div class="flex items-center space-x-4">
+                    <!-- Icono de Sonido (Se activa después del inicio) -->
+                    <div class="p-2 rounded-full text-white" title="Estado del Audio">
+                        <span id="audio-toggle-icon">
+                            <!-- Icono de Volumen Muteado Inicial -->
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.707 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.707l3.586-3.586a1 1 0 011.09-.338zM13.414 11.06l1.06 1.06a1 1 0 001.414-1.414l-1.06-1.06zM15.536 8.464a.5.5 0 010 .708L14.75 10l.786.786a.5.5 0 01-.708.708L14.043 11l-.707.707a.5.5 0 11-.708-.708l.707-.707-.707-.707a.5.5 0 01.708-.708l.707.707.707-.707z" clip-rule="evenodd"></path></svg>
+                        </span>
+                    </div>
+                    <!-- Botón de Acceso Artista (Llama a Google Apps Script) -->
+                    <button onclick="handleArtistLogin()" class="bg-art-purple text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-violet-600 transition duration-300">
+                        Acceso Artista
                     </button>
                 </div>
-
             </div>
         </div>
+    </header>
+
+    <main>
+        <!-- Sección Hero (Inicio) -->
+        <section id="inicio" class="hero-bg h-[70vh] flex items-center justify-center text-center">
+            <div class="max-w-4xl px-4 sm:px-6 lg:px-8">
+                <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight leading-none text-white mb-4 hero-text">
+                    Tu Arte Certificado, en Realidad Virtual.
+                </h1>
+                <p class="mt-3 max-w-2xl mx-auto text-xl text-gray-300">
+                    ART5D combina la autenticación digital de obras con la inmersión 360º de tu galería personal.
+                </p>
+                <div class="mt-8">
+                    <a href="#packs" class="bg-art-purple text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-violet-600 shadow-xl transition duration-300">
+                        Certifica Ahora
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Packs de Certificación (ACTUALIZADA Y CORREGIDA) -->
+        <section id="packs" class="py-16 md:py-24 bg-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-extrabold text-white">
+                        Packs de Certificación Híbrida
+                    </h2>
+                    <p class="mt-4 text-xl text-gray-400">
+                        Elige el nivel de inmersión y autenticación que necesita tu obra.
+                    </p>
+                </div>
+
+                <div class="flex flex-col lg:flex-row justify-center items-stretch gap-8">
+                    
+                    <!-- Pack GRATIS -->
+                    <div class="bg-gray-900 rounded-2xl p-8 card-shadow flex-1 max-w-sm mx-auto lg:max-w-none">
+                        <h3 class="text-2xl font-bold text-white mb-4">PACK GRATIS</h3>
+                        <p class="text-gray-400 mb-6">El inicio de tu viaje en ART5D.</p>
+                        <p class="text-4xl font-extrabold text-art-purple mb-8">$0 USD</p>
+                        <ul class="space-y-3 text-gray-300 text-left">
+                            <li class="flex items-center">
+                                <span class="text-green-400 mr-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                </span>
+                                1 Obra Propia
+                            </li>
+                            <li class="flex items-center">
+                                <span class="text-green-400 mr-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                </span>
+                                Acceso a Galería Pública Compartida
+                            </li>
+                            <li class="flex items-center">
+                                <span class="text-green-400 mr-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                </span>
+                                Certificación de 1 Boceto IA
+                            </li>
+                        </ul>
+                        <button onclick="handleArtistLogin()" class="w-full mt-10 bg-gray-700 text-gray-300 py-3 rounded-lg font-bold hover:bg-gray-600 transition duration-300">
+                            Empezar Gratis
+                        </button>
+                    </div>
+                    
+                    <!-- Pack GOLD (El principal y más completo) -->
+                    <div class="bg-gray-900 rounded-2xl p-8 card-shadow flex-1 max-w-sm mx-auto lg:max-w-none gold-border relative">
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-yellow-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
+                            RECOMENDADO
+                        </div>
+                        <h3 class="text-3xl font-bold text-yellow-500 mb-4 mt-2">PACK GOLD</h3>
+                        <p class="text-gray-300 mb-6">El desbloqueo total de la Matriz 5D.</p>
+                        <p class="text-5xl font-extrabold text-white mb-8">$19.99 USD</p>
+                        <ul class="space-y-3 text-gray-200 text-left">
+                            <li class="flex items-center font-semibold text-lg">
+                                <span class="text-yellow-400 mr-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </span>
+                                **10 Obras Propias Certificadas**
+                            </li>
+                            <li class="flex items-center font-semibold text-lg">
+                                <span class="text-yellow-400 mr-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </span>
+                                **5 Bocetos IA Certificados ART5D**
+                            </li>
+                            <li class="flex items-center font-semibold text-lg text-art-purple">
+                                <span class="text-yellow-400 mr-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </span>
+                                **Galería VR 360º Personal (Total: 15 Espacios)**
+                            </li>
+                            <li class="flex items-center">
+                                <span class="text-yellow-400 mr-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </span>
+                                Acceso al Panel de Subida Artista
+                            </li>
+                        </ul>
+                        <button onclick="handleArtistLogin()" class="w-full mt-10 bg-art-purple text-white py-3 rounded-lg font-bold text-lg hover:bg-violet-600 transition duration-300 shadow-lg">
+                            Comprar Pack Gold
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Galerías VR (galeria_vr.html integrado y con diseño) -->
+        <section id="galerias" class="py-16 md:py-24 bg-gray-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-extrabold text-white">
+                        Explora Galerías Inmersivas 360º
+                    </h2>
+                    <p class="mt-4 text-xl text-gray-400">
+                        La experiencia pública. Así es como se ve tu arte certificado con el Pack Gold.
+                    </p>
+                </div>
+
+                <!-- Simulación de la Galería VR con Avatares y Sonido (Vista Pública) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                    <!-- Galería Card 1: Avatar Femenino Ejemplo -->
+                    <div class="bg-gray-800 rounded-xl overflow-hidden card-shadow">
+                        <div class="relative h-64">
+                            <!-- Placeholder de una vista 360 -->
+                            <img src="https://placehold.co/600x400/34d399/ffffff?text=GALERIA+VR+1+360" onerror="this.onerror=null; this.src='https://placehold.co/600x400/34d399/ffffff?text=VR+Ejemplo+1';" alt="Vista 360 de Galería" class="w-full h-full object-cover">
+                            <!-- Simulación de Avatar (Unificado con la tarjeta) -->
+                            <div class="absolute top-4 right-4 bg-gray-900/70 text-sm font-semibold p-2 rounded-full flex items-center">
+                                <span class="text-green-400 mr-2">
+                                    <!-- Icono Femenino (Simulación de la clase de avatar) -->
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7s2.243 5 5 5 5-2.243 5-5-2.243-5-5-5zM15 13H9v2h2v4h2v-4h2v-2z"></path></svg>
+                                </span> Avatar Femenino
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold text-white">Mundos Fractales</h3>
+                            <p class="mt-2 text-gray-400">
+                                Artista: Isabella R. | **15** Obras Certificadas
+                            </p>
+                            <a href="#" class="mt-4 inline-flex items-center text-art-purple font-semibold hover:text-violet-400 transition duration-150">
+                                Ver Galería VR 
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Galería Card 2: Avatar Masculino Ejemplo -->
+                    <div class="bg-gray-800 rounded-xl overflow-hidden card-shadow">
+                        <div class="relative h-64">
+                            <img src="https://placehold.co/600x400/f87171/ffffff?text=GALERIA+VR+2+360" onerror="this.onerror=null; this.src='https://placehold.co/600x400/f87171/ffffff?text=VR+Ejemplo+2';" alt="Vista 360 de Galería" class="w-full h-full object-cover">
+                            <div class="absolute top-4 right-4 bg-gray-900/70 text-sm font-semibold p-2 rounded-full flex items-center">
+                                <span class="text-blue-400 mr-2">
+                                    <!-- Icono Masculino -->
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7s2.243 5 5 5 5-2.243 5-5-2.243-5-5-5zM15 13H9v2h2v4h2v-4h2v-2z"></path></svg>
+                                </span> Avatar Masculino
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold text-white">Simetría Oscura</h3>
+                            <p class="mt-2 text-gray-400">
+                                Artista: Daniel A. | **15** Obras Certificadas
+                            </p>
+                            <a href="#" class="mt-4 inline-flex items-center text-art-purple font-semibold hover:text-violet-400 transition duration-150">
+                                Ver Galería VR 
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Galería Card 3: Avatar Robot/IA Ejemplo -->
+                    <div class="bg-gray-800 rounded-xl overflow-hidden card-shadow">
+                        <div class="relative h-64">
+                            <img src="https://placehold.co/600x400/a78bfa/ffffff?text=GALERIA+VR+3+360" onerror="this.onerror=null; this.src='https://placehold.co/600x400/a78bfa/ffffff?text=VR+Ejemplo+3';" alt="Vista 360 de Galería" class="w-full h-full object-cover">
+                            <div class="absolute top-4 right-4 bg-gray-900/70 text-sm font-semibold p-2 rounded-full flex items-center">
+                                <span class="text-art-purple mr-2">
+                                    <!-- Icono IA -->
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7s2.243 5 5 5 5-2.243 5-5-2.243-5-5-5zM15 13H9v2h2v4h2v-4h2v-2z"></path></svg>
+                                </span> Avatar IA
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold text-white">Ecos del Algoritmo</h3>
+                            <p class="mt-2 text-gray-400">
+                                Artista: ART5D Labs | **15** Obras Certificadas
+                            </p>
+                            <a href="#" class="mt-4 inline-flex items-center text-art-purple font-semibold hover:text-violet-400 transition duration-150">
+                                Ver Galería VR 
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
-    <!-- Indicador y Botón de Audio -->
-    <div id="audio-indicator" onclick="initializeAudio()">
-        Activar Ambiente Cyberpunk (Clic)
-    </div>
-
-    <!-- Modal para Simulación de Subida de Avatar -->
-    <div id="avatar-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-[1010] flex items-center justify-center p-4" onclick="this.classList.add('hidden')">
-        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full" onclick="event.stopPropagation()">
-            <h3 class="text-xl font-bold mb-4 text-[#4B0082]">Actualizar Avatar</h3>
-            <p class="mb-4 text-gray-700">Selecciona tu nueva imagen de perfil. (Simulación de subida)</p>
-            <div class="flex flex-col space-y-3">
-                <input type="text" id="avatar-url-input" placeholder="Pega una URL de imagen aquí (e.g., placeholder.co)" class="p-2 border rounded-lg focus:ring-[#FF69B4] focus:border-[#FF69B4]">
-                <button 
-                    class="p-2 rounded-lg bg-[#FF69B4] text-white font-semibold hover:bg-[#D45A96] transition duration-200" 
-                    onclick="setNewAvatar()"
-                >
-                    Guardar Nuevo Avatar
-                </button>
-                <button 
-                    class="p-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition duration-200" 
-                    onclick="document.getElementById('avatar-modal').classList.add('hidden')"
-                >
-                    Cancelar
-                </button>
-            </div>
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-400 text-sm">
+                ART5D - Inmersión y Certificación Híbrida. Todos los derechos reservados.
+            </p>
         </div>
-    </div>
-
-
-    <!-- Pie de Página Básico -->
-    <footer class="bg-gray-800 text-white text-center p-4 mt-12">
-        <p>&copy; 2025 ART5D. Todos los derechos reservados.</p>
     </footer>
-
-
-    <script type="module">
-        // === Imports de Firebase (MANDATORIO) ===
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // === Variables Globales del Entorno ===
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-art5d-app';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        let app;
-        let db;
-        let auth;
-        let currentUserId = null;
-        let isAuthReady = false;
-
-        // Configuración para ver los logs de Firestore
-        setLogLevel('Debug');
-
-
-        // === Lógica de Utilidades ===
-
-        /**
-         * Muestra un mensaje de estado temporal en la esquina inferior derecha.
-         */
-        function showMessage(message, isError = false) {
-            console.log(isError ? "ERROR: " + message : "INFO: " + message);
-            
-            // Elimina mensajes anteriores para evitar acumulaciones
-            const existingMessage = document.querySelector('.status-message');
-            if (existingMessage) {
-                existingMessage.remove();
-            }
-
-            const statusElement = document.createElement('div');
-            statusElement.className = `status-message fixed bottom-5 right-5 p-4 rounded-lg shadow-xl text-white font-bold text-sm sm:text-base ${isError ? 'bg-red-600' : 'bg-green-600'}`;
-            statusElement.textContent = message;
-            document.body.appendChild(statusElement);
-            // El mensaje se auto-elimina vía CSS
-        }
-
-
-        // === Lógica de Inicialización de Firebase y Perfil ===
-
-        /**
-         * Inicializa Firebase y establece el estado de autenticación.
-         */
-        async function setupAuthAndFirestore() {
-            if (!firebaseConfig) {
-                showMessage("ERROR: Configuración de Firebase no disponible.", true);
-                return;
-            }
-
-            try {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                // Autenticación: Priorizar token, sino anónimo.
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                    showMessage("Autenticación exitosa con token personalizado.", false);
-                } else {
-                    await signInAnonymously(auth);
-                    showMessage("Autenticación anónima iniciada.", false);
-                }
-
-                // Escucha el estado de autenticación para cargar el perfil
-                onAuthStateChanged(auth, (user) => {
-                    isAuthReady = true;
-                    if (user) {
-                        currentUserId = user.uid;
-                        document.getElementById('user-status').textContent = 'Conectado';
-                        document.getElementById('user-id-display').textContent = `ID: ${currentUserId}`;
-                        loadUserAvatar(currentUserId);
-                    } else {
-                        currentUserId = null;
-                        document.getElementById('user-status').textContent = 'No Conectado';
-                        document.getElementById('user-id-display').textContent = 'ID: N/A';
-                        console.error("Usuario desconectado. Las reglas de Firestore podrían fallar si no permiten acceso anónimo.");
-                    }
-                });
-
-            } catch (error) {
-                showMessage(`ERROR Fatal en Firebase: ${error.message}`, true);
-                console.error("Firebase Initialization Error:", error);
-            }
-        }
-
-        /**
-         * Devuelve la referencia al documento de perfil del usuario en Firestore.
-         */
-        function getUserProfileRef(userId) {
-            // Ruta de datos privados: /artifacts/{appId}/users/{userId}/profile_data/{documentId}
-            if (!db || !userId) return null;
-            return doc(db, 'artifacts', appId, 'users', userId, 'profile_data', 'profile');
-        }
-
-        /**
-         * Carga el avatar del usuario desde Firestore y lo muestra.
-         */
-        async function loadUserAvatar(userId) {
-            const profileRef = getUserProfileRef(userId);
-            if (!profileRef) return;
-
-            try {
-                const docSnap = await getDoc(profileRef);
-                const avatarImg = document.getElementById('user-avatar');
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (data.avatarUrl) {
-                        avatarImg.src = data.avatarUrl;
-                        showMessage("Avatar de perfil cargado desde Firestore.", false);
-                        return;
-                    }
-                }
-                
-                // Avatar por defecto si no existe o si no hay URL
-                avatarImg.src = "https://placehold.co/50x50/333333/FFD700?text=A";
-                showMessage("Usando avatar predeterminado.", false);
-
-            } catch (error) {
-                showMessage(`ERROR al cargar el perfil: ${error.message}`, true);
-                console.error("Error loading profile:", error);
-            }
-        }
-
-
-        // === Lógica de Avatar y Modal ===
-
-        /**
-         * Muestra el modal para la subida simulada de avatar.
-         */
-        window.promptForAvatarUpload = function() {
-            if (!currentUserId) {
-                showMessage("Debes estar conectado para cambiar tu avatar.", true);
-                return;
-            }
-            document.getElementById('avatar-modal').classList.remove('hidden');
-        }
-
-        /**
-         * Simula la actualización del avatar con una URL y la guarda en Firestore.
-         */
-        window.setNewAvatar = async function() {
-            const urlInput = document.getElementById('avatar-url-input');
-            let newUrl = urlInput.value.trim();
-
-            if (!newUrl) {
-                // Generar una URL de placeholder aleatoria como simulación
-                const randomColor = Math.floor(Math.random()*16777215).toString(16);
-                const randomText = ['A', 'B', 'C', 'G', 'P'][Math.floor(Math.random() * 5)];
-                newUrl = `https://placehold.co/50x50/${randomColor}/FFFFFF?text=${randomText}`;
-                showMessage("URL vacía. Usando URL de placeholder generada aleatoriamente.", true);
-            }
-
-            const profileRef = getUserProfileRef(currentUserId);
-            if (!profileRef) {
-                showMessage("ERROR: No se pudo obtener la referencia de Firestore.", true);
-                return;
-            }
-
-            try {
-                // 1. Actualiza el documento en Firestore
-                await setDoc(profileRef, { 
-                    avatarUrl: newUrl, 
-                    lastUpdated: new Date().toISOString() 
-                }, { merge: true });
-
-                // 2. Actualiza la UI
-                document.getElementById('user-avatar').src = newUrl;
-                document.getElementById('avatar-modal').classList.add('hidden');
-                showMessage("¡Avatar actualizado con éxito y guardado en la Nube!", false);
-                urlInput.value = ''; // Limpiar input
-            } catch (error) {
-                showMessage(`ERROR al guardar el avatar: ${error.message}`, true);
-                console.error("Error setting avatar:", error);
-            }
-        }
-        
-        // === Lógica de Inicialización y Transacción de PayPal ===
-        
-        const PRODUCT_NAME = "PACK GOLD ART5D";
-        const PRODUCT_PRICE = "19.99"; // US Dollars
-
-        // Esta función se moverá a window.onload junto con el resto de la inicialización.
-        function initializePayPalButtons() {
-            if (typeof paypal !== 'undefined') {
-                paypal.Buttons({
-                    style: {
-                        layout: 'vertical',
-                        color: 'gold',
-                        shape: 'pill',
-                        label: 'paypal',
-                    },
-                    
-                    createOrder: function(data, actions) {
-                        return actions.order.create({
-                            purchase_units: [{
-                                description: PRODUCT_NAME,
-                                amount: {
-                                    currency_code: "USD",
-                                    value: PRODUCT_PRICE
-                                }
-                            }]
-                        });
-                    },
-
-                    onApprove: function(data, actions) {
-                        return actions.order.capture().then(function(details) {
-                            const transactionId = details.id;
-                            const payerName = details.payer.name.given_name;
-                            
-                            showMessage(`¡Pago de ${PRODUCT_PRICE} USD completado con éxito!`, false);
-                            showMessage(`✅ Bienvenido ${payerName} al PACK GOLD! Transacción ID: ${transactionId}. Prueba exitosa en Sandbox.`, false);
-                            
-                        });
-                    },
-
-                    onCancel: function(data) {
-                        showMessage("Transacción de PayPal cancelada por el usuario.", true);
-                    },
-                    onError: function(err) {
-                        showMessage("Ocurrió un error en la transacción de PayPal. Revisa la consola para más detalles.", true);
-                        console.error('Error de PayPal:', err);
-                    }
-
-                }).render('#paypal-button-container');
-            } else {
-                showMessage("Error: El SDK de PayPal no se cargó correctamente.", true);
-            }
-        }
-
-
-        // === Lógica de Audio (Tone.js) ===
-        let isAudioInitialized = false;
-        
-        window.initializeAudio = function() {
-            const audioIndicator = document.getElementById('audio-indicator');
-            
-            if (isAudioInitialized) {
-                Tone.Transport.stop();  
-                isAudioInitialized = false;
-                audioIndicator.textContent = "Activar Ambiente Cyberpunk (Clic)";
-                audioIndicator.classList.remove('active');
-                showMessage("Ambiente Cyberpunk desactivado.", false);
-                return;
-            }
-
-            Tone.start().then(() => {
-                // Inicialización del audio
-                const synth = new Tone.MembraneSynth().toDestination();
-                const loop = new Tone.Loop(time => {
-                    synth.triggerAttackRelease("C1", "8n", time);
-                }, "1n").start(0); 
-
-                Tone.Transport.bpm.value = 80;
-                Tone.Transport.start(); 
-
-                isAudioInitialized = true;
-                audioIndicator.textContent = "Ambiente ACTIVO";
-                audioIndicator.classList.add('active');
-                showMessage("Ambiente Cyberpunk activado. ¡Bienvenido a la Matriz!", false);
-            }).catch(e => {
-                showMessage("Error al iniciar el audio: " + e.message, true);
-                console.error("Error al iniciar Tone.js:", e);
-            });
-        }
-        
-        // Ejecución al cargar la ventana
-        window.addEventListener('load', () => {
-            setupAuthAndFirestore();
-            initializePayPalButtons();
-        });
-
-    </script>
 </body>
 </html>
