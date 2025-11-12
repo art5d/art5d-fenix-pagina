@@ -10,67 +10,71 @@
     .gradient-text { background: linear-gradient(to right, #00f5ff, #ff00ff); -webkit-background-clip: text; color: transparent; }
     .hero-bg { background: radial-gradient(circle at center, #1a1a2e, #0d0d1a); }
     .glow { box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); }
+    /* Estilo para asegurar que las imágenes de fondo se vean bien */
+    .hero-bg > div:first-child {
+        position: absolute;
+        inset: 0;
+        opacity: 0.30;
+    }
   </style>
 </head>
 <body class="bg-[#0d0d1a] text-white font-inter">
-
+  
   <!-- HERO -->
   <section class="hero-bg min-h-screen flex items-center justify-center relative overflow-hidden">
     <div class="absolute inset-0 opacity-30">
-      <img src="https://i.imgur.com/art5d-hero-360.jpg" alt="Galería 360°" class="w-full h-full object-cover">
+      <!-- NOTA: Reemplazar con la URL de una imagen 360° de alta calidad -->
+      <img src="https://placehold.co/1920x1080/0d0d1a/00f5ff?text=VR+HERO" alt="Galería 360°" class="w-full h-full object-cover">
     </div>
     <div class="relative z-10 text-center px-6">
       <h1 class="text-6xl md:text-8xl font-orbitron gradient-text animate-pulse">ART5D</h1>
-      <p class="text-4xl md:text-6xl font-bold mt-4">11:11</p>
-      <p class="text-xl mt-6 max-w-2xl mx-auto">IA + VR + NFT + Educación Global</p>
-      <button onclick="document.getElementById('packs').scrollIntoView()" 
+      <p class="text-4xl md:text-6xl font-bold mt-4">FÉNIX v6.6</p>
+      <p class="text-xl mt-6 max-w-2xl mx-auto">IA + VR + NFT + Educación Global | Arquitectura Costo Cero</p>
+      <button onclick="document.getElementById('packs').scrollIntoView()"
         class="mt-8 px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full glow text-lg font-bold hover:scale-105 transition">
         ELIGE TU PACK
       </button>
     </div>
   </section>
-
+  
   <!-- PACKS -->
   <section id="packs" class="py-20 px-6">
     <h2 class="text-5xl text-center font-orbitron gradient-text mb-16">PACKS PREMIUM</h2>
     <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-
       <!-- PLATINO -->
       <div class="bg-gradient-to-b from-gray-900 to-black p-8 rounded-2xl glow">
         <h3 class="text-3xl font-bold text-cyan-400">PLATINO</h3>
         <p class="text-5xl font-bold mt-4">$59.99</p>
         <ul class="mt-6 space-y-3 text-left">
-          <li>5 Bocetos IA + SOA</li>
-          <li>5 NFTs Solana</li>
+          <li>5 Bocetos IA Certificados + SOA</li>
+          <li>1 NFT Solana (Certificado de Arte)</li>
           <li>Galería Colectiva Infinita</li>
         </ul>
         <button onclick="openPayment('platino')" class="mt-8 w-full py-3 bg-cyan-600 rounded-full hover:bg-cyan-500 transition">
           COMPRAR
         </button>
       </div>
-
       <!-- GOLD -->
       <div class="bg-gradient-to-b from-purple-900 to-black p-8 rounded-2xl glow scale-105">
         <h3 class="text-3xl font-bold text-purple-400">GOLD</h3>
         <p class="text-5xl font-bold mt-4">$399.99</p>
         <ul class="mt-6 space-y-3 text-left">
-          <li>20 Imágenes + NFTs</li>
-          <li>Galería VR Personal</li>
-          <li>Exportable .zip</li>
+          <li>10 Imágenes Propias + 5 Bocetos IA (15 total)</li>
+          <li>2 NFTs Solana</li>
+          <li>Galería VR Personal + Exportable .zip</li>
         </ul>
         <button onclick="openPayment('gold')" class="mt-8 w-full py-3 bg-purple-600 rounded-full hover:bg-purple-500 transition">
           COMPRAR
         </button>
       </div>
-
       <!-- DIAMANTE -->
       <div class="bg-gradient-to-b from-yellow-900 to-black p-8 rounded-2xl glow">
         <h3 class="text-3xl font-bold text-yellow-400">DIAMANTE</h3>
         <p class="text-5xl font-bold mt-4">$499.99/año</p>
         <ul class="mt-6 space-y-3 text-left">
-          <li>30 NFTs + VR</li>
-          <li>Curso GRATIS</li>
-          <li>VIP TOP Portada</li>
+          <li>30 NFTs + VR Avanzada</li>
+          <li>Curso GRATIS + Mentoring VIP</li>
+          <li>Posicionamiento TOP Portada</li>
         </ul>
         <button onclick="openPayment('diamante')" class="mt-8 w-full py-3 bg-yellow-600 rounded-full hover:bg-yellow-500 transition">
           COMPRAR
@@ -78,31 +82,37 @@
       </div>
     </div>
   </section>
-
+  
   <!-- VR DEMO -->
-  <section class="py-20 px-6 bg-black">
-    <h2 class="text-5xl text-center font-orbitron gradient-text mb-12">GALERÍA VR 360°</h2>
+  <section id="vr-gallery" class="py-20 px-6 bg-black">
+    <h2 class="text-5xl text-center font-orbitron gradient-text mb-12">GALERÍA VR 360° DEMO</h2>
     <div class="max-w-4xl mx-auto h-96 rounded-2xl overflow-hidden glow">
-      <iframe src="https://art5d.github.io/vr-demo/" class="w-full h-full" allowfullscreen></iframe>
+      <!-- RUTA CORREGIDA: Apunta a la subcarpeta 'vr-demo' en el repositorio -->
+      <iframe src="./vr-demo/index.html" class="w-full h-full" allowfullscreen></iframe>
     </div>
   </section>
-
+  
   <!-- FORMULARIO -->
   <section class="py-20 px-6">
-    <h2 class="text-5xl text-center font-orbitron gradient-text mb-12">PRUÉBALO GRATIS</h2>
+    <h2 class="text-5xl text-center font-orbitron gradient-text mb-12">PRUÉBALO GRATIS (ART5D IA)</h2>
     <div class="max-w-2xl mx-auto">
-      <iframe src="https://docs.google.com/forms/d/e/.../viewform?embedded=true" 
+      <!-- NOTA: Reemplazar 'ID_DEL_FORMULARIO_DE_GOOGLE' con el ID real -->
+      <iframe src="https://docs.google.com/forms/d/e/ID_DEL_FORMULARIO_DE_GOOGLE/viewform?embedded=true"
         class="w-full h-96 rounded-2xl" frameborder="0"></iframe>
     </div>
   </section>
 
+  <!-- Footer (Omitido por brevedad, pero mantener en el código real) -->
+  
   <script>
     function openPayment(pack) {
       const urls = {
-        platino: "https://www.mercadopago.cl/checkout/v1/redirect?pref_id=...",
-        gold: "https://www.mercadopago.cl/checkout/v1/redirect?pref_id=...",
-        diamante: "https://www.mercadopago.cl/checkout/v1/redirect?pref_id=..."
+        // NOTA: Reemplazar 'PREF_ID' por la preferencia real generada por MercadoPago
+        platino: "https://www.mercadopago.cl/checkout/v1/redirect?pref_id=PREF_ID_PLATINO",
+        gold: "https://www.mercadopago.cl/checkout/v1/redirect?pref_id=PREF_ID_GOLD",
+        diamante: "https://www.mercadopago.cl/checkout/v1/redirect?pref_id=PREF_ID_DIAMANTE"
       };
+      // Aquí se debe configurar el webhook de MercadoPago para llamar a Apps Script después del pago.
       window.open(urls[pack], '_blank');
     }
   </script>
