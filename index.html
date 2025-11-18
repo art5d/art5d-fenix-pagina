@@ -1,151 +1,225 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplicación Nueva desde Cero</title>
-    <!-- Carga de Tailwind CSS para un diseño moderno y responsive -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Fuente por defecto para mejor legibilidad */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f7f7;
-        }
-    </style>
-</head>
-<body class="min-h-screen flex items-start justify-center p-4">
-    <div id="app-container" class="w-full max-w-4xl bg-white shadow-xl rounded-xl p-6 md:p-8 mt-10">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">¡Comenzando de Cero!</h1>
-        <p class="text-center text-gray-600 mb-8">La aplicación está lista para recibir tu nuevo código.</p>
-        
-        <!-- Contenedor principal donde construirás tu UI -->
-        <div id="main-content" class="min-h-64 border-2 border-dashed border-indigo-300 rounded-lg p-4 flex items-center justify-center">
-            <p id="auth-status" class="text-indigo-500 font-semibold">Cargando Firebase...</p>
-        </div>
+/**
+ * PUBLISHER DE OBRAS ART5D - Google Apps Script
+ *
+ * Este script lee las obras certificadas (columna "Publicado" = SÍ)
+ * de la Hoja de Google y las publica en la base de datos Firestore.
+ * Esto permite que la Galería en Vivo (index.html) se actualice en tiempo real.
+ *
+ * Configuración de Firebase requerida:
+ * 1. Project ID: Lo encuentras en la Configuración de tu proyecto de Firebase.
+ * 2. Web API Key: La clave para acceder a la API web (se genera al crear una app web).
+ * 3. App ID: La variable global del Canvas (la debes usar tal cual, sin cambiar).
+ */
 
-        <!-- Mensajes del sistema (para alertas personalizadas, no usamos alert()) -->
-        <div id="message-box" class="mt-4 p-3 bg-yellow-100 text-yellow-800 rounded-lg hidden" role="alert"></div>
+// =========================================================================
+// !!! ATENCIÓN: DEBES REEMPLAZAR ESTOS VALORES CON TUS CREDENCIALES REALES !!!
+// =========================================================================
+const FIREBASE_PROJECT_ID = "YOUR_FIREBASE_PROJECT_ID"; // Ejemplo: "art5d-database-2025"
+const FIREBASE_WEB_API_KEY = "YOUR_FIREBASE_WEB_API_KEY"; // Ejemplo: "AIzaSyC0V4Xk-G123456789"
+// ESTE APP ID es una variable GLOBAL en el entorno del Canvas. NO LO CAMBIES, DÉJALO ASÍ:
+const FIREBASE_APP_ID = "default-art5d-app-id"; // Corresponde al appId usado en index.html
+// =========================================================================
 
-    </div>
 
-    <!-- Script de configuración de Firebase -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+/**
+ * Función principal para leer la hoja y publicar en Firestore.
+ * Se puede ejecutar manualmente o configurar como disparador por tiempo.
+ */
+function publishCertifiedNFTs() {
+  // Configuración de la hoja y la base de datos
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = spreadsheet.getSheetByName("NFTs"); // Nombre de la hoja de cálculo
+  if (!sheet) {
+    Logger.log("Error: No se encontró la hoja de nombre 'NFTs'.");
+    return;
+  }
 
-        // Globales que serán inicializadas
-        let app;
-        let db;
-        let auth;
-        let userId = 'anonymous'; // ID de usuario por defecto
+  // Obtener todos los datos de la hoja (asumiendo que los encabezados están en la fila 1)
+  const range = sheet.getDataRange();
+  const values = range.getValues();
+  if (values.length < 2) {
+    Logger.log("No hay datos para procesar (solo encabezados).");
+    return;
+  }
 
-        // Constantes del entorno
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+  const headers = values[0];
+  const dataRows = values.slice(1);
 
-        const authStatusElement = document.getElementById('auth-status');
-        const messageBox = document.getElementById('message-box');
-        
-        // Función para mostrar mensajes de estado
-        function displayMessage(message, isError = false) {
-            messageBox.textContent = message;
-            messageBox.className = "mt-4 p-3 rounded-lg block";
-            if (isError) {
-                messageBox.classList.add('bg-red-100', 'text-red-800');
-                messageBox.classList.remove('bg-yellow-100', 'text-yellow-800');
-            } else {
-                messageBox.classList.add('bg-yellow-100', 'text-yellow-800');
-                messageBox.classList.remove('bg-red-100', 'text-red-800');
-            }
-        }
+  // Mapear los índices de las columnas importantes (basado en la hoja de ejemplo)
+  const COL_ID = headers.indexOf("ID");
+  const COL_TITLE = headers.indexOf("Título de Obra");
+  const COL_URL = headers.indexOf("URL de Imagen");
+  const COL_ADDRESS = headers.indexOf("NFT Address (Solana)");
+  const COL_PUBLICADO = headers.indexOf("Publicado (SÍ)");
+  const COL_POSITION = headers.indexOf("Position Index");
 
-        // Inicializar y autenticar
-        async function initializeAppAndAuth() {
-            if (!firebaseConfig) {
-                authStatusElement.textContent = "Error: Configuración de Firebase no disponible.";
-                return;
-            }
 
-            try {
-                // Habilitar logging de Firebase para debug
-                setLogLevel('debug');
-                
-                // 1. Inicializar Firebase
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
+  if (COL_PUBLICADO === -1 || COL_URL === -1 || COL_ADDRESS === -1 || COL_TITLE === -1 || COL_POSITION === -1) {
+    Logger.log("Error: Una o más columnas requeridas no fueron encontradas. Asegúrate de que los encabezados sean correctos: ID, Título de Obra, URL de Imagen, NFT Address (Solana), Publicado (SÍ), Position Index.");
+    return;
+  }
 
-                authStatusElement.textContent = "Inicializando autenticación...";
+  // --- CONFIGURACIÓN DE FIRESTORE REST API ---
+  const FIRESTORE_COLLECTION_PATH = `artifacts/${FIREBASE_APP_ID}/public/data/gallery_nfts`;
+  const FIREBASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/${FIRESTORE_COLLECTION_PATH}?key=${FIREBASE_WEB_API_KEY}`;
+  
+  // Array para almacenar los documentos a publicar
+  const nftsToPublish = [];
 
-                // 2. Intentar autenticación con el token proporcionado
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    // Si no hay token, usar autenticación anónima
-                    await signInAnonymously(auth);
-                }
+  // 1. Recorrer las filas y encontrar las certificadas
+  dataRows.forEach((row, index) => {
+    // Fila + 2, porque los datos empiezan en la fila 2 del sheet
+    const rowNumber = index + 2; 
 
-                // 3. Listener de estado de autenticación (siempre útil)
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        authStatusElement.textContent = `Autenticado. User ID: ${userId}`;
-                        authStatusElement.classList.remove('text-indigo-500');
-                        authStatusElement.classList.add('text-green-500');
-                        console.log("Firebase Auth listo. User ID:", userId);
+    // Solo publica si la columna "Publicado (SÍ)" contiene "SÍ" (ignora mayúsculas/minúsculas)
+    if (row[COL_PUBLICADO] && row[COL_PUBLICADO].toString().toUpperCase() === 'SÍ') {
+      
+      const nftId = row[COL_ID] ? row[COL_ID].toString() : `nft_${rowNumber}`; // Usa ID si existe, sino crea uno
 
-                        // --- COMIENZA AQUÍ EL CÓDIGO DE TU APLICACIÓN ---
-                        // Una vez que la autenticación es exitosa, puedes llamar a tus funciones de inicialización
-                        // Por ejemplo: initAppLogic(db, userId);
+      // Construye el objeto de datos para Firestore
+      const nftData = {
+        nftAddress: row[COL_ADDRESS] ? row[COL_ADDRESS].toString() : 'not_available',
+        imageUrl: row[COL_URL] ? row[COL_URL].toString() : 'https://placehold.co/400x480/cccccc/000000?text=No+URL',
+        title: row[COL_TITLE] ? row[COL_TITLE].toString() : 'Obra sin título',
+        positionIndex: row[COL_POSITION] ? row[COL_POSITION].toString() : '999', // Usamos string, Firestore lo guarda como string
+        publishedDate: new Date().toISOString()
+      };
+      
+      nftsToPublish.push({ id: nftId, data: nftData });
 
-                    } else {
-                        userId = 'anonymous';
-                        authStatusElement.textContent = "Sesión no iniciada (Anónima).";
-                        console.log("Sesión no iniciada (Anónima).");
-                        authStatusElement.classList.remove('text-green-500');
-                        authStatusElement.classList.add('text-red-500');
-                    }
-                });
+      // Opcional: Marcar la fila como ya procesada (para evitar re-publicar si solo se usa el disparador)
+      // sheet.getRange(rowNumber, COL_PUBLICADO + 1).setValue('PUBLICADO'); 
+    }
+  });
+  
+  // 2. Publicar en Firestore (¡IMPORTANTE! Solo publica los NFTs de la hoja, borra los demás)
+  
+  // Primero, leemos los IDs actuales de la colección para saber qué borrar
+  const existingDocs = getExistingDocumentIds(FIRESTORE_URL);
+  const idsToKeep = nftsToPublish.map(nft => nft.id);
 
-            } catch (error) {
-                console.error("Error al inicializar o autenticar Firebase:", error);
-                authStatusElement.textContent = `Error de Firebase: ${error.message}`;
-                authStatusElement.classList.add('text-red-500');
-            }
-        }
+  // IDs que existen en Firestore pero no están marcados como SÍ en la hoja (y por lo tanto deben ser eliminados)
+  const idsToDelete = existingDocs.filter(id => !idsToKeep.includes(id));
+  
+  // Eliminar documentos obsoletos
+  idsToDelete.forEach(id => {
+    deleteDocument(FIRESTORE_COLLECTION_PATH, id, FIREBASE_PROJECT_ID, FIREBASE_WEB_API_KEY);
+  });
+  
+  // Insertar/Actualizar los documentos certificados
+  let successCount = 0;
+  nftsToPublish.forEach(nft => {
+    if (setDocument(FIRESTORE_COLLECTION_PATH, nft.id, nft.data, FIREBASE_PROJECT_ID, FIREBASE_WEB_API_KEY)) {
+      successCount++;
+    }
+  });
 
-        initializeAppAndAuth();
+  Logger.log(`Proceso completado. Eliminados: ${idsToDelete.length}. Publicados/Actualizados: ${successCount}.`);
+}
 
-        // ----------------------------------------------------
-        // EJEMPLO DE CÓMO OBTENER UNA RUTA DE COLECCIÓN
-        // ----------------------------------------------------
 
-        // Colección privada (para el usuario actual)
-        function getPrivateCollectionRef(collectionName) {
-            if (!db || !userId) {
-                console.error("DB o User ID no disponibles para colección privada.");
-                return null;
-            }
-            return collection(db, `/artifacts/${appId}/users/${userId}/${collectionName}`);
-        }
+// --- FUNCIONES DE UTILIDAD DE FIRESTORE (NO EDITAR ABAJO) ---
 
-        // Colección pública (compartida entre todos los usuarios)
-        function getPublicCollectionRef(collectionName) {
-            if (!db) {
-                console.error("DB no disponible para colección pública.");
-                return null;
-            }
-            return collection(db, `/artifacts/${appId}/public/data/${collectionName}`);
-        }
+/**
+ * Inserta o actualiza un documento en Firestore.
+ * @param {string} collectionPath - Ruta de la colección (ej: 'artifacts/app_id/public/data/collectionName')
+ * @param {string} documentId - ID único del documento (ej: 'nft_123')
+ * @param {Object} data - Objeto JavaScript con los datos.
+ * @returns {boolean} True si la operación fue exitosa.
+ */
+function setDocument(collectionPath, documentId, data, projectId, apiKey) {
+  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/${collectionPath}/${documentId}?key=${apiKey}`;
+  
+  // Convierte el objeto JS a la estructura de campos requerida por la API de Firestore
+  const fields = {};
+  for (const key in data) {
+    // La API requiere el tipo de dato explícito. Simplificamos a 'stringValue'
+    fields[key] = { stringValue: data[key].toString() };
+  }
 
-        // Puedes exportar o definir funciones globales aquí si lo necesitas para interactuar con la consola
-        window.getPublicCollectionRef = getPublicCollectionRef;
-        window.getPrivateCollectionRef = getPrivateCollectionRef;
-        window.displayMessage = displayMessage; // Permite usar displayMessage en tu lógica
-    </script>
-</body>
-</html>
+  const payload = JSON.stringify({ fields: fields });
+
+  const options = {
+    method: 'patch', // Usa PATCH para actualizar o crear si no existe
+    contentType: 'application/json',
+    payload: payload,
+    muteHttpExceptions: true
+  };
+
+  try {
+    const response = UrlFetchApp.fetch(url, options);
+    const result = JSON.parse(response.getContentText());
+
+    if (response.getResponseCode() !== 200) {
+      Logger.log(`Error al publicar ${documentId}: ${result.error.message}`);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    Logger.log(`Excepción al publicar ${documentId}: ${e.toString()}`);
+    return false;
+  }
+}
+
+/**
+ * Obtiene los IDs de todos los documentos en una colección.
+ * @param {string} firestoreUrl - URL base para la colección.
+ * @returns {string[]} Array de IDs de documentos.
+ */
+function getExistingDocumentIds(firestoreUrl) {
+  const url = firestoreUrl; 
+  const options = {
+    method: 'get',
+    muteHttpExceptions: true
+  };
+
+  try {
+    const response = UrlFetchApp.fetch(url, options);
+    const result = JSON.parse(response.getContentText());
+
+    if (response.getResponseCode() !== 200) {
+      Logger.log(`Error al obtener documentos: ${result.error.message}`);
+      return [];
+    }
+    
+    // Extraer los IDs de los documentos
+    const documents = result.documents || [];
+    return documents.map(doc => {
+      // El nombre del documento es "projects/ID/databases/(default)/documents/ruta/ID_DOCUMENTO"
+      const parts = doc.name.split('/');
+      return parts[parts.length - 1];
+    });
+
+  } catch (e) {
+    Logger.log(`Excepción al obtener documentos: ${e.toString()}`);
+    return [];
+  }
+}
+
+/**
+ * Elimina un documento de Firestore.
+ * @param {string} collectionPath - Ruta de la colección.
+ * @param {string} documentId - ID del documento a eliminar.
+ */
+function deleteDocument(collectionPath, documentId, projectId, apiKey) {
+  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/${collectionPath}/${documentId}?key=${apiKey}`;
+  const options = {
+    method: 'delete',
+    muteHttpExceptions: true
+  };
+
+  try {
+    UrlFetchApp.fetch(url, options);
+    Logger.log(`Documento eliminado: ${documentId}`);
+  } catch (e) {
+    Logger.log(`Excepción al eliminar ${documentId}: ${e.toString()}`);
+  }
+}
+
+// Para facilitar la ejecución desde el menú, crea un menú personalizado (opcional)
+function onOpen() {
+  SpreadsheetApp.getUi()
+      .createMenu('ART5D Publicador')
+      .addItem('Publicar Obras Certificadas en Vivo', 'publishCertifiedNFTs')
+      .addToUi();
+}
