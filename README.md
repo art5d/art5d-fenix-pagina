@@ -1,4 +1,4 @@
-ART5D - FÉNIX v5.0 (Galería Estática Certificada)
+ART5D 
 
 Este repositorio contiene el código fuente de la plataforma ART5D, migrado a una arquitectura estática (Single Page Application) para máxima velocidad y fiabilidad, eliminando las dependencias pesadas de visores 3D (P2VR, Three.js).
 
