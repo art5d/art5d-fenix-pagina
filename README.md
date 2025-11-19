@@ -1,109 +1,91 @@
-art5d-fenix-pagina
+ART5D - FÉNIX v5.0 (Galería Estática Certificada)
 
-Página de Ventas y Certificación ART5D 🖼️ Galería Digital Profesional del Artista
+Este repositorio contiene el código fuente de la plataforma ART5D, migrado a una arquitectura estática (Single Page Application) para máxima velocidad y fiabilidad, eliminando las dependencias pesadas de visores 3D (P2VR, Three.js).
 
-Versión: 1.0.0
-Estado del Proyecto: Activo y en Mantenimiento
+🚀 Inicio Rápido y Despliegue
 
-📝 Descripción del Proyecto
+La aplicación se alimenta de la data en tiempo real desde Firebase Firestore y se despliega automáticamente a Netlify tras cada merge a la rama principal (main).
 
-Este repositorio contiene la estructura principal y la documentación para la Galería Digital del Artista. El objetivo es ofrecer una plataforma de alto rendimiento y visualmente atractiva para la exhibición de obras de arte, bocetos y colecciones certificadas, usando Firebase para la gestión de contenido en tiempo real.
+1. Requisitos
 
-✨ Características Principales
+Node.js (versión recomendada)
 
-Portafolio Dinámico: Vista de galería interactiva con filtrado por colección, estilo o fecha (implementado con Firestore).
+npm o yarn
 
-Certificación Digital: Mecanismo para validar la autenticidad de las obras y los Bocetos IA Certificados.
+Credenciales de Firebase configuradas como variables de entorno.
 
-Diseño Responsivo: Visualización óptima en dispositivos móviles, tabletas y escritorio.
+2. Ejecución Local (Desarrollo)
 
-Gestión en Tiempo Real: Uso de Firestore para la administración y publicación instantánea de contenido.
+Para trabajar en el código de la galería:
 
-🚀 Instalación y Configuración (Para Desarrolladores)
-
-Sigue estos pasos para levantar el entorno local:
-
-Clonar el Repositorio:
-
-git clone [URL_DEL_REPOSITORIO] 
-cd art5d-fenix-pagina
-
-
-Instalar dependencias: Asegúrate de tener Node.js instalado.
+Instalar dependencias:
 
 npm install
+# o
+yarn install
 
 
-Configuración de variables de entorno: Crea un archivo .env en el directorio raíz y configura las credenciales necesarias (Firebase, claves API, etc.).
+Ejecutar la aplicación (Modo Desarrollo):
 
-Ejemplo de .env
-
-FIREBASE_API_KEY="TU_CLAVE_API_FIREBASE"
-DB_URL="URL_DE_TU_BASE_DE_DATOS_FIREBASE"
-# ... otras variables
+npm run dev
+# o
+yarn dev
 
 
-Ejecutar la aplicación:
+La aplicación se iniciará en un puerto local dinámico, generalmente http://localhost:5173.
 
-npm run start
+3. Despliegue (Producción)
 
+El despliegue es completamente automatizado a través de Netlify, enlazado a tu repositorio de GitHub.
 
-La aplicación se iniciará en http://localhost:3000.
+Etapa
 
-🛠️ Uso y Despliegue
+Plataforma
 
-Gestión de contenido
+Rama de Origen
 
-El contenido de la galería se administra principalmente a través de la consola de administración conectada a Firestore.
+URL de Acceso
 
-Carga de obras: Utiliza el panel de administración para subir nuevas imágenes y rellenar los metadatos (título, técnica, dimensiones, año).
+Producción
 
-Actualización de catálogos: Las colecciones se pueden modificar desde la sección "Ajustes de galería" en el panel.
+Netlify
 
-🔑 Planes de Contenido y Actualizaciones
+main (o la rama principal)
 
-A. PACK GOLD (Actualización de contenido - [2025-10-09])
+art5d.cl
 
-El PACK GOLD corresponde a la publicación de un conjunto premium de imágenes en la galería. La configuración de este paquete en la base de datos debe adherirse al siguiente formato:
+Desarrollo
 
-Categoría
+Netlify
 
-Cantidad
+Ramas de preview
 
-Requisitos de Certificación
+art5d.netlify.app (Subdominios de preview)
 
-Imágenes Propias del Artista
+🛠️ Gestión de Contenido y Sincronización
 
-10
+La gestión de contenido y la lógica de certificación se simplifican y se centralizan:
 
-Alta Resolución (mín. 4K)
+1. Gestión de Contenido (Firebase Firestore)
 
-Bocetos IA Certificados por ART5D
+Todas las obras se gestionan directamente en la consola de Firebase Firestore.
 
-5
+Ubicación de Data: Firestore Database > /artifacts/{appId}/public/data/obras
 
-Requiere hash de certificación
+Estructura de Datos: Cada documento debe contener la data limpia y necesaria (título, artista, imageUrl, status, type).
 
-Total de Imágenes en la Galería
+Lógica del PACK GOLD (Validación): La lógica de la aplicación valida los límites: 10 Obras Propias Certificadas + 5 Bocetos IA Certificados por artista.
 
-15
+2. Sincronización y Certificación (App Script / Cloud)
 
+Las funciones complejas de validación y certificación se manejan en back-end mediante:
 
+Google App Script (ART5D_Sincronizador_Total): Para la automatización de flujos de trabajo con hojas de cálculo y Firebase.
 
-Nota Importante: Asegúrate de que los textos de exhibición estén corregidos y muestren esta composición total de 15 imágenes.
+Google Cloud Console: Para la función de Actualización Avanzada (tareas más robustas).
 
-B. Actualización Avanzada (Formato y Ventana - [2025-11-07])
+🚨 Notas de Auditoría
 
-La función de "Actualización Avanzada" (advancedUpdate) no se ejecuta desde el panel principal. El nuevo formato y flujo de esta función debe registrarse y gestionarse directamente a través de:
+Archivos Obsoletos (Limpieza P2VR): Se eliminó más de 1.2 GB de assets (/pano, /scenes, componentes 3D).
 
-Ubicación de la Función: Se encuentra disponible en una ventana de consola diferente dentro de la herramienta de implementación (probablemente en Cloud Functions o un entorno similar).
-
-Ejecución: Debes usar la Consola de Google Cloud para invocar esta función con los parámetros de registro específicos.
-
-🤝 Contribución
-
-Agradecemos cualquier contribución para mejorar la galería. Por favor, lee CONTRIBUTING.md para conocer el proceso de envío de solicitudes de extracción.
-
-📄 Licencia
-
-Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo LICENSE.md para obtener más detalles.
+Depuración de Datos: Se recomienda revisar y limpiar los campos obsoletos de P2VR en la colección obras de Firestore (ver el Checklist de Limpieza anterior).
