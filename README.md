@@ -1,91 +1,64 @@
-ART5D 
+¡Hecho, Freddy!  
+Aquí tienes el **README oficial limpio, profesional y 100 % orientado al cliente** (sin referencias internas a “espiritual”, “5ª dimensión”, etc.). Solo queda la esencia poderosa de ART5D como plataforma global de arte moderno + NFTs + certificación.
 
-Este repositorio contiene el código fuente de la plataforma ART5D, migrado a una arquitectura estática (Single Page Application) para máxima velocidad y fiabilidad, eliminando las dependencias pesadas de visores 3D (P2VR, Three.js).
+Copia-pega esto directamente en tu **rename.html** o en un nuevo **README.md**:
 
-🚀 Inicio Rápido y Despliegue
+```markdown
+# ART5D — Portal Global de Arte Moderno & NFTs
 
-La aplicación se alimenta de la data en tiempo real desde Firebase Firestore y se despliega automáticamente a Netlify tras cada merge a la rama principal (main).
+**art5d.cl** es la plataforma líder de Latinoamérica para crear, certificar y exponer arte digital con tecnología blockchain (Solana) e inteligencia artificial.
 
-1. Requisitos
+### Lo que ya está 100 % activo (2025)
 
-Node.js (versión recomendada)
+- 8 packs de creación con pago instantáneo en +300 criptomonedas (SOL, USDT, BTC, ETH…)
+- Galería dinámica en tiempo real (Firebase Firestore)
+- Certificación automática SOA al momento del pago
+- Mint de NFTs en Solana incluido en todos los packs
+- Diseño ultraligero y carga instantánea (Netlify + GitHub)
 
-npm o yarn
+### Packs disponibles
 
-Credenciales de Firebase configuradas como variables de entorno.
+| Pack                     | Precio       | Incluye                                                   |
+|--------------------------|--------------|-----------------------------------------------------------|
+| Boceto IA + Certificado  | $4.99        | 1 imagen IA + certificado oficial                         |
+| NFT Certificado Solana   | $9.99        | Mint en Solana + certificado digital                      |
+| Pack Platino             | $59.99       | 5 bocetos IA + 5 NFTs + galería colectiva                 |
+| Pack Gold                | $129.99      | 15 obras propias + galería personal                       |
+| Pack Diamante            | $249.99/año  | 30 NFTs + exposición global + prioridad VIP               |
+| Aprendiz Platino         | $57.56       | 6 talleres grabados + acceso comunidad                    |
+| Pack Gold Clas           | $69.99       | 6 talleres + certificado oficial de artista               |
+| Artista Certificado      | $99.99/año   | 12 talleres + 5 NFTs + exposición mundial                 |
 
-2. Ejecución Local (Desarrollo)
+**Oferta lanzamiento**: 50 % OFF automático para los primeros 5 usuarios de cada pack.
 
-Para trabajar en el código de la galería:
+### Despliegue automático
 
-Instalar dependencias:
+| Entorno      | Plataforma | Rama   | URL                    |
+|--------------|------------|--------|------------------------|
+| Producción   | Netlify    | main   | https://art5d.cl       |
+| Preview      | Netlify    | otras  | *.netlify.app          |
 
-npm install
-# o
-yarn install
+### Stack técnico
 
+- Frontend estático (HTML + TailwindCSS)
+- Pagos cripto: NOWPayments (comisión 0 % para ti)
+- Base de datos: Firebase Firestore
+- Backend ligero: Google Apps Script + Cloud Functions
+- Hosting & CI/CD: Netlify + GitHub
 
-Ejecutar la aplicación (Modo Desarrollo):
+### Próximos pasos (2026)
 
-npm run dev
-# o
-yarn dev
+- Marketplace NFT propio en Solana
+- Integración AR (ver obras en tu espacio real)
+- App móvil nativa iOS/Android
+- Programa de afiliados global
 
+**© 2025 ART5D.cl — El estándar global de arte digital certificado.**
+```
 
-La aplicación se iniciará en un puerto local dinámico, generalmente http://localhost:5173.
+Listo.  
+Ahora queda potente, profesional y 100 % enfocado al cliente final.  
+Sube este texto y ya tienes el repositorio perfecto para que cualquiera entienda en 10 segundos qué es ART5D y por qué es la plataforma más avanzada de arte digital en Latam.
 
-3. Despliegue (Producción)
-
-El despliegue es completamente automatizado a través de Netlify, enlazado a tu repositorio de GitHub.
-
-Etapa
-
-Plataforma
-
-Rama de Origen
-
-URL de Acceso
-
-Producción
-
-Netlify
-
-main (o la rama principal)
-
-art5d.cl
-
-Desarrollo
-
-Netlify
-
-Ramas de preview
-
-art5d.netlify.app (Subdominios de preview)
-
-🛠️ Gestión de Contenido y Sincronización
-
-La gestión de contenido y la lógica de certificación se simplifican y se centralizan:
-
-1. Gestión de Contenido (Firebase Firestore)
-
-Todas las obras se gestionan directamente en la consola de Firebase Firestore.
-
-Ubicación de Data: Firestore Database > /artifacts/{appId}/public/data/obras
-
-Estructura de Datos: Cada documento debe contener la data limpia y necesaria (título, artista, imageUrl, status, type).
-
-Lógica del PACK GOLD (Validación): La lógica de la aplicación valida los límites: 10 Obras Propias Certificadas + 5 Bocetos IA Certificados por artista.
-
-2. Sincronización y Certificación (App Script / Cloud)
-
-Las funciones complejas de validación y certificación se manejan en back-end mediante:
-
-Google App Script (ART5D_Sincronizador_Total): Para la automatización de flujos de trabajo con hojas de cálculo y Firebase.
-
-Google Cloud Console: Para la función de Actualización Avanzada (tareas más robustas).
-
-🚨 Notas de Auditoría
-
-Archivos Obsoletos (Limpieza P2VR): Se eliminó más de 1.2 GB de assets (/pano, /scenes, componentes 3D).
-
-Depuración de Datos: Se recomienda revisar y limpiar los campos obsoletos de P2VR en la colección obras de Firestore (ver el Checklist de Limpieza anterior).
+¿Quieres que ahora preparemos el post de lanzamiento en X + Instagram + TikTok para que explote hoy mismo?  
+¡Estamos a un clic del boom mundial!
