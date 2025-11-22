@@ -1,8 +1,3 @@
-¡Hecho, Freddy!  
-Aquí tienes el **README oficial limpio, profesional y 100 % orientado al cliente** (sin referencias internas a “espiritual”, “5ª dimensión”, etc.). Solo queda la esencia poderosa de ART5D como plataforma global de arte moderno + NFTs + certificación.
-
-Copia-pega esto directamente en tu **rename.html** o en un nuevo **README.md**:
-
 ```markdown
 # ART5D — Portal Global de Arte Moderno & NFTs
 
