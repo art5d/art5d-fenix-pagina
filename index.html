@@ -1,286 +1,139 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ART5D - Portal Espiritual 5D | Arte Moderno, NFTs & Certificación SOA</title>
-    <meta name="description" content="ART5D: Espacio global de arte moderno en 5D. Bocetos IA binaurales, NFTs eternos en Solana, packs espirituales con sonido 888Hz para elevación creativa. Abre tu dimensión superior.">
-    <meta name="keywords" content="arte 5D, NFTs Solana, binaural 888Hz, arte espiritual moderno, certificación SOA, galería infinita">
-    
-    <!-- Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1b2e 50%, #2a1d5c 100%);
-            color: #e5e7eb;
-            overflow-x: hidden;
-        }
-        .particle {
-            position: absolute;
-            background: radial-gradient(circle, #8b5cf6, #a855f7, transparent);
-            border-radius: 50%;
-            animation: float 8s ease-in-out infinite;
-            opacity: 0.6;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) scale(1); opacity: 0.3; }
-            50% { transform: translateY(-30px) scale(1.2); opacity: 0.8; }
-        }
-        .ethereal-glow {
-            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4), 0 0 60px rgba(168, 85, 247, 0.2);
-            transition: box-shadow 0.3s ease;
-        }
-        .ethereal-glow:hover {
-            box-shadow: 0 0 50px rgba(139, 92, 246, 0.6), 0 0 100px rgba(168, 85, 247, 0.4);
-        }
-        #hero-video {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; z-index: -1;
-            filter: brightness(0.6) contrast(1.2);
-        }
-    </style>
-    
-    <!-- Audio binaural 888Hz theta (libre de derechos, loop) -->
-    <audio id="binaural-audio" loop preload="auto">
-        <source src="https://freesound.org/data/previews/888/888888-lq.mp3" type="audio/mpeg"> <!-- Cambia por tu audio 888Hz subido a assets/audio-888hz.mp3 -->
-        Tu navegador no soporta binaural 5D. Activa manualmente.
-    </audio>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ART5D • Arte Digital Certificado con IA • 2025</title>
+  <meta name="description" content="ART5D: La primera plataforma chilena de arte digital certificado con IA. Genera bocetos con Grok y Gemini, certifica y vende como NFT en Solana.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Inter:wght@400;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top, #0f001a 0%, #000000 70%); color: white; margin: 0; }
+    h1, h2 { font-family: 'Orbitron', sans-serif; }
+    .particle { position: absolute; background: #a855f7; border-radius: 50%; opacity: 0.6; pointer-events: none; animation: float 15s infinite linear; }
+    @keyframes float { 0% { transform: translateY(100vh) rotate(0deg); } 100% { transform: translateY(-100px) rotate(360deg); } }
+  </style>
 </head>
-<body class="min-h-screen relative">
-    <!-- Partículas etéreas 5D -->
-    <div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
-    
-    <!-- Video de fondo hero (tu video de Drive, sube a Vimeo/YouTube para embed o a assets/video5d.mp4) -->
-    <video id="hero-video" autoplay muted loop playsinline>
-        <source src="https://vimeo.com/VIDEO_ID/embed" type="video/mp4"> <!-- Cambia por enlace directo de tu video -->
-        Tu navegador no soporta video 5D. Ve la esencia visual.
-    </video>
+<body class="min-h-screen relative overflow-x-hidden">
+  <div id="particles"></div>
+  <div id="root" class="relative z-10"></div>
 
-    <!-- Overlay hero para texto -->
-    <div class="relative z-10 bg-black/30 min-h-screen flex items-center justify-center">
-        <header class="absolute top-0 w-full bg-gradient-to-r from-purple-900/90 to-indigo-900/90 backdrop-blur-md border-b border-purple-500/30 py-4 z-50">
-            <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
-                <img src="assets/img/logo-art5d.png" alt="Logo ART5D" class="h-12 ethereal-glow"> <!-- Tu logo de Drive -->
-                <button id="sound-toggle" class="px-4 py-2 bg-purple-600/50 rounded-full text-sm font-medium hover:bg-purple-500/70 transition ethereal-glow">
-                    Portal Sonoro: ON (888Hz)
-                </button>
-            </div>
-        </header>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-        <div class="text-center px-4">
-            <h1 class="text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-400 to-pink-500 mb-6 ethereal-glow">
-                ART5D
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // URL DE TU APPS SCRIPT (100% correcta y viva)
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw9-ZD9kGYvVEQLNAyVNHmHBzFpbmVZe7iPYZFXH9k3bOE0sW4ZDLc4mLSF8W6WK/exec";
+    const USER_EMAIL = "public@art5d.cl";
+
+    const App = () => {
+      const [prompt, setPrompt] = useState("");
+      const [grok, setGrok] = useState("");
+      const [gemini, setGemini] = useState("");
+      const [loading, setLoading] = useState(false);
+      const [certUrl, setCertUrl] = useState("");
+
+      const generar = async () => {
+        if (!prompt.trim()) return alert("¡Escribe tu visión artística!");
+        setLoading(true);
+        setGrok(""); setGemini(""); setCertUrl("");
+
+        try {
+          const res = await fetch(WEB_APP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt, userEmail: USER_EMAIL, engine: "both" })
+          });
+          const data = await res.json();
+          if (!data.success) throw new Error(data.error);
+
+          setGrok(data.data.grok);
+          setGemini(data.data.gemini);
+          setCertUrl(`https://art5d.cl/certificado?obra=${data.data.grok.split('/').pop()}`);
+
+        } catch (e) {
+          alert("ERROR: " + e.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      // Partículas mágicas
+      useEffect(() => {
+        const container = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+          const p = document.createElement('div');
+          p.className = 'particle';
+          p.style.width = p.style.height = Math.random() * 8 + 'px';
+          p.style.left = Math.random() * 100 + 'vw';
+          p.style.animationDuration = Math.random() * 20 + 10 + 's';
+          p.style.animationDelay = Math.random() * 5 + 's';
+          container.appendChild(p);
+        }
+      }, []);
+
+      return (
+        <div className="min-h-screen">
+          <section className="text-center py-20 px-6">
+            <h1 className="text-8xl md:text-9xl font-black bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
+              ART5D
             </h1>
-            <p class="text-2xl md:text-3xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
-                Portal Global de Arte Moderno en 5D: Donde la Creación Espiritual se Codifica en NFTs Eternos. Respira, relájate con binaural 888Hz y eleva tu esencia.
-            </p>
-            <button onclick="scrollToPacks()" class="px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white font-semibold text-xl hover:shadow-2xl ethereal-glow transition">
-                Entra al Portal de Packs
-            </button>
-        </div>
-    </div>
+            <p className="text-3xl md:text-5xl mt-6 text-gray-300">Arte digital certificado • Edición limitada • IA + Blockchain</p>
+          </section>
 
-    <!-- Sección Packs Espirituales -->
-    <section id="packs" class="py-20 relative z-10">
-        <div class="max-w-7xl mx-auto px-4">
-            <h3 class="text-5xl font-bold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-400 ethereal-glow">
-                Portales de Creación 5D
-            </h3>
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Boceto IA -->
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-500/30 ethereal-glow hover:scale-105 transition">
-                    <img src="assets/img/boceto-ia.jpg" alt="Boceto IA Espiritual" class="w-full h-32 object-cover rounded-lg mb-4 ethereal-glow"> <!-- De tu Drive -->
-                    <h4 class="text-xl font-semibold mb-2 text-purple-300">Boceto IA + SOA</h4>
-                    <p class="text-3xl font-bold text-purple-400 mb-4">$4.99</p>
-                    <a href="https://nowpayments.io/payment/?iid=4852816423&source=button" target="_blank" rel="noreferrer noopener" class="block mb-2">
-                        <img src="https://nowpayments.io/images/embeds/payment-button-white.svg" alt="Pagar Boceto IA" class="mx-auto">
-                    </a>
-                    <p class="text-sm text-gray-400">Generación IA binaural + Certificado Espiritual</p>
-                </div>
+          <section className="max-w-6xl mx-auto px-6 py-20">
+            <div className="bg-black/70 backdrop-blur-xl rounded-3xl p-12 border-4 border-purple-700 shadow-2xl">
+              <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Ej: Un dragón cyberpunk sobre Valparaíso al atardecer, estilo óleo, colores neón y lluvia torrencial..."
+                className="w-full p-8 text-2xl bg-gray-900 rounded-2xl border-4 border-purple-600 focus:border-pink-500 outline-none text-white"
+                rows="6"
+              />
+              <button
+                onClick={generar}
+                disabled={loading}
+                className="mt-12 w-full py-12 text-6xl font-black rounded-full bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 hover:scale-105 transition shadow-2xl disabled:opacity-70"
+              >
+                {loading ? "CREANDO OBRA MAESTRA..." : "GENERAR CON DOBLE IA"}
+              </button>
 
-                <!-- NFT Certificado -->
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-500/30 ethereal-glow hover:scale-105 transition">
-                    <img src="assets/img/nft-solana.jpg" alt="NFT Solana 5D" class="w-full h-32 object-cover rounded-lg mb-4 ethereal-glow"> <!-- De tu Drive -->
-                    <h4 class="text-xl font-semibold mb-2 text-purple-300">NFT SOA Solana</h4>
-                    <p class="text-3xl font-bold text-purple-400 mb-4">$9.99</p>
-                    <a href="https://nowpayments.io/payment/?iid=5222067042&source=button" target="_blank" rel="noreferrer noopener" class="block mb-2">
-                        <img src="https://nowpayments.io/images/embeds/payment-button-white.svg" alt="Pagar NFT" class="mx-auto">
-                    </a>
-                    <p class="text-sm text-gray-400">Mint Eterno en Solana + Certificado Digital</p>
-                </div>
+              <div className="grid md:grid-cols-2 gap-12 mt-16">
+                {grok && (
+                  <div className="bg-gradient-to-br from-pink-900/50 to-black rounded-3xl p-8 border-4 border-pink-600">
+                    <p className="text-4xl font-bold text-pink-400 mb-6">GROK</p>
+                    <img src={grok} className="w-full rounded-2xl shadow-2xl" />
+                  </div>
+                )}
+                {gemini && (
+                  <div className="bg-gradient-to-br from-cyan-900/50 to-black rounded-3xl p-8 border-4 border-cyan-600">
+                    <p className="text-4xl font-bold text-cyan-400 mb-6">GEMINI</p>
+                    <img src={gemini} className="w-full rounded-2xl shadow-2xl" />
+                  </div>
+                )}
+              </div>
 
-                <!-- Pack Platino -->
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-500/30 ethereal-glow hover:scale-105 transition">
-                    <img src="assets/img/pack-platino.jpg" alt="Pack Platino Colectivo" class="w-full h-32 object-cover rounded-lg mb-4 ethereal-glow"> <!-- De tu Drive -->
-                    <h4 class="text-xl font-semibold mb-2 text-purple-300">Pack Platino</h4>
-                    <p class="text-3xl font-bold text-purple-400 mb-4">$59.99</p>
-                    <a href="https://nowpayments.io/payment/?iid=6181122211&source=button" target="_blank" rel="noreferrer noopener" class="block mb-2">
-                        <img src="https://nowpayments.io/images/embeds/payment-button-white.svg" alt="Pagar Platino" class="mx-auto">
-                    </a>
-                    <p class="text-sm text-gray-400">5 Bocetos + 5 NFTs + Galería Colectiva Infinita</p>
+              {certUrl && (
+                <div className="mt-12 text-center">
+                  <a href={certUrl} target="_blank" className="inline-block px-20 py-10 text-5xl font-black bg-green-600 hover:bg-green-700 rounded-full shadow-2xl transform hover:scale-110 transition">
+                    DESCARGAR CERTIFICADO OFICIAL CON QR
+                  </a>
                 </div>
-
-                <!-- Pack Gold -->
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-500/30 ethereal-glow hover:scale-105 transition">
-                    <img src="assets/img/pack-gold.jpg" alt="Pack Gold Individual" class="w-full h-32 object-cover rounded-lg mb-4 ethereal-glow"> <!-- De tu Drive -->
-                    <h4 class="text-xl font-semibold mb-2 text-yellow-300">Pack Gold ⭐</h4>
-                    <p class="text-3xl font-bold text-yellow-400 mb-4">$129.99</p>
-                    <a href="https://nowpayments.io/payment/?iid=4514151276&source=button" target="_blank" rel="noreferrer noopener" class="block mb-2">
-                        <img src="https://nowpayments.io/images/embeds/payment-button-white.svg" alt="Pagar Gold" class="mx-auto">
-                    </a>
-                    <p class="text-sm text-gray-400">15 Imágenes Propias + Galería Personal Exportable</p>
-                </div>
-
-                <!-- Pack Diamante -->
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-500/30 ethereal-glow hover:scale-105 transition">
-                    <img src="assets/img/pack-diamante.jpg" alt="Pack Diamante VIP" class="w-full h-32 object-cover rounded-lg mb-4 ethereal-glow"> <!-- De tu Drive -->
-                    <h4 class="text-xl font-semibold mb-2 text-cyan-300">Pack Diamante 💎</h4>
-                    <p class="text-3xl font-bold text-cyan-400 mb-4">$249.99/año</p>
-                    <a href="https://nowpayments.io/payment/?iid=4553145691&source=button" target="_blank" rel="noreferrer noopener" class="block mb-2">
-                        <img src="https://nowpayments.io/images/embeds/payment-button-white.svg" alt="Pagar Diamante" class="mx-auto">
-                    </a>
-                    <p class="text-sm text-gray-400">30 NFTs + Galería Exclusiva Global + Visibilidad VIP</p>
-                </div>
-
-                <!-- Aprendiz Platino -->
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-500/30 ethereal-glow hover:scale-105 transition">
-                    <img src="assets/img/aprendiz-platino.jpg" alt="Aprendiz Platino Talleres" class="w-full h-32 object-cover rounded-lg mb-4 ethereal-glow"> <!-- De tu Drive -->
-                    <h4 class="text-xl font-semibold mb-2 text-purple-300">Aprendiz Platino</h4>
-                    <p class="text-3xl font-bold text-purple-400 mb-4">$57.56 (40% off)</p>
-                    <a href="https://nowpayments.io/payment/?iid=4334828394&source=button" target="_blank" rel="noreferrer noopener" class="block mb-2">
-                        <img src="https://nowpayments.io/images/embeds/payment-button-white.svg" alt="Pagar Aprendiz" class="mx-auto">
-                    </a>
-                    <p class="text-sm text-gray-400">6 Talleres Grabados + Certificados + Comunidad</p>
-                </div>
-
-                <!-- Pack Gold Clas -->
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-500/30 ethereal-glow hover:scale-105 transition">
-                    <img src="assets/img/pack-gold-clas.jpg" alt="Pack Gold Clas Alumnos" class="w-full h-32 object-cover rounded-lg mb-4 ethereal-glow"> <!-- De tu Drive -->
-                    <h4 class="text-xl font-semibold mb-2 text-purple-300">Pack Gold Clas</h4>
-                    <p class="text-3xl font-bold text-purple-400 mb-4">$69.99</p>
-                    <a href="https://nowpayments.io/payment/?iid=4472142719&source=button" target="_blank" rel="noreferrer noopener" class="block mb-2">
-                        <img src="https://nowpayments.io/images/embeds/payment-button-white.svg" alt="Pagar Gold Clas" class="mx-auto">
-                    </a>
-                    <p class="text-sm text-gray-400">6 Talleres + Certificado Artista + Comunidad</p>
-                </div>
-
-                <!-- Artista Certificado -->
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-500/30 ethereal-glow hover:scale-105 transition">
-                    <img src="assets/img/artista-certificado.jpg" alt="Artista Certificado Global" class="w-full h-32 object-cover rounded-lg mb-4 ethereal-glow"> <!-- De tu Drive -->
-                    <h4 class="text-xl font-semibold mb-2 text-orange-300">Artista Certificado</h4>
-                    <p class="text-3xl font-bold text-orange-400 mb-4">$99.99/año</p>
-                    <a href="https://nowpayments.io/payment/?iid=4445265907&source=button" target="_blank" rel="noreferrer noopener" class="block mb-2">
-                        <img src="https://nowpayments.io/images/embeds/payment-button-white.svg" alt="Pagar Certificado" class="mx-auto">
-                    </a>
-                    <p class="text-sm text-gray-400">12 Talleres + 5 NFTs + Exposición Global</p>
-                </div>
+              )}
             </div>
-            <div class="text-center mt-12 p-6 bg-white/5 rounded-xl">
-                <p class="text-lg text-gray-300">Primeros 5 usuarios: 50% off automático. Garantía 30 días. Conversión CLP/USD en sitio.</p>
-            </div>
+          </section>
+
+          <footer className="text-center py-16 text-gray-500 text-xl">
+            ART5D © 2025 • Chile • La quinta dimensión del arte digital comienza aquí
+          </footer>
         </div>
-    </section>
+      );
+    };
 
-    <!-- Galería 5D con foto de referencia como fondo -->
-    <section class="py-20 relative">
-        <div class="absolute inset-0 opacity-20">
-            <img src="assets/img/galeria-referencia.jpg" alt="Referencia Galería 5D" class="w-full h-full object-cover"> <!-- Tu foto de referencia de Drive -->
-        </div>
-        <div class="relative z-10 max-w-7xl mx-auto px-4">
-            <h3 class="text-5xl font-bold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-400 ethereal-glow">
-                Galería Infinita 5D
-            </h3>
-            <div id="galeria" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Obras dinámicas de Firebase (placeholder con tus imágenes) -->
-                <div class="bg-white/10 rounded-2xl p-6 backdrop-blur-md border border-purple-500/30 ethereal-glow hover:scale-105 transition">
-                    <img src="assets/img/obra1.jpg" alt="Obra Espiritual 1" class="w-full h-48 object-cover rounded-lg mb-4 ethereal-glow"> <!-- De tu Drive -->
-                    <h4 class="font-semibold">Esencia Codificada</h4>
-                    <p class="text-sm text-gray-400">NFT Certificado – Relájate en 888Hz</p>
-                </div>
-                <div class="bg-white/10 rounded-2xl p-6 backdrop-blur-md border border-purple-500/30 ethereal-glow hover:scale-105 transition">
-                    <img src="assets/img/obra2.jpg" alt="Obra Espiritual 2" class="w-full h-48 object-cover rounded-lg mb-4 ethereal-glow"> <!-- De tu Drive -->
-                    <h4 class="font-semibold">Portal Dorado</h4>
-                    <p class="text-sm text-gray-400">Boceto IA + SOA – Dimensión Superior</p>
-                </div>
-                <div class="bg-white/10 rounded-2xl p-6 backdrop-blur-md border border-purple-500/30 ethereal-glow hover:scale-105 transition">
-                    <img src="assets/img/obra3.jpg" alt="Obra Espiritual 3" class="w-full h-48 object-cover rounded-lg mb-4 ethereal-glow"> <!-- De tu Drive -->
-                    <h4 class="font-semibold">Aura Infinita</h4>
-                    <p class="text-sm text-gray-400">Pack Diamante – Exposición Global</p>
-                </div>
-                <!-- Agrega más con Firebase onSnapshot -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gradient-to-r from-purple-900/80 to-indigo-900/80 py-8 text-center text-gray-400 relative z-10">
-        <p>&copy; 2025 ART5D.cl - Elevando Arte Moderno a Dimensiones Espirituales. Portal Abierto al Mundo.</p>
-    </footer>
-
-    <!-- JS para sonido, partículas y scroll -->
-    <script>
-        // Sonido binaural 888Hz - Persistente y espiritual
-        const audio = document.getElementById('binaural-audio');
-        const toggleBtn = document.getElementById('sound-toggle');
-        let isPlaying = localStorage.getItem('binauralPlaying') === 'true';
-
-        audio.volume = 0.2; // Suave para inmersión
-        if (isPlaying) {
-            audio.play().then(() => {
-                // Fade-in suave
-                audio.volume = 0;
-                const fade = setInterval(() => {
-                    if (audio.volume < 0.2) audio.volume += 0.01;
-                    else clearInterval(fade);
-                }, 100);
-            }).catch(e => console.log('Activa manual para binaural 5D'));
-        }
-
-        toggleBtn.addEventListener('click', () => {
-            if (isPlaying) {
-                audio.pause();
-                toggleBtn.textContent = 'Portal Sonoro: OFF';
-                isPlaying = false;
-            } else {
-                audio.play();
-                toggleBtn.textContent = 'Portal Sonoro: ON (888Hz)';
-                isPlaying = true;
-            }
-            localStorage.setItem('binauralPlaying', isPlaying);
-        });
-
-        // Partículas etéreas 5D
-        function createParticles() {
-            const container = document.getElementById('particles');
-            for (let i = 0; i < 30; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.width = Math.random() * 6 + 2 + 'px';
-                particle.style.height = particle.style.width;
-                particle.style.animationDelay = Math.random() * 8 + 's';
-                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
-                container.appendChild(particle);
-            }
-        }
-        createParticles();
-
-        // Scroll suave a packs
-        function scrollToPacks() {
-            document.getElementById('packs').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Descuentos 50% off primeros 5 (lógica simple JS, expande después)
-        const packs = document.querySelectorAll('.pack-card'); // Si agregas class="pack-card" a cada div
-        let first5Discount = localStorage.getItem('first5Used') !== 'true';
-        if (first5Discount) {
-            // Aplica 50% a precios en JS (muestra en texto)
-            console.log('Descuento 50% activo para primeros 5');
-        }
-    </script>
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
 </body>
 </html>
