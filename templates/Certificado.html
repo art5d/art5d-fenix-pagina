@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: 'Georgia', serif; background: linear-gradient(135deg, #0f0f23, #1a1a2e); color: #e2e8f0; padding: 40px; }
+      .cert { max-width: 800px; margin: 0 auto; background: rgba(255,255,255,0.95); color: #111; padding: 60px; border-radius: 20px; border: 6px solid #ec4899; position: relative; }
+      h1 { font-size: 48px; color: #ec4899; text-align: center; margin-bottom: 40px; }
+      .logo { text-align: center; margin-bottom: 30px; }
+      .logo img { width: 120px; }
+      .data { font-size: 20px; line-height: 2; }
+      .footer { text-align: center; margin-top: 60px; font-size: 14px; color: #666; }
+      .qr { position: absolute; bottom: 60px; right: 60px; }
+    </style>
+  </head>
+  <body>
+    <div class="cert">
+      <div class="logo">
+        <h1>ART5D</h1>
+        <p>Certificado Oficial de Autenticidad</p>
+      </div>
+      
+      <h1>OBRA CERTIFICADA</h1>
+      
+      <div class="data">
+        <strong>ID de Obra:</strong> <?= data.artworkId ?><br>
+        <strong>Fecha:</strong> <?= new Date().toLocaleString("es-CL") ?><br>
+        <strong>Autor:</strong> <?= Session.getActiveUser().getEmail() ?><br>
+        <strong>Motor IA:</strong> <?= data.engine.toUpperCase() ?><br>
+        <strong>Prompt:</strong> <?= data.prompt ?><br><br>
+        
+        <p>Esta obra ha sido generada y certificada con tecnología blockchain ART5D.<br>
+        Metadatos permanentes en Google Drive + NFT en Solana (próximamente).</p>
+      </div>
+      
+      <div class="footer">
+        ART5D © 2025 – El estándar mundial de arte certificado con IA<br>
+        www.art5d.cl
+      </div>
+    </div>
+  </body>
+</html>
