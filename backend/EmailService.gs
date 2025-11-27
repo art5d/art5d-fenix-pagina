@@ -1,42 +1,20 @@
-// EmailService.gs – Emails automáticos ART5D (bienvenida + obra certificada con PDF)
-
-function sendWelcomeEmail(email, packId, packNombre) {
-  const subject = "¡Bienvenido a ART5D – Tu pack está activado!";
-  const htmlBody = `
-    <h1 style="color:#ec4899;">¡FELICIDADES, ARTISTA!</h1>
-    <p>Tu <strong>${packNombre}</strong> ha sido activado exitosamente.</p>
-    <p>Ya puedes generar hasta ${getLimitesPack(packId).ia + getLimitesPack(packId).propias} obras certificadas con IA + NFT en Solana.</p>
-    <br>
-    <p><a href="${ScriptApp.getService().getUrl()}" style="background:#ec4899;color:white;padding:15px 30px;text-decoration:none;border-radius:50px;font-weight:bold;">IR A CERTIFICAR OBRAS</a></p>
-    <br>
-    <p>— El equipo ART5D</p>
+function getCertifiedArtworkHtml(data, pdfUrl) {
+  const imageUrl = data.grok || data.gemini;
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:650px;margin:auto;background:#0f001a;color:white;padding:40px;border-radius:20px;text-align:center;">
+      <h1 style="color:#ec4899;font-size:32px;">¡OBRA MAESTRA CERTIFICADA!</h1>
+      <p style="font-size:18px;">ID único en blockchain: <strong>${data.artworkId}</strong></p>
+      <img src="${imageUrl}" style="max-width:100%;border-radius:16px;margin:20px 0;border:4px solid #ec4899;" />
+      <br><br>
+      <a href="${pdfUrl}" style="background:#ec4899;color:white;padding:18px 50px;border-radius:50px;text-decoration:none;font-size:22px;font-weight:bold;">
+        DESCARGAR CERTIFICADO OFICIAL PDF
+      </a>
+      <br><br><br>
+      <p>Este certificado es inmutable y verificable para siempre.</p>
+      <hr style="border-color:#333;margin:40px 0;">
+      <p><strong>Soporte / Gerencia:</strong> redesegpro@gmail.com</p>
+      <p><small>Desarrollo técnico: freddy.vicencio@gmail.com</small></p>
+      <p style="color:#888;margin-top:30px;">ART5D © 2025 – Chile</p>
+    </div>
   `;
-  GmailApp.sendEmail(email, subject, "", { htmlBody: htmlBody });
-  Logger.log("Email de bienvenida enviado a " + email);
-}
-
-function sendCertifiedArtworkEmail(userEmail, artworkData) {
-  // artworkData viene de generateArtwork(): {imageUrl, metadataUrl, prompt, artworkId, engine}
-  const pdfBlob = generateCertificatePDF(artworkData); // función en PDFService.gs
-  const subject = `🎨 Tu obra "${artworkData.prompt.substring(0,50)}..." ya está certificada – ART5D #${artworkData.artworkId}`;
-  
-  const htmlBody = `
-    <h1 style="color:#ec4899;">¡OBRA CERTIFICADA CON ÉXITO!</h1>
-    <p>Aquí tienes tu certificado oficial ART5D con tecnología blockchain.</p>
-    <p><strong>Prompt:</strong> ${artworkData.prompt}</p>
-    <p><strong>Motor IA:</strong> ${artworkData.engine.toUpperCase()}</p>
-    <p><strong>ID de Obra:</strong> ${artworkData.artworkId}</p>
-    <br>
-    <p>Descarga tu certificado PDF adjunto y compártelo con el mundo.</p>
-    <p>Pronto recibirás también tu NFT en Solana.</p>
-    <br>
-    <a href="${ScriptApp.getService().getUrl()}" style="background:#ec4899;color:white;padding:15px 30px;text-decoration:none;border-radius:50px;font-weight:bold;">VOLVER AL PANEL</a>
-  `;
-
-  GmailApp.sendEmail(userEmail, subject, "", {
-    htmlBody: htmlBody,
-    attachments: [pdfBlob.setName(`Certificado_ART5D_${artworkData.artworkId}.pdf`)]
-  });
-  
-  Logger.log("Email con certificado PDF enviado a " + userEmail);
 }
