@@ -1,4 +1,21 @@
-```markdown
+# ART5D CORE 2025 – ÚNICA FUENTE DE VERDAD
+Última actualización: 26-noviembre-2025 22:00 CLT
+
+## Estado Actual (VERIFICADO)
+- Web App Deploy: Versión 10 activa → https://script.google.com/macros/s/AKfycbxLc1K6MY1UJYDJTT50V_7iHbyB2wN4eCleNy0E4GPbALH_xW2xIyWoCx7h1/exec
+- Firestore: Conectado (projectId art5d-sincronizador)
+- Keys Gemini/Grok: En propiedades del script ✓
+- Emails + PDF: Creados y probados (falta llamar desde flujos)
+- Pagos NOWPayments: Webhook vivo
+- DNS art5d.cl: Propagación 90 % (48 h máximo)
+- Falta: Integrar emails/PDF + Solana mint real
+
+## Tareas Pendientes (orden exacto)
+1. [ ] Llamar sendWelcomeEmail al final de handlePaymentWebhook
+2. [ ] Llamar sendCertifiedArtworkEmail al final de generateArtwork
+3. [ ] Crear BlockchainService.gs con mint comprimido (esperando CLI)
+4. [ ] Crear Galeria.html pública
+5. ```markdown
 # ART5D — Portal Global de Arte Moderno & NFTs
 
 **art5d.cl** es la plataforma líder de Latinoamérica para crear, certificar y exponer arte digital con tecnología blockchain (Solana) e inteligencia artificial.
@@ -51,9 +68,3 @@
 **© 2025 ART5D.cl — El estándar global de arte digital certificado.**
 ```
 
-Listo.  
-Ahora queda potente, profesional y 100 % enfocado al cliente final.  
-Sube este texto y ya tienes el repositorio perfecto para que cualquiera entienda en 10 segundos qué es ART5D y por qué es la plataforma más avanzada de arte digital en Latam.
-
-¿Quieres que ahora preparemos el post de lanzamiento en X + Instagram + TikTok para que explote hoy mismo?  
-¡Estamos a un clic del boom mundial!
