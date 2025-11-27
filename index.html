@@ -4,135 +4,75 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ART5D • Arte Digital Certificado con IA • 2025</title>
-  <meta name="description" content="ART5D: La primera plataforma chilena de arte digital certificado con IA. Genera bocetos con Grok y Gemini, certifica y vende como NFT en Solana.">
+  <meta name="description" content="Primera plataforma chilena de arte digital certificado con IA + NFT en Solana. Genera, certifica y vende tu obra en segundos.">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Inter:wght@400;700&display=swap');
-    body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top, #0f001a 0%, #000000 70%); color: white; margin: 0; }
+    body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top, #0f001a 0%, #000000 70%); color: white; margin: 0; overflow-x: hidden; }
     h1, h2 { font-family: 'Orbitron', sans-serif; }
     .particle { position: absolute; background: #a855f7; border-radius: 50%; opacity: 0.6; pointer-events: none; animation: float 15s infinite linear; }
     @keyframes float { 0% { transform: translateY(100vh) rotate(0deg); } 100% { transform: translateY(-100px) rotate(360deg); } }
   </style>
 </head>
-<body class="min-h-screen relative overflow-x-hidden">
+<body class="min-h-screen relative">
   <div id="particles"></div>
-  <div id="root" class="relative z-10"></div>
+  <div class="relative z-10">
+    <section class="text-center py-20 px-6">
+      <h1 class="text-8xl md:text-9xl font-black bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
+        ART5D
+      </h1>
+      <p class="text-3xl md:text-5xl mt-6 text-gray-300">Arte Digital Certificado • IA + Blockchain • 2025</p>
+      <p class="text-xl mt-4 text-purple-300">La quinta dimensión del arte comienza aquí</p>
+    </section>
 
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <script type="text/babel">
-    const { useState, useEffect } = React;
-
-    // TU URL DE APPS SCRIPT (100% viva)
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw9-ZD9kGYvVEQLNAyVNHmHBzFpbmVZe7iPYZFXH9k3bOE0sW4ZDLc4mLSF8W6WK/exec";
-    const USER_EMAIL = "public@art5d.cl";
-
-    const App = () => {
-      const [prompt, setPrompt] = useState("");
-      const [grok, setGrok] = useState("");
-      const [gemini, setGemini] = useState("");
-      const [loading, setLoading] = useState(false);
-      const [certUrl, setCertUrl] = useState("");
-
-      const generar = async () => {
-        if (!prompt.trim()) return alert("¡Escribe tu visión artística!");
-        setLoading(true);
-        setGrok(""); setGemini(""); setCertUrl("");
-
-        try {
-          const res = await fetch(WEB_APP_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt, userEmail: USER_EMAIL, engine: "both" })
-          });
-          const data = await res.json();
-          if (!data.success) throw new Error(data.error);
-
-          setGrok(data.data.grok);
-          setGemini(data.data.gemini);
-          setCertUrl(`https://art5d.cl/certificado?obra=${data.data.grok.split('/').pop()}`);
-
-        } catch (e) {
-          alert("ERROR: " + e.message);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      useEffect(() => {
-        const container = document.getElementById('particles');
-        for (let i = 0; i < 50; i++) {
-          const p = document.createElement('div');
-          p.className = 'particle';
-          p.style.width = p.style.height = Math.random() * 8 + 'px';
-          p.style.left = Math.random() * 100 + 'vw';
-          p.style.animationDuration = Math.random() * 20 + 10 + 's';
-          p.style.animationDelay = Math.random() * 5 + 's';
-          container.appendChild(p);
-        }
-      }, []);
-
-      return (
-        <div className="min-h-screen">
-          <section className="text-center py-20 px-6">
-            <h1 className="text-8xl md:text-9xl font-black bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
-              ART5D
-            </h1>
-            <p className="text-3xl md:text-5xl mt-6 text-gray-300">Arte digital certificado • Edición limitada • IA + Blockchain</p>
-          </section>
-
-          <section className="max-w-6xl mx-auto px-6 py-20">
-            <div className="bg-black/70 backdrop-blur-xl rounded-3xl p-12 border-4 border-purple-700 shadow-2xl">
-              <textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Ej: Un dragón cyberpunk sobre Valparaíso al atardecer, estilo óleo, colores neón y lluvia torrencial..."
-                className="w-full p-8 text-2xl bg-gray-900 rounded-2xl border-4 border-purple-600 focus:border-pink-500 outline-none text-white"
-                rows="6"
-              />
-              <button
-                onClick={generar}
-                disabled={loading}
-                className="mt-12 w-full py-12 text-6xl font-black rounded-full bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 hover:scale-105 transition shadow-2xl disabled:opacity-70"
-              >
-                {loading ? "CREANDO OBRA MAESTRA..." : "GENERAR CON DOBLE IA"}
-              </button>
-
-              <div className="grid md:grid-cols-2 gap-12 mt-16">
-                {grok && (
-                  <div className="bg-gradient-to-br from-pink-900/50 to-black rounded-3xl p-8 border-4 border-pink-600">
-                    <p className="text-4xl font-bold text-pink-400 mb-6">GROK</p>
-                    <img src={grok} className="w-full rounded-2xl shadow-2xl" />
-                  </div>
-                )}
-                {gemini && (
-                  <div className="bg-gradient-to-br from-cyan-900/50 to-black rounded-3xl p-8 border-4 border-cyan-600">
-                    <p className="text-4xl font-bold text-cyan-400 mb-6">GEMINI</p>
-                    <img src={gemini} className="w-full rounded-2xl shadow-2xl" />
-                  </div>
-                )}
-              </div>
-
-              {certUrl && (
-                <div className="mt-12 text-center">
-                  <a href={certUrl} target="_blank" className="inline-block px-20 py-10 text-5xl font-black bg-green-600 hover:bg-green-700 rounded-full shadow-2xl transform hover:scale-110 transition">
-                    DESCARGAR CERTIFICADO OFICIAL CON QR
-                  </a>
-                </div>
-              )}
-            </div>
-          </section>
-
-          <footer className="text-center py-16 text-gray-500 text-xl">
-            ART5D © 2025 • Chile • La quinta dimensión del arte digital comienza aquí
-          </footer>
+    <section class="max-w-6xl mx-auto px-6 py-20">
+      <div id="app" class="bg-black/70 backdrop-blur-xl rounded-3xl p-12 border-4 border-purple-700 shadow-2xl">
+        <div id="login" class="text-center">
+          <button onclick="google.accounts.id.initialize({client_id:'TU_CLIENT_ID_WEB.apps.googleusercontent.com', callback: handleCredentialResponse}); google.accounts.id.prompt();"
+            class="px-16 py-8 text-4xl font-bold bg-white text-black rounded-full hover:scale-110 transition shadow-2xl">
+            ENTRAR CON GOOGLE
+          </button>
+          <p class="mt-8 text-2xl text-gray-400">Necesitas cuenta Google para generar y certificar obras</p>
         </div>
-      );
-    };
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+        <div id="main" class="hidden">
+          <div class="text-center mb-12">
+            <p class="text-3xl">Bienvenido <span id="userName" class="text-pink-400 font-bold"></span></p>
+          </div>
+          <!-- Aquí irá el generador, packs, galería, etc. (lo añadimos después) -->
+          <p class="text-center text-5xl mt-20">Panel en desarrollo • Vuelve pronto</p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="text-center py-16 text-gray-500 text-xl">
+      ART5D © 2025 • Chile • Todos los derechos reservados • contacto@art5d.cl
+    </footer>
+  </div>
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxLc1K6MY1UJYDJTT50V_7iHbyB2wN4eCleNy0E4GPbALH_xW2xIyWoCx7h1/exec"; // TU URL REAL ACTUAL
+
+    function handleCredentialResponse(response) {
+      const data = JSON.parse(atob(response.credential.split('.')[1]));
+      document.getElementById('login').classList.add('hidden');
+      document.getElementById('main').classList.remove('hidden');
+      document.getElementById('userName').textContent = data.name || data.email;
+      // Aquí más adelante llamamos a tu Apps Script con data.email
+    }
+
+    // Partículas
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 60; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.width = p.style.height = Math.random() * 10 + 3 + 'px';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.animationDuration = Math.random() * 25 + 15 + 's';
+      p.style.animationDelay = Math.random() * 5 + 's';
+      container.appendChild(p);
+    }
   </script>
 </body>
 </html>
