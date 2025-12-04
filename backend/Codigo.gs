@@ -1,18 +1,18 @@
 // HUB CENTRAL – ENLAZA TODOS LOS SERVICIOS
 const AllServices = {
-  Util: UTIL,
-  Image: ImageService,
-  Solana: SolanaService,
-  App: AppService,
-  Email: EmailService,
-  PDF: PDFService,
-  RateLimit: RateLimitService,
-  AI: AIEvaluatorService,
-  Alert: AdminAlertService,
-  Template: TemplateService,
-  WebHook: WebHook,  // Si tienes un WebHook.gs, agrégalo aquí
-  Precios: Precios,  // Si tienes Precios.gs
-  AdminDashboard: AdminDashboard
+Utilidades:        Utilidades,          // → utilidades.gs
+  ImageService:      ImageService,        // → ImageService.gs
+  SolanaService:     SolanaService,       // → SolanaService.gs
+  AppService:        AppService,          // → AppService.gs
+  EmailService:      EmailService,        // → EmailService.gs
+  PDFService:        PDFService,          // → PDFService.gs
+  RateLimitService:  RateLimitService,    // → RateLimitService.gs
+  AIEvaluatorService:AIEvaluatorService,  // → AIEvaluatorService.gs
+  WebHook:           WebHook,             // → WebHook.gs
+  Precios:           Precios,             // → Precios.gs
+  AdminDashboard:    AdminDashboard,      // → AdminDashboard.gs
+  Config:            Config,              // → Config.gs
+  FirebaseTest:      FirebaseTest         // → FirebaseTest.gs
 };
 
 // ANCHOR GLOBAL
