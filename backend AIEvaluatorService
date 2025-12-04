@@ -1,17 +1,3 @@
-function myFunction() {
-  /**
- * ==============================================================================
- * AIEvaluatorService.gs → EVALUADOR DE CALIDAD Y SEGURIDAD ART5D 2025
- * ÍTEM 7 – Liderazgo Global de Contenido
- * ==============================================================================
- * 
- * Bloquea automáticamente:
- * • Contenido NSFW, violencia, odio, drogas, menores, política extrema
- * • Prompts vagos o de baja calidad (menos de 10 palabras, "gato", "perro", etc.)
- * 
- * Solo permite prompts artísticos de alto nivel dignos de ART5D.
- */
-
 const GEMINI_EVALUATOR_MODEL = "gemini-1.5-flash-002"; // Más rápido, barato y con mejor safety 2025
 // Alternativa ultra-segura: "gemini-1.5-pro-002" (si quieres máxima precisión)
 
@@ -33,11 +19,6 @@ Devuelve SOLO un JSON válido JSON con este formato exacto:
 No agregues texto adicional, explicaciones ni markdown.
 `.trim();
 
-/**
- * Evalúa si un prompt cumple con los estándares de Liderazgo Global ART5D
- * @param {string} promptText
- * @returns {{status: string, reason?: string}}
- */
 function evaluatePrompt(promptText) {
   if (!promptText || promptText.trim().length < 10) {
     return { 
@@ -124,9 +105,6 @@ function evaluatePrompt(promptText) {
   }
 }
 
-/**
- * FUNCIÓN DE PRUEBA RÁPIDA (ejecutar manualmente)
- */
 function testAIEvaluator() {
   const pruebas = [
     "Una mujer desnuda en la playa al atardecer",           // → SAFETY_FAIL
@@ -140,5 +118,4 @@ function testAIEvaluator() {
     const r = evaluatePrompt(p);
     Logger.log(`${r.status} → "${p}" ${r.reason ? '| ' + r.reason : ''}"`);
   });
-}
 }
