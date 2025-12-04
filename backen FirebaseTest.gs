@@ -4,21 +4,6 @@
  * Proyecto: art5d-sincronizador → 100% FUNCIONAL DESDE YA
  * ==============================================================================
  */
-
-const SERVICE_ACCOUNT = {
-  "type": "service_account",
-  "project_id": "art5d-sincronizador",
-  "private_key_id": "98639884b8e281b1458985c092a0a1aa0ad50ee7",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCryHrlznPfAPnfonvLAGAHRjHfYOrvFR0OJ23tXfKUsLisSRWqjU3TclLvdPfIH7nBQYlNiPPZpg8dTTqh1VFtGuPyFQvINQM+/XWL/GzDnxfAKduFU+JQCb1p57/NiZ7Al1PoFYA5UEKphyPMjGv0gtbrHipuXkNESWFOBYQ1CPrmsAsAbBBL7tl5YZaATZS+I6cx1Fn2XmgzxFLPV4PLfg1dAfF+REUEuakRchCPKAxHQFTSEbm3ktCg68dUBdoI/TAo4+aePiyQaI4t7nnGsciyUj6MdDMRA2ofgmnTbaGZEIAHC5bz6rq17DpAsxt1xtaGY7Vw33iYJPLALVgrAgMBAAECggEAAmp96HFk1FpeU/ZdHJKDRzw+42426Ix1TaeaMukL9PifFoL/9hB/B+GOPWJ5lsTJPIUwRnHxe5bg6d/AzGf9XOfbML7rzscWwor6ljC1KOUrv4Jo+bEfm8QC27DXGyFtbFLGTn7q6uqMq7BEKD0JkacQw/c3JTk7nKBO6RdINx2aJKufh3KxToBWdMJ2bx4lwdt1wAETHUqdF3QHX4aKcx9QXeL49k7YvTFwpfj6LUE9EcNW5sBrgztGuqboFMrBg5xb5FYLqIF72hyAq1W7OQARIxM3OIsT1E5a8fitZ6EBnbp6zJ9gk1rBqgagDELSWjeb1EvBf3TmB/kkh7YMjQKBgQDdHoOi/NW/yJaqU+acvZiIaX6LZ8ide56Z37mIliAklWNSThTNU2DnFs6+hRBlRa7KqNHARhtavYX9emauHBshLXwr38HWajT9GOBziCMfGLsaBNdiDpZ0X4aWRlKKgAZF28GK7KjBZadH92ssKbY4iZNZTKovX6ijGKGtM/ps3QKBgQDG4Z7rRevNrJB4Kk07w3DODbrVywU1DmXVvzttaX1uZT9FqDTyzlhz2CxaUSwhscn1QU5Y9h/dvSUDvoO44TbggN9LKdfE5+FGyUI8bECfP4MSt7Bx4A6tmSo0+4AQ3SBP4r74zwnTLUU/k6rF2NdIYT+2V9n0BkWuW1e+GNJkpwKBgQClGfGkMzDOoFGPIFJi2lYYFNz97iInJHSJ5Di+OYoKhtjATbjOjuEd6zO3oddaJquaem8TJ8Wo/TYcy9X7TtUa8sFyaQJsvKSQDpEY8p92ypp5lP/VIZtJjUIK1rsu2uTUKH/c4VQoA2TiIWWOdh6vHFo/JTU1ZjGehffCQbtMqQKBgQCbruZeOf/aouj8h/CphdZ6FllZHnHXFIw3BFmazmc30d3zwzafk1O+a0xc7wni3m+/ov2XuiM7yuJ8ydgHE5WHrJofFoQnSXUZmlZVQlBb2LXcIxrmKYST9EAL9YxMpyyyHEduMXP5cYixugCGm7X6nNXpAWBGG9rUIADReFDKJQKBgEIWgCmiK7cSYB7J7L9lcsWTs6F2UXOpb/liyP5aqolmz+oOlyiKzDynNrpxPTJgQ6fxx+Y3FOJF+GxpTev3MNKmuUeI/mDsfbueqHlohjT9XCKgTT4V4572MoEHDCPmD65sjNsptmuWorlvZ2wNjyq9SNN4S9xTiAiflUJhPC9W\n-----END PRIVATE KEY-----\n",
-  "client_email": "firebase-adminsdk-fbsvc@art5d-sincronizador.iam.gserviceaccount.com",
-  "client_id": "110646118644755518290",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40art5d-sincronizador.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
-};
-
 // GENERA TOKEN (CON REINTENTO AUTOMÁTICO)
 function getFirebaseAccessToken() {
   for (let i = 0; i < 3; i++) {
