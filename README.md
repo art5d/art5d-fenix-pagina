@@ -2,7 +2,7 @@
 Última actualización: 26-noviembre-2025 22:00 CLT
 
 ## Estado Actual (VERIFICADO)
-- Web App Deploy: Versión 10 activa → https://script.google.com/macros/s/AKfycbxLc1K6MY1UJYDJTT50V_7iHbyB2wN4eCleNy0E4GPbALH_xW2xIyWoCx7h1/exec
+- Web App Deploy: Versión 10 activa → https://script.google.com/macros/s/AKfycby5NHZPYJv1xBkm5bhIdW4OZzxt7XvNnlhSE-LLF_LDc_XJu0Ic9ROa5kpkoqk1AlrB/exec
 - Firestore: Conectado (projectId art5d-sincronizador)
 - Keys Gemini/Grok: En propiedades del script ✓
 - Emails + PDF: Creados y probados (falta llamar desde flujos)
