@@ -1,0 +1,144 @@
+function myFunction() {
+  /**
+ * ==============================================================================
+ * AIEvaluatorService.gs → EVALUADOR DE CALIDAD Y SEGURIDAD ART5D 2025
+ * ÍTEM 7 – Liderazgo Global de Contenido
+ * ==============================================================================
+ * 
+ * Bloquea automáticamente:
+ * • Contenido NSFW, violencia, odio, drogas, menores, política extrema
+ * • Prompts vagos o de baja calidad (menos de 10 palabras, "gato", "perro", etc.)
+ * 
+ * Solo permite prompts artísticos de alto nivel dignos de ART5D.
+ */
+
+const GEMINI_EVALUATOR_MODEL = "gemini-1.5-flash-002"; // Más rápido, barato y con mejor safety 2025
+// Alternativa ultra-segura: "gemini-1.5-pro-002" (si quieres máxima precisión)
+
+const SYSTEM_PROMPT_EVALUATOR = `
+Eres el Evaluador Oficial de Calidad y Seguridad de ART5D – Plataforma Mundial de Arte Certificado.
+
+Tu misión es implacable:
+1. RECHAZAR cualquier contenido NSFW, sexual, violento, de odio, ilegal, drogas, menores de edad, político extremista o que infrinja leyes internacionales.
+2. RECHAZAR prompts vagos, genéricos o de menos de 10 palabras significativas (ej: "perro", "mujer bonita", "fuego").
+3. APROBAR solo prompts artísticos ricos, descriptivos y de alto nivel creativo.
+
+Devuelve SOLO un JSON válido JSON con este formato exacto:
+
+{
+  "status": "OK" | "SAFETY_FAIL" | "LOW_QUALITY",
+  "reason": "Explicación breve en español (máx 80 caracteres)"
+}
+
+No agregues texto adicional, explicaciones ni markdown.
+`.trim();
+
+/**
+ * Evalúa si un prompt cumple con los estándares de Liderazgo Global ART5D
+ * @param {string} promptText
+ * @returns {{status: string, reason?: string}}
+ */
+function evaluatePrompt(promptText) {
+  if (!promptText || promptText.trim().length < 10) {
+    return { 
+      status: 'LOW_QUALITY', 
+      reason: 'Prompt demasiado corto o vacío.' 
+    };
+  }
+
+  const apiKey = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
+  if (!apiKey) {
+    Logger.log("ERROR: GEMINI_API_KEY no configurada en Script Properties");
+    return { status: 'OK', reason: 'Evaluador temporalmente desactivado' }; // Fail-open seguro
+  }
+
+  const apiUrl = `https://generativelanguage.googleapis.com/v1/models/${GEMINI_EVALUATOR_MODEL}:generateContent?key=${apiKey}`;
+
+  const payload = {
+    contents: [{
+      role: "user",
+      parts: [{ text: promptText }]
+    }],
+    systemInstruction: {
+      role: "system",
+      parts: [{ text: SYSTEM_PROMPT_EVALUATOR }]
+    },
+    generationConfig: {
+      temperature: 0.3,
+      topP: 0.95,
+      maxOutputTokens: 128,
+      responseMimeType: "application/json"
+    },
+    safetySettings: [
+      { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
+      { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" },
+      { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
+      { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" }
+    ]
+  };
+
+  const options = {
+    method: "post",
+    contentType: "application/json",
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  try {
+    const response = UrlFetchApp.fetch(apiUrl, options);
+    const code = response.getResponseCode();
+
+    if (code !== 200) {
+      const error = JSON.parse(response.getContentText()).error;
+      Logger.log(`Gemini Error ${code}: ${error.message}`);
+      
+      // Si Gemini bloquea por seguridad, replicamos el rechazo
+      if (code === 400 || code === 500 || error.message.includes("safety")) {
+        return { status: 'SAFETY_FAIL', reason: 'Contenido bloqueado por seguridad.' };
+      }
+      return { status: 'OK', reason: 'Evaluador temporalmente no disponible' };
+    }
+
+    const data = JSON.parse(response.getContentText());
+    const jsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!jsonText) {
+      return { status: 'SAFETY_FAIL', reason: 'Bloqueado por filtros de Google.' };
+    }
+
+    try {
+      const result = JSON.parse(jsonText);
+      // Validación final
+      if (result.status === "OK" || result.status === "SAFETY_FAIL" || result.status === "LOW_QUALITY") {
+        return result;
+      }
+      // Si devuelve algo raro, rechazamos por seguridad
+      return { status: 'LOW_QUALITY', reason: 'Formato de respuesta inválido.' };
+    } catch (e) {
+      return { status: 'LOW_QUALITY', reason: 'Respuesta del evaluador corrupta.' };
+    }
+
+  } catch (e) {
+    Logger.log("ERROR CRÍTICO AIEvaluator: " + e.toString());
+    return { status: 'OK', reason: 'Error interno del evaluador.' }; // Nunca bloqueamos por error técnico
+  }
+}
+
+/**
+ * FUNCIÓN DE PRUEBA RÁPIDA (ejecutar manualmente)
+ */
+function testAIEvaluator() {
+  const pruebas = [
+    "Una mujer desnuda en la playa al atardecer",           // → SAFETY_FAIL
+    "gato",                                                // → LOW_QUALITY
+    "Retrato surrealista de una diosa cyberpunk con luces neón volumétricas, estilo Blade Runner 2049, 8k", // → OK
+    "Explosión nuclear en Nueva York",                    // → SAFETY_FAIL
+    "Paisaje impresionista de un bosque en otoño con luz dorada suave, estilo Monet" // → OK
+  ];
+
+  pruebas.forEach(p => {
+    const r = evaluatePrompt(p);
+    Logger.log(`${r.status} → "${p}" ${r.reason ? '| ' + r.reason : ''}"`);
+  });
+}
+}
