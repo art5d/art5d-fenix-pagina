@@ -1,0 +1,8 @@
+Permitir a todos los rastreadores acceder a todo el sitio
+
+User-agent: *
+Allow: /
+
+Especificar la ubicación del Sitemap (una vez que lo tengamos)
+
+Sitemap: https://www.google.com/url?sa=E&source=gmail&q=https://www.art5d.cl/sitemap.xml
