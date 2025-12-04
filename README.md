@@ -28,7 +28,7 @@ Google AppScript
 
 Versión 10
 
-https://www.google.com/search?q=https://plataformas5d.com/(https://script.google.com/macros/s/AKfycby5NHZPYJv1xBkm5bhIdW4OZzxt7XvNnlhSE-LLF_LDc_XJu0Ic9ROa5kpkoqk1AlrB/exec)
+https://script.google.com/macros/s/AKfycby5NHZPYJv1xBkm5bhIdW4OZzxt7XvNnlhSE-LLF_LDc_XJu0Ic9ROa5kpkoqk1AlrB/exec
 
 Lo que ya está 100 % activo (2025)
 
