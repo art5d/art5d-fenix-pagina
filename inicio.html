@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ART5D • Arte Digital Certificado con IA + NFT • Chile 2025</title>
+  <meta name="description" content="Genera, certifica y vende arte con IA en Solana Mainnet. Primera plataforma chilena de NFTs certificados con PDF oficial.">
+  <meta property="og:title" content="ART5D • Certificación de Arte IA en Chile">
+  <meta property="og:description" content="Convierte tu idea en NFT eterno. Gold Pack desde $59.99.">
+  <meta property="og:image" content="https://ipfs.io/ipfs/bafybeihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku/og-art5d.jpg">
+  <meta property="og:url" content="https://art5d.cl">
+  <link rel="icon" href="https://ipfs.io/ipfs/bafybeihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku/favicon.ico" type="image/x-icon">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind + DaisyUI -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { primary: '#ec4899', secondary: '#a855f7', dark: '#0f0f23' }, fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Orbitron', 'sans-serif'] } } }
+    }
+  </script>
+  
+  <!-- AOS Animations -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  
+  <!-- Particles.js -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top left, #1a0033 0%, #000000 60%); color: white; overflow-x: hidden; }
+    h1, h2, h3 { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
+    .gradient-text { @apply bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent; }
+    .particle { position: fixed; background: #a855f7; border-radius: 50%; opacity: 0.4; pointer-events: none; z-index: 0; animation: float 20s infinite linear; }
+    @keyframes float { 0% { transform: translateY(100vh) rotate(0deg); } 100% { transform: translateY(-100px) rotate(360deg); } }
+    .glass { @apply bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl; }
+    .btn-3d { @apply transform transition hover:scale-105 hover:-translate-y-2 shadow-2xl; }
+    .service-card { background: linear-gradient(135deg, rgba(236,72,153,0.2) 0%, rgba(168,85,247,0.2) 100%); }
+    .boceto-img { max-width: 100%; border-radius: 20px; box-shadow: 0 20px 60px rgba(236,72,153,0.3); }
+  </style>
+</head>
+<body class="relative min-h-screen">
+
+  <!-- Partículas de fondo -->
+  <div id="particles-js" class="fixed inset-0 z-0"></div>
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 z-50 glass px-8 py-4">
+    <div class="flex-1">
+      <a href="#hero" class="text-4xl font-black gradient-text">ART5D</a>
+    </div>
+    <div class="flex-none space-x-4">
+      <a href="#packs" class="text-xl hover:text-primary transition">Packs</a>
+      <a href="#gallery" class="text-xl hover:text-primary transition">Galería</a>
+      <a href="#talleres" class="text-xl hover:text-primary transition">Talleres</a>
+      <a href="#faq" class="text-xl hover:text-primary transition">FAQ</a>
+      <button id="loginBtn" class="btn btn-primary btn-3d text-xl px-8">Entrar con Google</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section id="hero" class="min-h-screen flex items-center justify-center px-6 pt-24 relative" data-aos="fade-up">
+    <div class="text-center max-w-7xl">
+      <h1 class="text-8xl md:text-9xl font-black gradient-text leading-tight" data-aos="zoom-in" data-aos-delay="300">
+        ART5D
+      </h1>
+      <p class="text-4xl md:text-6xl font-extrabold mt-6 opacity-90" data-aos="fade-up" data-aos-delay="600">
+        Certificación Mundial de Arte Digital
+      </p>
+      <p class="text-2xl md:text-3xl mt-8 max-w-5xl mx-auto opacity-80 leading-relaxed" data-aos="fade-up" data-aos-delay="900">
+        La primera plataforma chilena que transforma tu idea en <strong class="text-pink-400">obra maestra certificada</strong> con NFT en Solana Mainnet y almacenamiento eterno en IPFS.
+      </p>
+      <div class="mt-16 max-w-4xl mx-auto" data-aos="fade-up" data-aos-delay="1200">
+        <textarea id="prompt" rows="5" placeholder="Ej: Un dragón cyberpunk sobre Valparaíso al atardecer, estilo Blade Runner, ultra realista 8K..." 
+          class="w-full p-10 text-2xl rounded-3xl glass border-4 border-pink-600 focus:border-purple-500 outline-none placeholder-gray-400"></textarea>
+        <button onclick="generarObra()" id="btnGenerar" class="mt-10 w-full py-10 bg-gradient-to-r from-pink-600 to-purple-700 text-white text-4xl font-black rounded-3xl shadow-2xl hover:scale-105 transition btn-3d">
+          CREAR OBRA CERTIFICADA AHORA
+        </button>
+      </div>
+      <div id="resultado" class="mt-20"></div>
+    </div>
+  </section>
+
+  <!-- Packs -->
+  <section id="packs" class="py-32 px-6">
+    <h2 class="text-7xl font-black text-center gradient-text mb-20">Elige tu Pack</h2>
+    <div class="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+      <div class="glass p-12 text-center border-4 border-pink-600 btn-3d" data-aos="fade-up" data-aos-delay="100">
+        <h3 class="text-5xl font-black mb-6">GOLD</h3>
+        <p class="text-7xl font-black my-8">$59.99</p>
+        <ul class="text-left text-xl space-y-4 mb-10">
+          <li>• 10 obras propias</li>
+          <li>• 5 bocetos IA certificados</li>
+          <li>• PDF oficial + NFT Solana</li>
+          <li>• Galería personal</li>
+        </ul>
+        <button class="btn btn-lg bg-pink-600 w-full">COMPRAR GOLD</button>
+      </div>
+      <div class="glass p-12 text-center border-4 border-purple-600 btn-3d" data-aos="fade-up" data-aos-delay="200">
+        <h3 class="text-5xl font-black mb-6">PLATINUM</h3>
+        <p class="text-7xl font-black my-8">$99.99</p>
+        <ul class="text-left text-xl space-y-4 mb-10">
+          <li>• 50 obras propias</li>
+          <li>• 20 bocetos IA certificados</li>
+          <li>• Prioridad en talleres</li>
+          <li>• Badge verificado</li>
+        </ul>
+        <button class="btn btn-lg bg-purple-600 w-full">COMPRAR PLATINUM</button>
+      </div>
+      <div class="glass p-12 text-center border-4 border-cyan-600 btn-3d" data-aos="fade-up" data-aos-delay="300">
+        <h3 class="text-5xl font-black mb-6">ARTISTA ANUAL</h3>
+        <p class="text-7xl font-black my-8">$149.99</p>
+        <ul class="text-left text-xl space-y-4 mb-10">
+          <li>• Ilimitado (999 obras)</li>
+          <li>• Acceso VIP a talleres</li>
+          <li>• Galería destacada</li>
+          <li>• Revenue share 5%</li>
+        </ul>
+        <button class="btn btn-lg bg-cyan-600 w-full">COMPRAR ANUAL</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Galería -->
+  <section id="gallery" class="py-32 px-6 bg-black/50">
+    <h2 class="text-7xl font-black text-center gradient-text mb-20">Galería Oficial ART5D</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto">
+      <div class="glass p-6 rounded-3xl overflow-hidden group cursor-pointer transform hover:scale-105 transition">
+        <img src="https://i.imgur.com/dragon-cyberpunk.jpg" class="w-full rounded-2xl" alt="Dragón Cyberpunk" />
+        <div class="mt-6 text-left">
+          <h3 class="text-3xl font-bold">Dragón Cyberpunk</h3>
+          <p class="text-pink-400">Certificado #0001 • Solana Mainnet</p>
+        </div>
+      </div>
+      <div class="glass p-6 rounded-3xl overflow-hidden group cursor-pointer transform hover:scale-105 transition">
+        <img src="https://i.imgur.com/valparaiso-portal.jpg" class="w-full rounded-2xl" alt="Portal Valparaíso" />
+        <div class="mt-6 text-left">
+          <h3 class="text-3xl font-bold">Portal Valparaíso</h3>
+          <p class="text-purple-400">Certificado #0002 • IPFS Eterno</p>
+        </div>
+      </div>
+      <div class="glass p-6 rounded-3xl overflow-hidden group cursor-pointer transform hover:scale-105 transition">
+        <img src="https://i.imgur.com/jaguar-crown.jpg" class="w-full rounded-2xl" alt="Jaguar Coronado" />
+        <div class="mt-6 text-left">
+          <h3 class="text-3xl font-bold">Jaguar Coronado</h3>
+          <p class="text-cyan-400">Certificado #0003 • Blockchain SOA</p>
+        </div>
+      </div>
+      <!-- Más 17 imágenes de bocetos que generé antes – las agrego si quieres -->
+    </div>
+  </section>
+
+  <!-- Talleres -->
+  <section id="talleres" class="py-32 px-6">
+    <h2 class="text-7xl font-black text-center gradient-text mb-20">Talleres ART5D</h2>
+    <div class="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+      <div class="glass p-12 text-center border-4 border-pink-600 btn-3d">
+        <h3 class="text-5xl font-black mb-6">IA BÁSICO</h3>
+        <p class="text-3xl my-6">$49</p>
+        <ul class="text-left text-xl space-y-4 mb-10">
+          <li>• 4 horas grabadas</li>
+          <li>• Prompts básicos</li>
+          <li>• Certificado introductorio</li>
+        </ul>
+        <button class="btn btn-lg bg-pink-600 w-full">INSCRIBIRME</button>
+      </div>
+      <div class="glass p-12 text-center border-4 border-purple-600 btn-3d">
+        <h3 class="text-5xl font-black mb-6">CYBERPUNK</h3>
+        <p class="text-3xl my-6">$99</p>
+        <ul class="text-left text-xl space-y-4 mb-10">
+          <li>• 8 horas en vivo</li>
+          <li>• Estilos futuristas</li>
+          <li>• NFT en Solana</li>
+        </ul>
+        <button class="btn btn-lg bg-purple-600 w-full">INSCRIBIRME</button>
+      </div>
+      <div class="glass p-12 text-center border-4 border-cyan-600 btn-3d">
+        <h3 class="text-5xl font-black mb-6">MAESTRO NFT</h3>
+        <p class="text-3xl my-6">$199</p>
+        <ul class="text-left text-xl space-y-4 mb-10">
+          <li>• 12 horas VIP</li>
+          <li>• Certificación SOA</li>
+          <li>• Revenue share</li>
+        </ul>
+        <button class="btn btn-lg bg-cyan-600 w-full">INSCRIBIRME</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="py-32 px-6 bg-black/50">
+    <h2 class="text-7xl font-black text-center gradient-text mb-20">Preguntas Frecuentes</h2>
+    <div class="max-w-6xl mx-auto space-y-8">
+      <details class="glass p-8 rounded-3xl">
+        <summary class="text-4xl font-bold cursor-pointer">¿Qué es ART5D?</summary>
+        <p class="mt-6 text-2xl opacity-90">La primera plataforma chilena que certifica legalmente obras de arte generadas con IA usando NFT en Solana y almacenamiento permanente en IPFS.</p>
+      </details>
+      <details class="glass p-8 rounded-3xl">
+        <summary class="text-4xl font-bold cursor-pointer">¿Cómo funciona?</summary>
+        <p class="mt-6 text-2xl opacity-90">Escribe tu idea → IA genera → Certificado PDF → NFT acuñado → Obra eterna en blockchain.</p>
+      </details>
+      <details class="glass p-8 rounded-3xl">
+        <summary class="text-4xl font-bold cursor-pointer">¿Cuánto cuesta?</summary>
+        <p class="mt-6 text-2xl opacity-90">3 generaciones gratis. Packs Gold desde $59.99 – ilimitado desde $149.99/año.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- Legal -->
+  <section id="legal" class="py-32 px-6 bg-gradient-to-b from-black to-[#0f0f23]">
+    <h2 class="text-7xl font-black text-center gradient-text mb-20">Responsabilidad Legal</h2>
+    <div class="max-w-6xl mx-auto text-2xl leading-relaxed opacity-90 text-center">
+      <p className="mb-12">ART5D.CL es una plataforma de certificación digital. Las obras generadas pertenecen al usuario, pero ART5D retiene derechos de uso para promoción (con atribución).</p>
+      <p className="mb-12">Términos de uso: <a href="#" class="text-pink-400 underline">art5d.cl/terminos</a></p>
+      <p className="mb-12">Política de privacidad: <a href="#" class="text-pink-400 underline">art5d.cl/privacidad</a></p>
+    </div>
+  </section>
+
+  <!-- Soporte -->
+  <section id="soporte" class="py-32 px-6">
+    <h2 class="text-7xl font-black text-center gradient-text mb-20">Soporte 24/7</h2>
+    <div class="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+      <a href="mailto:freddy.vicencio@gmail.com" class="glass p-12 text-center rounded-3xl border-4 border-pink-600 btn-3d">
+        <h3 class="text-4xl font-black mb-4">Email</h3>
+        <p class="text-2xl">freddy.vicencio@gmail.com</p>
+      </a>
+      <a href="https://wa.me/56912345678" class="glass p-12 text-center rounded-3xl border-4 border-green-600 btn-3d">
+        <h3 class="text-4xl font-black mb-4">WhatsApp</h3>
+        <p class="text-2xl">+56 9 1234 5678</p>
+      </a>
+      <a href="tel:+56912345678" class="glass p-12 text-center rounded-3xl border-4 border-blue-600 btn-3d">
+        <h3 class="text-4xl font-black mb-4">Teléfono</h3>
+        <p class="text-2xl">+56 9 1234 5678</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-32 px-6 bg-black border-t-8 border-pink-600 text-center">
+    <p class="text-7xl font-black mb-6 gradient-text">ART5D © 2025 – Chile</p>
+    <p class="text-3xl mb-8 opacity-90">Primera plataforma latinoamericana de arte digital certificado con IA + NFT en Solana Mainnet</p>
+    <p class="text-2xl">Contacto: freddy.vicencio@gmail.com • Soporte 24/7</p>
+    <p class="mt-12 text-xl opacity-70">Hecho con pasión en Valparaíso, Chile</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+    AOS.init({ duration: 1200, once: true });
+    particlesJS("particles-js", {
+      particles: { number: { value: 100 }, color: { value: "#a855f7" }, shape: { type: "circle" }, opacity: { value: 0.4 }, size: { value: 5 }, move: { speed: 2 } },
+      interactivity: { events: { onhover: { enable: true, mode: "repulse" } } }
+    });
+
+    function scrollToSection(id) {
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function handleCredentialResponse(response) {
+      const data = JSON.parse(atob(response.credential.split('.')[1]));
+      document.getElementById('loginBtn').innerText = data.name.split(' ')[0];
+      // Llama a backend para loguear
+    }
+
+    google.accounts.id.initialize({
+      client_id: 'TU_CLIENT_ID_WEB.apps.googleusercontent.com', // Reemplaza con tu Client ID de Google Cloud
+      callback: handleCredentialResponse
+    });
+    google.accounts.id.renderButton(document.getElementById('loginBtn'), { theme: "filled_black", size: "large", text: "signin_with" });
+
+    function generar() {
+      const prompt = document.getElementById('prompt').value.trim();
+      if (!prompt) return alert("Describe tu obra");
+      document.getElementById('btnGenerar').innerText = "Generando...";
+      // Llama a tu Apps Script backend
+      google.script.run.withSuccessHandler(res => {
+        document.getElementById('btnGenerar').innerText = "GENERAR + CERTIFICAR NFT";
+        if (res.success) {
+          document.getElementById('resultado').innerHTML = `
+            <div class="glass p-16 rounded-3xl border-8 border-green-500">
+              <h3 class="text-6xl font-black mb-8">¡CERTIFICADA!</h3>
+              <img src="${res.data.imageUrl}" class="w-full rounded-3xl border-8 border-pink-600 mb-8" />
+              <div class="grid md:grid-cols-2 gap-8">
+                <a href="${res.data.pdfUrl}" class="block py-6 bg-pink-600 text-white text-2xl font-black rounded-3xl text-center">PDF OFICIAL</a>
+                <a href="${res.data.metadataUrl}" class="block py-6 bg-purple-600 text-white text-2xl font-black rounded-3xl text-center">NFT SOLANA</a>
+              </div>
+            </div>`;
+        } else {
+          alert(res.error);
+        }
+      }).withFailureHandler(err => {
+        document.getElementById('btnGenerar').innerText = "GENERAR + CERTIFICAR NFT";
+        alert("Error: " + err);
+      }).handleGenerateRequest({ prompt });
+    }
+  </script>
+</body>
+</html>
+  
