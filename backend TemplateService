@@ -1,0 +1,21 @@
+// TemplateService.gs – Plantillas de email
+const TemplateService = {
+  get(name) {
+    const templates = {
+      certificado: `
+        <div style="font-family:Arial,sans-serif;background:#0f0f23;color:white;padding:40px;text-align:center;">
+          <h1 style="color:#ec4899;">Certificado Oficial ART5D</h1>
+          <h2>{{TITLE}}</h2>
+          <img src="{{IMAGE}}" style="max-width:600px;border-radius:16px;border:4px solid #a855f7;">
+          <br><br>
+          <p><strong>Metadata Permanente (IPFS):</strong><br>
+             <a href="{{METADATA}}" style="color:#a855f7;font-size:1.2em;">{{METADATA}}</a></p>
+          <p><strong>CID:</strong> {{CID}}</p>
+          <hr style="border:1px solid #ec4899;">
+          <p>© 2025 <strong>ART5D.CL</strong> – Certificación Mundial de Arte Digital</p>
+        </div>
+      `
+    };
+    return templates[name] || "";
+  }
+};
