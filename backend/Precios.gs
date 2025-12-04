@@ -1,80 +1,165 @@
 /**
  * ==============================================================================
- * ARCHIVO: Precios.gs → MATRIZ OFICIAL DE PRECIOS ART5D 2025 (FUENTE ÚNICA DE VERDAD)
+ * Precios.gs → MATRIZ OFICIAL DE PRECIOS ART5D 2025 (FUENTE ÚNICA DE VERDAD)
+ * Versión FINAL DEFINITIVA – DICIEMBRE 2025 – DOMINIO GLOBAL
  * ==============================================================================
- * 
- * Esta es la ÚNICA fuente de precios del sistema.
- * Se usa en:
- *   • INPUT_CLIENTE → Cálculo automático de costo total
- *   • Webhook NOWPayments → Validación de pago recibido
- *   • Manager.html → Límites de obras por pack
- *   • Emails automáticos y certificados
- * 
- * © 2025 ART5D.cl – Portal Global de Arte Digital Certificado
  */
 
 const PRECIOS_ART5D_2025 = {
 
-  // ========================================================================
-  // 1. PACKS PRINCIPALES (los que vendes en art5d.cl)
-  // ========================================================================
-  "SC-01_BOCETO_IA":               { precio: 4.99,   nombre: "Boceto IA + Certificado",               limiteIA: 1,  limitePropias: 0 },
-  "SC-02_NFT_SOLANA":              { precio: 9.99,   nombre: "NFT Certificado Solana",                limiteIA: 1,  limitePropias: 0 },
+  // ==========================================================================
+  // 1. PACKS PÚBLICOS (art5d.cl)
+  // ==========================================================================
+  "SC-01_BOCETO_IA": {
+    precio: 4.99,
+    nombre: "Boceto IA + Certificado NFT",
+    limiteIA: 3,
+    limitePropias: 0,
+    totalCertificados: 3,
+    incluyeNFT: true
+  },
 
-  "PP-01_PLATINO":                 { precio: 59.99,  nombre: "Pack Platino",                          limiteIA: 5,  limitePropias: 5 },
-  "PP-02_GOLD":                    { precio: 129.99, nombre: "Pack Gold",                             limiteIA: 5,  limitePropias: 10 },
-  "PP-03_DIAMANTE":                { precio: 249.99, nombre: "Pack Diamante (Anual)",                 limiteIA: 30, limitePropias: 30 },
+  "SC-02_NFT_SOLO": {
+    precio: 9.99,
+    nombre: "Certificado NFT Único (obra propia)",
+    limiteIA: 0,
+    limitePropias: 1,
+    totalCertificados: 1,
+    incluyeNFT: true
+  },
 
-  // ========================================================================
-  // 2. PACKS EDUCATIVOS
-  // ========================================================================
-  "PE-01_APRENDIZ_PLATINO":        { precio: 57.56,  nombre: "Aprendiz Platino (6 talleres)",         limiteIA: 0,  limitePropias: 0 },
-  "PE-02_GOLD_CLAS":               { precio: 69.99,  nombre: "Pack Gold Clas",                        limiteIA: 0,  limitePropias: 0 },
-  "PE-03_ARTISTA_CERTIFICADO":     { precio: 99.99,  nombre: "Artista Certificado (Anual)",           limiteIA: 5,  limitePropias: 10 },
+  "PP-01_PLATINO": {
+    precio: 59.99,
+    nombre: "Pack Platino",
+    limiteIA: 10,
+    limitePropias: 10,
+    totalCertificados: 20,
+    incluyeNFT: true
+  },
 
-  // ========================================================================
-  // 3. REGALOS / COLABORACIONES / INFLUENCERS (costo 0)
-  // ========================================================================
-  "REGALO_PLATINO":                { precio: 0,      nombre: "Regalo Pack Platino",                   limiteIA: 5,  limitePropias: 5 },
-  "REGALO_GOLD":                   { precio: 0,      nombre: "Regalo Pack Gold",                      limiteIA: 5,  limitePropias: 10 },
-  "REGALO_DIAMANTE":               { precio: 0,      nombre: "Regalo Pack Diamante",                  limiteIA: 30, limitePropias: 30 },
-  "REGALO_ARTISTA_CERTIFICADO":    { precio: 0,      nombre: "Regalo Artista Certificado",            limiteIA: 5,  limitePropias: 10 },
+  "PP-02_GOLD": {
+    precio: 129.99,
+    nombre: "Pack Gold",
+    limiteIA: 15,
+    limitePropias: 20,
+    totalCertificados: 35,
+    incluyeNFT: true,
+    destacado: true
+  },
 
-  // ========================================================================
-  // 4. EXTRAS
-  // ========================================================================
-  "EXTRA_NFT":                     { precio: 9.99,   nombre: "NFT adicional",                         limiteIA: 0,  limitePropias: 0 }
+  "PP-03_DIAMANTE": {
+    precio: 249.99,
+    nombre: "Pack Diamante (Anual)",
+    limiteIA: 50,
+    limitePropias: 50,
+    totalCertificados: 100,
+    incluyeNFT: true,
+    incluyeVault: true
+  },
+
+  // ==========================================================================
+  // 2. PACK EXCLUSIVO PARA GALERÍAS – 500 NFTs REALES EN SOLANA
+  // ==========================================================================
+  "GP-500_GALLERY_PARTNER": {
+    precio: 2499.00,
+    nombre: "Gallery Partner – 500 NFTs Certificados",
+    limiteIA: 250,
+    limitePropias: 250,
+    totalCertificados: 500,
+    incluyeNFT: true,
+    incluyeVault: true,
+    incluyeGaleriaDestacada: true,
+    incluyeBadgeVerificado: true,
+    incluyeRevenueShare: "5% en reventas secundarias (opcional)",
+    plazasLimitadas: 77,
+    descripcion: "Acceso exclusivo como socio estratégico ART5D"
+  },
+
+  // ==========================================================================
+  // 3. PACKS EDUCATIVOS
+  // ==========================================================================
+  "PE-01_APRENDIZ_PLATINO": {
+    precio: 57.56,
+    nombre: "Aprendiz Platino",
+    limiteIA: 5,
+    limitePropias: 5,
+    totalCertificados: 10
+  },
+
+  "PE-02_GOLD_CLAS": {
+    precio: 69.99,
+    nombre: "Pack Gold Institucional",
+    limiteIA: 10,
+    limitePropias: 10,
+    totalCertificados: 20
+  },
+
+  "PE-03_ARTISTA_CERTIFICADO": {
+    precio: 99.99,
+    nombre: "Artista Certificado Anual",
+    limiteIA: 15,
+    limitePropias: 20,
+    totalCertificados: 35
+  },
+
+  // ==========================================================================
+  // 4. REGALOS / COLABORACIONES
+  // ==========================================================================
+  "REGALO_PLATINO": {
+    precio: 0,
+    nombre: "Regalo Pack Platino",
+    limiteIA: 10,
+    limitePropias: 10
+  },
+
+  "REGALO_GOLD": {
+    precio: 0,
+    nombre: "Regalo Pack Gold",
+    limiteIA: 15,
+    limitePropias: 20
+  },
+
+  "REGALO_DIAMANTE": {
+    precio: 0,
+    nombre: "Regalo Pack Diamante",
+    limiteIA: 50,
+    limitePropias: 50
+  },
+
+  "REGALO_GALLERY_PARTNER": {
+    precio: 0,
+    nombre: "Regalo Gallery Partner",
+    limiteIA: 250,
+    limitePropias: 250
+  },
+
+  // ==========================================================================
+  // 5. EXTRAS
+  // ==========================================================================
+  "EXTRA_NFT": {
+    precio: 9.99,
+    nombre: "NFT Adicional",
+    limiteIA: 0,
+    limitePropias: 1,
+    totalCertificados: 1
+  }
 };
 
 /**
- * OBTIENE EL PRECIO DE UN PACK
- * @param {string} packId 
- * @return {number} Precio en USD (0 si es regalo)
+ * ========================================================================
+ * FUNCIONES OFICIALES – USADAS EN TODO EL SISTEMA
+ * ========================================================================
  */
 function getPrecio(packId) {
   const pack = PRECIOS_ART5D_2025[packId];
-  if (!pack) {
-    Logger.log(`ADVERTENCIA: Pack no encontrado → ${packId}`);
-    return null;
-  }
-  return pack.precio;
+  return pack ? pack.precio : null;
 }
 
-/**
- * OBTIENE EL NOMBRE LEGIBLE DEL PACK
- * @param {string} packId 
- * @return {string}
- */
 function getNombrePack(packId) {
   const pack = PRECIOS_ART5D_2025[packId];
   return pack ? pack.nombre : "Pack Desconocido";
 }
 
-/**
- * OBTIENE LÍMITES DEL PACK (para el Manager y el Webhook)
- * @param {string} packId 
- * @return {{ia: number, propias: number}}
- */
 function getLimitesPack(packId) {
   const pack = PRECIOS_ART5D_2025[packId];
   if (!pack) return { ia: 0, propias: 0 };
@@ -84,22 +169,35 @@ function getLimitesPack(packId) {
   };
 }
 
-/**
- * LISTA TODOS LOS PACKS CON PRECIO > 0 (útil para reportes)
- * @return {Array}
- */
-function listarPacksPagados() {
-  return Object.entries(PRECIOS_ART5D_2025)
-    .filter(([id, data]) => data.precio > 0)
-    .map(([id, data]) => ({ id, ...data }));
+function getTotalCertificados(packId) {
+  const pack = PRECIOS_ART5D_2025[packId];
+  return pack ? (pack.totalCertificados || (pack.limiteIA + pack.limitePropias)) : 0;
 }
 
-// ==============================================================================
-// FUNCIÓN DE PRUEBA RÁPIDA (ejecuta una vez para verificar que todo esté OK)
-// ==============================================================================
+function esPackConNFT(packId) {
+  const pack = PRECIOS_ART5D_2025[packId];
+  return pack ? pack.incluyeNFT === true : false;
+}
+
+function listarPacksPublicos() {
+  return Object.entries(PRECIOS_ART5D_2025)
+    .filter(([id, p]) => p.precio > 0 && !id.startsWith('REGALO') && !id.startsWith('PE-'))
+    .map(([id, p]) => ({
+      id,
+      nombre: p.nombre,
+      precio: p.precio,
+      totalCertificados: getTotalCertificados(id),
+      destacado: p.destacado || false,
+      descripcion: p.descripcion || `${getTotalCertificados(id)} certificados NFT incluidos`
+    }));
+}
+
+// ========================================================================
+// TEST RÁPIDO
+// ========================================================================
 function testPrecios() {
-  Logger.log("=== MATRIZ DE PRECIOS ART5D 2025 CARGADA CORRECTAMENTE ===");
-  Logger.log("Pack Gold → $" + getPrecio("PP-02_GOLD") + " | Límites → IA: " + getLimitesPack("PP-02_GOLD").ia + " | Propias: " + getLimitesPack("PP-02_GOLD").propias);
-  Logger.log("Pack Diamante → $" + getPrecio("PP-03_DIAMANTE") + " | Límites → " + JSON.stringify(getLimitesPack("PP-03_DIAMANTE")));
-  Logger.log("===================================================");
+  Logger.log("MATRIZ ART5D 2025 CARGADA CORRECTAMENTE – DOMINIO GLOBAL");
+  Logger.log("Gallery Partner 500 → $" + getPrecio("GP-500_GALLERY_PARTNER"));
+  Logger.log("Total certificados → " + getTotalCertificados("GP-500_GALLERY_PARTNER"));
+  Logger.log("Packs públicos → " + listarPacksPublicos().length);
 }
