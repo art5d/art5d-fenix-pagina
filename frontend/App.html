@@ -1,759 +1,440 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ART5D Art Manager - Colección y Galería</title>
-  <!-- Incluye Tailwind CSS CDN -->
+  <title>ART5D • Arte Digital Certificado • 2025</title>
+  
+  <!-- Estilos y Librerías -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Configuración para el uso del font Inter -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" />
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+  <!-- Fuentes -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f7f9fb;
+    body { font-family: 'Inter', sans-serif; background-color: #000; color: white; overflow-x: hidden; }
+    h1, h2, h3, .font-orbitron { font-family: 'Orbitron', sans-serif; }
+    
+    /* Fondo Galáctico */
+    .bg-space {
+      background: radial-gradient(circle at top left, #2e003e 0%, #000000 60%);
+      background-attachment: fixed;
     }
-    .container-view {
-      min-height: 100vh;
+
+    .gradient-text {
+      background: linear-gradient(90deg, #ec4899, #a855f7, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    /* Nuevos estilos para la galería Gold - marcos 3D, efectos reales */
-    .frame-3d {
-      transform: perspective(1000px) rotateY(6deg) rotateX(2deg);
-      transition: all 0.4s ease;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-      border: 10px solid #ec4899; /* Rosa Art5D */
-      border-radius: 5px;
-      overflow: hidden;
-      background: white;
+
+    /* Glassmorphism */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
     }
-    .frame-3d:hover {
-      transform: perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(-10px);
-      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+
+    /* Audio Player Flotante */
+    .audio-player {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+      transition: all 0.3s ease;
     }
-    .glow-light { filter: drop-shadow(0 0 20px rgba(255,215,0,0.4)); }
-    .nft-badge {
-      background: #00d4aa; 
-      color: white; 
-      padding: 5px 10px; 
-      border-radius: 15px; 
-      font-size: 12px;
-    }
-    .soa-cert {
-      background: #f0f0f0; 
-      padding: 5px; 
-      font-size: 10px; 
-      border: 1px solid #ccc;
-    }
-    .qr-code {
-      width: 50px; 
-      height: 50px;
+
+    /* Ajuste imágenes Packs */
+    .pack-image {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 16px 16px 0 0;
     }
   </style>
-  <!-- Incluye React, ReactDOM y Babel -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
-  <!-- Importaciones de Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { 
-      getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged 
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { 
-      getFirestore, collection, doc, setDoc, deleteDoc,
-      onSnapshot, serverTimestamp 
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    setLogLevel('debug'); 
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-art5d-app-id';
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-    let app = null;
-    let db = null;
-    let auth = null;
-    let firebaseInitialized = false;
-
-    if (firebaseConfig) {
-      try {
-        app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        auth = getAuth(app);
-        firebaseInitialized = true;
-        
-        window.db = db;
-        window.auth = auth;
-        window.firebaseInitialized = firebaseInitialized;
-        window.initialAuthToken = initialAuthToken;
-        
-        window.firebaseUtils = {
-          serverTimestamp: serverTimestamp,
-          docRef: doc,
-          collectionRef: collection,
-          setDoc: setDoc,
-          deleteDoc: deleteDoc,
-          onSnapshot: onSnapshot,
-        };
-
-        window.getPrivateCollectionPath = (userId) => {
-          return `artifacts/${appId}/users/${userId}/artworks`;
-        };
-        window.getPublicCollectionPath = () => {
-          return `artifacts/${appId}/public/data/gallery_artworks`;
-        };
-      } catch (error) {
-        console.error("Error al inicializar Firebase:", error);
-        window.firebaseInitialized = false;
-      }
-    } else {
-      console.error("Firebase config no disponible. Usando modo de desarrollo sin Firestore.");
-    }
-  </script>
 </head>
-<body>
-  <div id="root"></div>
+<body class="bg-space min-h-screen">
 
-  <script type="text/babel">
-  const { useState, useEffect, useCallback, useMemo } = React;
-  
-  // --- CONSTANTES DEL PACK GOLD ---
-  const MAX_OWN_WORKS = 10;
-  const MAX_IA_WORKS = 5;
-  const MAX_TOTAL_WORKS = MAX_OWN_WORKS + MAX_IA_WORKS;
+  <!-- Partículas de fondo -->
+  <div id="particles-js" class="fixed inset-0 pointer-events-none z-0"></div>
 
-  const initialFormState = {
-    title: '',
-    artistName: '',
-    technique: '',
-    year: new Date().getFullYear().toString(),
-    imageUrl: '',
-    description: '',
-    isIA: false,
-    certified: false,
-    isPublic: false,
-  };
+  <!-- NAVBAR -->
+  <div class="navbar fixed top-0 z-50 glass-panel m-4 w-[calc(100%-2rem)] rounded-full px-6 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <!-- LOGO / SELLO DE AGUA -->
+      <img src="https://drive.google.com/uc?export=view&id=1pWtfan-g93XbHSRhaAbwjeeUIXsXlzi2" alt="Logo ART5D" class="w-10 h-10 md:w-12 md:h-12 rounded-full border border-purple-500">
+      <a href="#" class="text-2xl font-orbitron font-black tracking-widest text-white hidden md:block">ART5D</a>
+    </div>
+    <div class="hidden lg:flex">
+      <ul class="menu menu-horizontal px-1 font-bold text-sm uppercase tracking-wider">
+        <li><a href="#hero">Inicio</a></li>
+        <li><a href="#generador">Generar</a></li>
+        <li><a href="#galeria">Galería</a></li>
+        <li><a href="#packs" class="text-pink-400">Packs</a></li>
+        <li><a href="#talleres">Talleres</a></li>
+      </ul>
+    </div>
+    <div>
+      <button class="btn btn-primary btn-sm rounded-full font-orbitron bg-gradient-to-r from-pink-600 to-purple-600 border-none shadow-[0_0_15px_rgba(236,72,153,0.5)]">
+        Conectar Wallet
+      </button>
+    </div>
+  </div>
 
-  // -----------------------------------------------------------------------
-  // ---------------------- MODAL DE AGREGAR OBRA --------------------------
-  // -----------------------------------------------------------------------
-
-  const AddArtworkModal = ({ isOpen, onClose, userId, db, totalArtworks, ownArtworksCount, iaArtworksCount }) => {
-    const [formData, setFormData] = useState(initialFormState);
-    const [isSaving, setIsSaving] = useState(false);
-    const [saveError, setSaveError] = useState(null);
-
-    useEffect(() => {
-      if (isOpen) {
-        setFormData(initialFormState);
-        setSaveError(null);
-      }
-    }, [isOpen]);
-
-    const handleChange = (e) => {
-      const { name, value, type, checked } = e.target;
-      setFormData(prev => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value,
-      }));
-    };
-
-    const handleSave = async (e) => {
-      e.preventDefault();
+  <!-- 1. HERO SECTION (VIDEO PRINCIPAL) -->
+  <section id="hero" class="min-h-screen flex items-center justify-center relative px-6 pt-28 pb-10">
+    <div class="text-center max-w-6xl z-10 w-full" data-aos="zoom-in" data-aos-duration="1000">
+      <h1 class="text-5xl md:text-8xl font-black mb-6 leading-tight">
+        LA QUINTA <br> <span class="gradient-text">DIMENSIÓN</span>
+      </h1>
+      <p class="text-lg md:text-2xl text-gray-300 mb-10 max-w-3xl mx-auto">
+        Transforma tus ideas en Obras Maestras Certificadas con IA y asegúralas eternamente en Solana Blockchain.
+      </p>
       
-      if (!db || !userId) {
-        setSaveError("Error: Base de datos o Usuario no disponible.");
-        return;
-      }
-
-      if (!formData.title || !formData.artistName) {
-        setSaveError("El Título y el Nombre del Artista son obligatorios.");
-        return;
-      }
-      
-      if (totalArtworks >= MAX_TOTAL_WORKS) {
-        setSaveError(`Límite de ${MAX_TOTAL_WORKS} obras (PACK GOLD) alcanzado. No puedes agregar más.`);
-        return;
-      }
-
-      setIsSaving(true);
-      setSaveError(null);
-      
-      try {
-        const privateCollectionRef = firebaseUtils.collectionRef(db, getPrivateCollectionPath(userId));
-        const newDocRef = firebaseUtils.docRef(privateCollectionRef); 
-        
-        const newArtwork = {
-          ...formData,
-          id: newDocRef.id, 
-          artistId: userId, 
-          createdAt: firebaseUtils.serverTimestamp(),
-          updatedAt: firebaseUtils.serverTimestamp(),
-          year: parseInt(formData.year) || formData.year,
-        };
-        
-        await firebaseUtils.setDoc(newDocRef, newArtwork); 
-        
-        setFormData(initialFormState);
-        onClose();
-
-      } catch (error) {
-        console.error("Error al guardar la obra:", error);
-        setSaveError("Fallo al guardar en Firestore. Asegúrate de que las reglas de seguridad lo permitan.");
-      } finally {
-        setIsSaving(false);
-      }
-    };
-
-    if (!isOpen) return null;
-
-    return (
-      <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 overflow-y-auto">
-        <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 my-8 transform transition-all">
-          <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2 flex justify-between items-center">
-            Añadir Obra
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-            </button>
-          </h3>
-          
-          <p className="text-sm text-gray-500 mb-4 p-2 bg-indigo-50 rounded-lg">
-            Estás añadiendo la obra número <span className="font-bold text-indigo-800">{totalArtworks + 1}</span> de {MAX_TOTAL_WORKS} (<span className="text-indigo-600 font-bold">PACK GOLD</span>).
-            <span className="block mt-1">Límites: Propias ({ownArtworksCount}/{MAX_OWN_WORKS}), Bocetos IA ({iaArtworksCount}/{MAX_IA_WORKS})</span>
-          </p>
-
-          <form onSubmit={handleSave} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700">Título de la Obra <span className="text-red-500">*</span></label>
-                <input type="text" id="title" name="title" value={formData.title} onChange={handleChange} required
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" />
-              </div>
-              <div>
-                <label htmlFor="artistName" className="block text-sm font-medium text-gray-700">Nombre del Artista <span className="text-red-500">*</span></label>
-                <input type="text" id="artistName" name="artistName" value={formData.artistName} onChange={handleChange} required
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="technique" className="block text-sm font-medium text-gray-700">Técnica/Medio</label>
-                <input type="text" id="technique" name="technique" value={formData.technique} onChange={handleChange}
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" />
-              </div>
-              <div>
-                <label htmlFor="year" className="block text-sm font-medium text-gray-700">Año de Creación</label>
-                <input type="number" id="year" name="year" value={formData.year} onChange={handleChange}
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" />
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">URL de la Imagen (Link)</label>
-              <input type="url" id="imageUrl" name="imageUrl" value={formData.imageUrl} onChange={handleChange}
-                placeholder="https://ejemplo.com/mi-obra.jpg"
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" />
-            </div>
-
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">Descripción (Opcional)</label>
-              <textarea id="description" name="description" rows="3" value={formData.description} onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border"></textarea>
-            </div>
-
-            <div className="flex items-center space-x-6 pt-2">
-              <div className="flex items-center">
-                <input id="isIA" name="isIA" type="checkbox" checked={formData.isIA} onChange={handleChange}
-                  className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" />
-                <label htmlFor="isIA" className="ml-2 block text-sm font-medium text-gray-700">Marcar como Boceto IA</label>
-              </div>
-            </div>
-            
-            {saveError && (
-              <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                {saveError}
-              </div>
-            )}
-
-            <div className="flex justify-end space-x-3 pt-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-150"
-                disabled={isSaving}
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition duration-150 shadow-md flex items-center"
-                disabled={isSaving}
-              >
-                {isSaving ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Guardando...
-                  </>
-                ) : (
-                  "Guardar Obra"
-                )}
-              </button>
-            </div>
-          </form>
+      <!-- VIDEO EMBED (Google Drive Preview) -->
+      <div class="glass-panel p-2 mb-12 max-w-4xl mx-auto transform hover:scale-[1.01] transition duration-500 shadow-[0_0_50px_rgba(168,85,247,0.2)]">
+        <div class="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden bg-black relative" style="padding-top: 56.25%;">
+          <iframe 
+            src="https://drive.google.com/file/d/1IKRui-jdjJVgcie4JTxvv2SjS7zE9QqN/preview" 
+            class="absolute top-0 left-0 w-full h-full"
+            frameborder="0" 
+            allow="autoplay; fullscreen" 
+            allowfullscreen>
+          </iframe>
         </div>
       </div>
-    );
-  });
 
-  // -----------------------------------------------------------------------
-  // ---------------------- VISTA DE GALERÍA (PÚBLICA) ---------------------
-  // -----------------------------------------------------------------------
+      <a href="#generador" class="btn btn-lg border-none bg-white text-black hover:bg-gray-200 font-orbitron px-12 rounded-full text-xl shadow-[0_0_30px_rgba(255,255,255,0.4)] animate-pulse">
+        COMENZAR AHORA
+      </a>
+    </div>
+  </section>
 
-  // Componente que muestra una sola obra de arte en la galería (con nuevo look Gold)
-  const GalleryItem = React.memo(({ artwork }) => (
-    <div className="frame-3d relative overflow-hidden rounded-xl bg-white transition duration-300 hover:shadow-2xl">
-      <img src={artwork.imageUrl || `https://placehold.co/400x400/1e293b/ffffff?text=ART5D+${artwork.title}`}
-        alt={artwork.title}
-        className="w-full h-full object-cover rounded-lg glow-light"
-        onError={(e) => {
-          e.target.onerror = null; 
-          e.target.src = `https://placehold.co/400x400/ef4444/ffffff?text=Error+Cargando+Imagen`;
-        }}
-        loading="lazy"
-      />
-      <div className="nft-badge absolute top-3 right-3 bg-green-500 text-white p-2 rounded-full shadow-lg" title="NFT Certificado">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+  <!-- 2. GENERADOR IA (Con Imagen PACK BÁSICO como visual) -->
+  <section id="generador" class="py-24 px-6 relative">
+    <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
+      
+      <!-- Columna Izquierda: Formulario -->
+      <div class="glass-panel p-8 md:p-12" data-aos="fade-right">
+        <div class="mb-6 inline-block bg-purple-600 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
+          Motor Doble: Grok + Gemini
+        </div>
+        <h2 class="text-4xl font-black mb-6">CREA TU OBRA</h2>
+        <p class="text-gray-400 mb-6">Describe tu visión. Nuestra IA generará una obra única, creará su metadata y te entregará un Certificado PDF Oficial.</p>
+        
+        <div class="form-control mb-6">
+          <label class="label"><span class="label-text text-white font-bold">Describe tu visión (Prompt):</span></label>
+          <textarea id="promptInput" class="textarea textarea-bordered h-40 text-lg bg-black/50 text-white border-purple-500 focus:border-pink-500" placeholder="Ej: Un jaguar cyberpunk con armadura dorada sobre Valparaíso futurista, 8k, luces neón, estilo cinematográfico..."></textarea>
+        </div>
+
+        <button id="btnGenerar" onclick="generarArte()" class="btn btn-block h-16 text-xl font-orbitron bg-gradient-to-r from-pink-600 to-cyan-500 border-none text-white hover:scale-[1.02] transition shadow-lg">
+          GENERAR + CERTIFICAR
+        </button>
+
+        <!-- Loading -->
+        <div id="loading" class="hidden mt-8 text-center">
+          <span class="loading loading-infinity loading-lg text-secondary scale-150"></span>
+          <p class="mt-4 text-purple-300 animate-pulse">Conectando con la IA y Blockchain...</p>
+        </div>
       </div>
-      <div className="soa-cert absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm border border-gray-300 px-4 py-2 rounded-lg text-xs font-medium">
-        Certificado SOA #SOA-2025-001
-      </div>
-      <img className="qr-code absolute bottom-3 right-3 rounded" src="https://api.qrserver.com/v1/create-qr-code/?data=https://art5d.cl/@freddyvicencio&size=50x50" alt="QR Profile" />
-      <div className="p-4 text-center">
-        <h3 className="text-xl font-bold text-gray-900 truncate mb-1">{artwork.title}</h3>
-        <p className="text-sm text-indigo-600 font-medium mb-2">{artwork.artistName}</p>
+
+      <!-- Columna Derecha: Visual (Imagen Pack Básico usada como ejemplo de creación) -->
+      <div class="relative hidden lg:block" data-aos="fade-left">
+         <img src="https://drive.google.com/uc?export=view&id=1vkjE1C4SYHHwRM-h7xZIK_hVT3nC0Gir" class="w-full rounded-2xl shadow-[0_0_60px_rgba(236,72,153,0.3)] border-2 border-white/10 transform rotate-3 hover:rotate-0 transition duration-500" alt="Ejemplo Generación">
+         <div class="absolute -bottom-6 -right-6 glass-panel p-4 animate-bounce">
+            <p class="text-sm font-bold">Generaciones Gratis</p>
+            <p class="text-xs text-green-400">3 Disponibles hoy</p>
+         </div>
       </div>
     </div>
-  ));
 
-
-  const GalleryView = ({ artworks, isLoading }) => {
-    // Solo mostramos las obras que están marcadas como públicas
-    const publicArtworks = artworks.filter(a => a.isPublic);
-
-    return (
-      <div className="container-view bg-gray-50 p-4 sm:p-8 lg:p-12">
-        <header className="text-center mb-10">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-            Galería de Obras ART5D
-          </h1>
-          <p className="mt-3 text-lg text-gray-500">
-            Obras publicadas por el administrador. (PACK GOLD: Máx. 10 propias + 5 Bocetos IA Certificados).
-          </p>
-        </header>
-
-        {/* Indicadores de estado */}
-        {isLoading && (
-          <div className="text-center py-10">
-            <svg className="animate-spin h-8 w-8 text-indigo-600 mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <p className="text-indigo-600 font-medium">Cargando obras públicas...</p>
+    <!-- Resultado (Oculto al inicio) -->
+    <div id="resultadoContainer" class="hidden max-w-4xl mx-auto mt-16 glass-panel p-8 animate-fade-in border-2 border-green-500/50">
+        <div class="text-center mb-8">
+          <h3 class="text-3xl font-black text-green-400 mb-2">¡OBRA CERTIFICADA!</h3>
+          <p class="text-gray-300">Tu obra ha sido registrada en el sistema global ART5D.</p>
+        </div>
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div>
+            <img id="imgResultado" src="" class="w-full rounded-xl shadow-2xl border-2 border-pink-500/50">
           </div>
-        )}
-
-        {!isLoading && publicArtworks.length === 0 && (
-          <div className="text-center py-10 border-2 border-dashed border-gray-300 p-8 rounded-xl max-w-xl mx-auto">
-            <p className="text-xl text-gray-700 font-semibold mb-2">No hay obras de arte públicas para mostrar.</p>
-            <p className="text-gray-500">El administrador debe publicar obras desde su Panel de Administración.</p>
+          <div class="flex flex-col justify-center gap-4">
+            <a id="btnPdf" href="#" target="_blank" class="btn btn-outline btn-info w-full text-lg h-14">
+              📄 DESCARGAR CERTIFICADO PDF
+            </a>
+            <div class="divider">MÁS ACCIONES</div>
+            <a href="#packs" class="btn btn-primary w-full bg-gradient-to-r from-yellow-600 to-yellow-400 border-none text-black font-bold">
+              💎 HACER MINT (SOLANA)
+            </a>
+            <div class="text-left text-sm text-gray-400 mt-4 p-4 bg-black/40 rounded-lg">
+              <p>✓ Rate Limit consumido: 1/3</p>
+              <p>✓ Metadata en IPFS: OK</p>
+              <p>✓ Firma Digital: OK</p>
+            </div>
           </div>
-        )}
+        </div>
+    </div>
+  </section>
 
-        {/* Grid de la Galería con nuevo look Gold */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {publicArtworks.map((artwork) => (
-            <GalleryItem key={artwork.id} artwork={artwork} />
-          ))}
+  <!-- 3. GALERÍA OFICIAL (IMAGEN NFTs) -->
+  <section id="galeria" class="py-24 px-6 bg-black/40">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="text-5xl font-black text-center mb-16 gradient-text" data-aos="fade-up">GALERÍA NFT</h2>
+      
+      <!-- Layout Especial para la imagen NFTs -->
+      <div class="glass-panel p-4 md:p-8 flex flex-col md:flex-row gap-8 items-center" data-aos="zoom-in">
+        <div class="md:w-1/2">
+           <img src="https://drive.google.com/uc?export=view&id=1mG3auPh8JLkJczBJ2XCu_yj_iI7OJmdH" class="w-full rounded-xl shadow-2xl" alt="Colección NFT">
+        </div>
+        <div class="md:w-1/2 text-left">
+           <h3 class="text-3xl font-bold mb-4">Colección Génesis 2025</h3>
+           <p class="text-gray-300 mb-6 text-lg">
+             Explora las obras certificadas por ART5D. Cada pieza es única, inmutable y vive eternamente en la blockchain de Solana y IPFS.
+           </p>
+           <div class="flex gap-4">
+             <div class="badge badge-outline badge-lg text-pink-400">Solana</div>
+             <div class="badge badge-outline badge-lg text-cyan-400">IPFS</div>
+             <div class="badge badge-outline badge-lg text-purple-400">Verified</div>
+           </div>
+           <button class="btn btn-white mt-8 px-8 rounded-full text-black hover:bg-gray-200">Ver Marketplace</button>
         </div>
       </div>
-    );
-  };
+    </div>
+  </section>
 
-  // -----------------------------------------------------------------------
-  // ---------------------- VISTA DE ADMINISTRACIÓN ------------------------
-  // -----------------------------------------------------------------------
+  <!-- 4. PACKS (CON TUS IMÁGENES) -->
+  <section id="packs" class="py-24 px-6 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl -z-10"></div>
+    <div class="max-w-7xl mx-auto">
+      <h2 class="text-5xl font-black text-center mb-4">PACKS & MEMBRESÍAS</h2>
+      <p class="text-center text-gray-400 mb-16 text-xl">Eleva tu nivel. Cobra en Crypto. Vende al mundo.</p>
 
-  const AdminView = ({ artworks, isLoading, fetchError, userId, db }) => {
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-    const [artworkToToggle, setArtworkToToggle] = useState(null);
-    const [isToggling, setIsToggling] = useState(false);
-    const [toggleError, setToggleError] = useState(null);
-
-    const totalArtworks = artworks.length;
-    const iaArtworksCount = artworks.filter(a => a.isIA && a.isPublic).length;
-    const ownArtworksCount = artworks.filter(a => !a.isIA && a.isPublic).length;
-
-
-    const getArtworkTypeLimitMessage = (artwork) => {
-      if (artwork.isPublic) {
-        return "Al despublicar se liberará un espacio en la Galería.";
-      }
-      if (artwork.isIA) {
-        return iaArtworksCount >= MAX_IA_WORKS 
-          ? `Límite de Bocetos IA (${MAX_IA_WORKS}) alcanzado. Necesitas despublicar uno.`
-          : `Publicar como Boceto IA (actual: ${iaArtworksCount} de ${MAX_IA_WORKS}). Se certificará automáticamente.`;
-      } else {
-        return ownArtworksCount >= MAX_OWN_WORKS 
-          ? `Límite de Obras Propias (${MAX_OWN_WORKS}) alcanzado. Necesitas despublicar una.`
-          : `Publicar como Obra Propia (actual: ${ownArtworksCount} de ${MAX_OWN_WORKS}).`;
-      }
-    }
-    
-    const openConfirmModal = (artwork) => {
-      setArtworkToToggle(artwork);
-      setIsConfirmModalOpen(true);
-      setToggleError(null);
-    }
-
-    const handleTogglePublic = async () => {
-      if (!artworkToToggle || !db || !userId) {
-        setToggleError("Error de contexto: Base de datos o Usuario no disponible.");
-        return;
-      }
-
-      const newIsPublicState = !artworkToToggle.isPublic;
-      let finalCertifiedState = artworkToToggle.certified;
-      
-      if (newIsPublicState) {
-        if (artworkToToggle.isIA && iaArtworksCount >= MAX_IA_WORKS) {
-          setToggleError(`Límite de Bocetos IA (${MAX_IA_WORKS}) alcanzado. Despublica uno para publicar este.`);
-          return;
-        }
-        if (!artworkToToggle.isIA && ownArtworksCount >= MAX_OWN_WORKS) {
-          setToggleError(`Límite de Obras Propias (${MAX_OWN_WORKS}) alcanzado. Despublica una para publicar esta.`);
-          return;
-        }
+      <div class="grid md:grid-cols-3 gap-8">
         
-        if (artworkToToggle.isIA) {
-          finalCertifiedState = true;
-        }
-      }
+        <!-- Pack Gold -->
+        <div class="glass-panel overflow-hidden transform hover:-translate-y-4 transition duration-300 border-t-4 border-yellow-500" data-aos="fade-up" data-aos-delay="0">
+          <img src="https://drive.google.com/uc?export=view&id=1INbhEqDKxrdci1RU4Kj-ncn2m-w-zN2p" class="pack-image" alt="Pack Gold">
+          <div class="p-8">
+            <h3 class="text-3xl font-black text-yellow-400 mb-2">GOLD</h3>
+            <div class="text-4xl font-bold mb-6 text-white">$19.99 <span class="text-sm text-gray-400">/mes</span></div>
+            <ul class="space-y-3 text-gray-300 mb-8 text-sm">
+              <li>✓ 10 Obras Propias Certificadas</li>
+              <li>✓ 5 Generaciones IA Premium</li>
+              <li>✓ Soporte Email Prioritario</li>
+            </ul>
+            <button class="btn btn-block btn-outline border-yellow-500 text-yellow-400 hover:bg-yellow-500 hover:text-black">Elegir Gold</button>
+          </div>
+        </div>
 
-      setIsToggling(true);
-      setToggleError(null);
-      
-      try {
-        const privateDocRef = firebaseUtils.docRef(db, getPrivateCollectionPath(userId), artworkToToggle.id);
-        const publicDocRef = firebaseUtils.docRef(db, getPublicCollectionPath(), artworkToToggle.id);
+        <!-- Pack Platinum (Destacado) -->
+        <div class="glass-panel overflow-hidden transform scale-105 shadow-[0_0_40px_rgba(168,85,247,0.4)] z-10 border-t-4 border-purple-500 bg-gray-900" data-aos="fade-up" data-aos-delay="100">
+          <div class="relative">
+             <img src="https://drive.google.com/uc?export=view&id=14YjXAHnvSjINzNiG17SMbEozC0Zp9HAx" class="pack-image h-[280px]" alt="Pack Platinum">
+             <div class="absolute top-4 right-4 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">MÁS VENDIDO</div>
+          </div>
+          <div class="p-8">
+            <h3 class="text-3xl font-black text-white mb-2">PLATINUM</h3>
+            <div class="text-5xl font-bold mb-6 gradient-text">$49.99</div>
+            <ul class="space-y-3 text-white mb-8">
+              <li>✓ <strong>Certificaciones Ilimitadas</strong></li>
+              <li>✓ 50 Generaciones IA (8K)</li>
+              <li>✓ Minteo en Solana incluido</li>
+              <li>✓ Acceso a Galería Privada</li>
+            </ul>
+            <button class="btn btn-block bg-purple-600 hover:bg-purple-700 text-white border-none h-12 text-lg">OBTENER AHORA</button>
+          </div>
+        </div>
 
-        const updatePayload = {
-          isPublic: newIsPublicState,
-          certified: finalCertifiedState,
-          updatedAt: firebaseUtils.serverTimestamp(),
-        };
+        <!-- Pack Anual -->
+        <div class="glass-panel overflow-hidden transform hover:-translate-y-4 transition duration-300 border-t-4 border-cyan-500" data-aos="fade-up" data-aos-delay="200">
+          <img src="https://drive.google.com/uc?export=view&id=1XNKkhrgryuRW1tmUsLwbvppgmhEsQPZw" class="pack-image" alt="Pack Anual">
+          <div class="p-8">
+            <h3 class="text-3xl font-black text-cyan-400 mb-2">ANUAL</h3>
+            <div class="text-4xl font-bold mb-6 text-white">$99.99 <span class="text-sm text-gray-400">/año</span></div>
+            <ul class="space-y-3 text-gray-300 mb-8 text-sm">
+              <li>✓ <strong>Todo lo de Platinum</strong></li>
+              <li>✓ 2 Meses Gratis (Ahorro)</li>
+              <li>✓ Badge "Artista Verificado"</li>
+            </ul>
+            <button class="btn btn-block btn-outline border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-black">Ser Pro</button>
+          </div>
+        </div>
 
-        await firebaseUtils.setDoc(privateDocRef, updatePayload, { merge: true });
+      </div>
+    </div>
+  </section>
 
+  <!-- 5. TALLERES (Imagen Talleres) -->
+  <section id="talleres" class="py-24 px-6 bg-white/5">
+    <div class="max-w-6xl mx-auto flex flex-col-reverse md:flex-row items-center gap-12">
+      <div class="md:w-1/2" data-aos="fade-right">
+        <h2 class="text-4xl font-black mb-6">ACADEMIA ART5D</h2>
+        <p class="text-xl text-gray-300 mb-8">
+          Aprende Prompt Engineering, Tokenización y Estrategias de Venta en Solana. 
+          Domina las herramientas del futuro hoy.
+        </p>
+        <div class="flex flex-col gap-4">
+          <div class="alert bg-black/50 border-purple-500">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Curso Básico: Introducción a la IA (Gratis)</span>
+          </div>
+          <div class="alert bg-black/50 border-pink-500">
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6 text-pink-500"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            <span>Masterclass: NFT & Monetización (Usuarios Platinum)</span>
+          </div>
+        </div>
+      </div>
+      <div class="md:w-1/2" data-aos="fade-left">
+        <img src="https://drive.google.com/uc?export=view&id=1Bh_cXkuKWKORRpu0TxOamxua_wPJXclq" class="w-full rounded-2xl shadow-2xl border-4 border-purple-900" alt="Talleres ART5D">
+      </div>
+    </div>
+  </section>
 
-        if (newIsPublicState) {
-          const publicData = {
-            ...artworkToToggle,
-            ...updatePayload, 
-            artistId: userId,
-          };
-          await firebaseUtils.setDoc(publicDocRef, publicData);
-        } else {
-          await firebaseUtils.deleteDoc(publicDocRef);
-        }
+  <!-- 6. TECNOLOGÍA -->
+  <section id="tecnologia" class="py-20 px-6">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-3xl font-black mb-12 text-gray-400 uppercase tracking-widest">Powered By</h2>
+      <div class="flex flex-wrap justify-center gap-8 md:gap-16 opacity-70 grayscale hover:grayscale-0 transition duration-500">
+        <!-- Iconos simples representativos -->
+        <div class="text-center">
+           <span class="text-5xl">💎</span>
+           <p class="font-bold mt-2">Solana</p>
+        </div>
+        <div class="text-center">
+           <span class="text-5xl">📦</span>
+           <p class="font-bold mt-2">IPFS</p>
+        </div>
+        <div class="text-center">
+           <span class="text-5xl">🧠</span>
+           <p class="font-bold mt-2">Grok AI</p>
+        </div>
+        <div class="text-center">
+           <span class="text-5xl">✨</span>
+           <p class="font-bold mt-2">Gemini</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        setIsConfirmModalOpen(false);
-        setArtworkToToggle(null);
-        
-      } catch (error) {
-        console.error("Error al alternar estado de publicación:", error);
-        setToggleError("Fallo en la operación. Revisa las reglas de seguridad o tu conexión.");
-      } finally {
-        setIsToggling(false);
-      }
-    };
+  <!-- FOOTER -->
+  <footer class="footer footer-center p-10 bg-black text-primary-content border-t-4 border-purple-900">
+    <aside>
+      <img src="https://drive.google.com/uc?export=view&id=1pWtfan-g93XbHSRhaAbwjeeUIXsXlzi2" class="w-20 h-20 rounded-full border-2 border-white mb-4 shadow-lg">
+      <p class="font-black text-3xl font-orbitron tracking-widest">ART5D</p>
+      <p class="font-bold text-gray-400">
+        Plataforma Chilena de Arte Digital Certificado<br/>
+        IA + Blockchain + Pasión
+      </p> 
+      <p class="text-sm mt-4">Copyright © 2025 - Todos los derechos reservados</p>
+      <p class="text-xs text-gray-600">Valparaíso, Chile</p>
+    </aside> 
+  </footer>
 
-    const AdminTableRow = React.memo(({ artwork }) => {
-      const isPublishBlocked = !artwork.isPublic && 
-        ( (artwork.isIA && iaArtworksCount >= MAX_IA_WORKS) || (!artwork.isIA && ownArtworksCount >= MAX_OWN_WORKS) );
+  <!-- REPRODUCTOR DE AUDIO INTELIGENTE -->
+  <div id="audioControls" class="audio-player opacity-60 hover:opacity-100">
+    <button id="btnAudio" class="btn btn-circle btn-primary shadow-lg border-2 border-white w-14 h-14" onclick="toggleAudio()">
+      <!-- Icono Play -->
+      <svg id="iconPlay" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      <!-- Icono Pause (oculto) -->
+      <svg id="iconPause" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    </button>
+    <audio id="bgMusic" loop>
+      <source src="https://cdn.freesound.org/previews/626/626297_5674468-lq.mp3" type="audio/mpeg">
+    </audio>
+  </div>
 
-      return (
-        <tr className="hover:bg-indigo-50 transition duration-150">
-          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{artwork.title}</td>
-          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${artwork.isIA ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
-              {artwork.isIA ? 'Boceto IA' : 'Obra Propia'}
-            </span>
-          </td>
-          <td className="px-6 py-4 whitespace-nowrap">
-            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${artwork.certified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-              {artwork.certified ? 'Certificado' : 'En proceso'}
-            </span>
-          </td>
-          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            {artwork.isPublic ? (
-              <span className="text-green-600 font-semibold">Público</span>
-            ) : (
-              <span className="text-red-500 font-semibold">Privado</span>
-            )}
-          </td>
-          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <button 
-              onClick={() => openConfirmModal(artwork)}
-              className={`ml-3 transition duration-150 font-semibold px-3 py-1 rounded-md ${
-                isPublishBlocked && !artwork.isPublic
-                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'text-indigo-600 hover:text-indigo-900 hover:bg-indigo-100'
-              }`}
-              disabled={isPublishBlocked && !artwork.isPublic}
-              title={isPublishBlocked ? getArtworkTypeLimitMessage(artwork) : (artwork.isPublic ? "Despublicar de la galería" : "Publicar en la galería")}
-            >
-              {artwork.isPublic ? 'Despublicar' : 'Publicar'}
-            </button>
-          </td>
-        </tr>
-      );
+  <!-- SCRIPT LÓGICA -->
+  <script>
+    // Inicializar Animaciones y Partículas
+    AOS.init();
+    particlesJS("particles-js", {
+      "particles": { "number": { "value": 50 }, "color": { "value": "#ffffff" }, "opacity": { "value": 0.3 }, "size": { "value": 2 }, "move": { "enable": true, "speed": 0.5 } }
     });
 
-    const ConfirmModal = () => {
-      if (!isConfirmModalOpen || !artworkToToggle) return null;
+    // Lógica de Audio
+    const audio = document.getElementById('bgMusic');
+    const btnAudio = document.getElementById('btnAudio');
+    const iconPlay = document.getElementById('iconPlay');
+    const iconPause = document.getElementById('iconPause');
+    let isPlaying = false;
 
-      const isPublishing = !artworkToToggle.isPublic;
-      const actionText = isPublishing ? 'Publicar' : 'Despublicar';
-      const bgColor = isPublishing ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700';
-
-      const isBlocked = isPublishing && 
-        ( (artworkToToggle.isIA && iaArtworksCount >= MAX_IA_WORKS) || (!artworkToToggle.isIA && ownArtworksCount >= MAX_OWN_WORKS) );
-
-      return (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Confirmar Acción</h3>
-            
-            <p className="mb-4 text-gray-700">
-              ¿Estás seguro que deseas **{actionText}** la obra **"{artworkToToggle.title}"**?
-            </p>
-
-            <div className="space-y-2 mb-4 p-3 rounded-lg text-sm" style={{ backgroundColor: isBlocked ? '#ffebeb' : '#eef2ff' }}>
-              <p className="font-semibold text-gray-800">Estado de Publicación (PACK GOLD):</p>
-              <p>Obras Propias Públicas: {ownArtworksCount} / {MAX_OWN_WORKS}</p>
-              <p>Bocetos IA Certificados: {iaArtworksCount} / {MAX_IA_WORKS}</p>
-              <p className={`text-xs mt-2 ${isBlocked ? 'text-red-700 font-bold' : 'text-gray-600'}`}>{getArtworkTypeLimitMessage(artworkToToggle)}</p>
-              
-              {isPublishing && artworkToToggle.isIA && (
-                <p className="text-xs font-semibold text-purple-700 pt-2 border-t border-purple-200">
-                  Nota: Al publicar un Boceto IA, se marcará automáticamente como Certificado.
-                </p>
-              )}
-            </div>
-            
-            {toggleError && (
-              <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg mb-4">
-                {toggleError}
-              </div>
-            )}
-
-            <div className="flex justify-end space-x-3 pt-4">
-              <button
-                type="button"
-                onClick={() => { setIsConfirmModalOpen(false); setArtworkToToggle(null); setToggleError(null); }}
-                className="px-4 py-2 text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-150"
-                disabled={isToggling}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleTogglePublic}
-                className={`px-4 py-2 text-white font-semibold rounded-lg transition duration-150 shadow-md ${isBlocked ? 'bg-gray-400 cursor-not-allowed' : bgColor} ${isToggling ? 'opacity-70 cursor-wait' : ''}`}
-                disabled={isToggling || isBlocked}
-              >
-                {isToggling ? 'Procesando...' : `${actionText} Ahora`}
-              </button>
-            </div>
-          </div>
-        </div>
-      );
+    function toggleAudio() {
+      if (isPlaying) {
+        audio.pause();
+        iconPlay.classList.remove('hidden');
+        iconPause.classList.add('hidden');
+        btnAudio.classList.remove('animate-spin-slow');
+      } else {
+        audio.play().then(() => {
+          iconPlay.classList.add('hidden');
+          iconPause.classList.remove('hidden');
+          btnAudio.classList.add('animate-spin-slow'); // Efecto visual opcional
+        }).catch(e => console.log("Audio bloq por nav", e));
+      }
+      isPlaying = !isPlaying;
     }
 
-    return (
-      <div className="container-view p-4 sm:p-8 bg-gray-100">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-3 text-indigo-700">Panel de Administración de Obras</h1>
-          <p className="mb-6 text-gray-600">
-            Gestiona tu colección privada y publica en la galería. <span className="font-bold text-indigo-800">PACK GOLD:</span> Almacenamiento total: {MAX_TOTAL_WORKS} obras.
-          </p>
-          
-          <div className="mb-8 flex justify-between items-center flex-wrap gap-4 p-4 bg-white rounded-xl shadow-lg">
-            <button
-              onClick={() => setIsAddModalOpen(true)}
-              className={`flex items-center space-x-2 px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg shadow-lg transition duration-150 ${totalArtworks >= MAX_TOTAL_WORKS ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700 transform hover:scale-[1.02]'}`}
-              disabled={totalArtworks >= MAX_TOTAL_WORKS}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-              <span>{totalArtworks >= MAX_TOTAL_WORKS ? `Límite (${MAX_TOTAL_WORKS}) Alcanzado` : 'Agregar Nueva Obra'}</span>
-            </button>
-            <div className="flex space-x-4 flex-wrap text-sm sm:text-lg p-2">
-              <span className="font-semibold text-gray-800 bg-gray-50 p-2 rounded-lg border border-gray-200">
-                Colección Total: {totalArtworks} / {MAX_TOTAL_WORKS}
-              </span>
-              <span className="font-semibold text-blue-800 bg-blue-100 p-2 rounded-lg">
-                Propias Públicas: {ownArtworksCount} / {MAX_OWN_WORKS}
-              </span>
-              <span className="font-semibold text-purple-800 bg-purple-100 p-2 rounded-lg">
-                IA Públicos: {iaArtworksCount} / {MAX_IA_WORKS}
-              </span>
-            </div>
-          </div>
-          
-          {isLoading && <p className="text-indigo-600 font-semibold p-4">Cargando datos de administración...</p>}
-          {fetchError && <p className="p-3 bg-red-100 text-red-700 border border-red-400 rounded-lg font-bold">Error al cargar: {fetchError}</p>}
-          
-          {!isLoading && artworks.length > 0 ? (
-            <div className="overflow-x-auto bg-white shadow-xl rounded-xl">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-indigo-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Título</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Tipo</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Certif.</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Estado Público</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-indigo-700 uppercase tracking-wider">Acción</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {artworks.map((artwork) => (
-                    <AdminTableRow key={artwork.id} artwork={artwork} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            !isLoading && (
-              <div className="text-center py-10 border-2 border-dashed border-gray-300 p-8 rounded-xl">
-                <p className="text-xl text-gray-700 font-semibold">Tu colección privada está vacía.</p>
-                <p className="text-gray-500">Haz clic en "Agregar Nueva Obra" para empezar.</p>
-              </div>
-            )
-          )}
-
-          <AddArtworkModal 
-            isOpen={isAddModalOpen} 
-            onClose={() => setIsAddModalOpen(false)} 
-            userId={userId} 
-            db={db}
-            totalArtworks={totalArtworks}
-            ownArtworksCount={ownArtworksCount}
-            iaArtworksCount={iaArtworksCount}
-          />
-          <ConfirmModal />
-        </div>
-      </div>
-    );
-  };
-
-
-  // -----------------------------------------------------------------------
-  // ------------------------- COMPONENTE PRINCIPAL APP --------------------
-  // -----------------------------------------------------------------------
-
-  const App = () => {
-    const [db, setDb] = useState(null);
-    const [auth, setAuth] = useState(null);
-    const [userId, setUserId] = useState(null);
-    const [view, setView] = useState('admin'); // 'admin' o 'gallery'
-    const [artworks, setArtworks] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [fetchError, setFetchError] = useState(null);
-    const [isAuthReady, setIsAuthReady] = useState(false);
-
-    useEffect(() => {
-      if (window.firebaseInitialized) {
-        const dbInstance = window.db;
-        const authInstance = window.auth;
-        const initialAuthToken = window.initialAuthToken;
-
-        setDb(dbInstance);
-        setAuth(authInstance);
-
-        const handleAuth = async () => {
-          try {
-            if (initialAuthToken) {
-              await authInstance.signInWithCustomToken(initialAuthToken);
-            } else {
-              await authInstance.signInAnonymously();
-            }
-          } catch (error) {
-            console.error("Error de autenticación inicial:", error);
-          }
-        };
-        
-        const unsubscribe = authInstance.onAuthStateChanged((user) => {
-          if (user) {
-            setUserId(user.uid);
-          } else {
-            setUserId(crypto.randomUUID());
-          }
-          setIsAuthReady(true);
-        });
-
-        handleAuth();
-
-        return () => unsubscribe();
-      } else {
-        setFetchError("Firebase no está inicializado. Error de configuración.");
-      }
-    }, []);
-
-
-    useEffect(() => {
-      if (!db || !userId || !isAuthReady) {
-        return;
-      }
-
-      const collectionPath = view === 'admin' 
-        ? getPrivateCollectionPath(userId) 
-        : getPublicCollectionPath();      
-
-      const collectionRef = firebaseUtils.collectionRef(db, collectionPath);
+    // Lógica del Generador
+    function generarArte() {
+      const prompt = document.getElementById('promptInput').value;
+      if (!prompt || prompt.length < 5) return alert("Por favor describe tu obra con más detalle.");
       
-      const unsubscribe = firebaseUtils.onSnapshot(collectionRef, (snapshot) => {
-        const fetchedArtworks = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+      const btn = document.getElementById('btnGenerar');
+      const loading = document.getElementById('loading');
+      const resultado = document.getElementById('resultadoContainer');
+      
+      // UI Update
+      btn.disabled = true;
+      btn.classList.add('hidden');
+      loading.classList.remove('hidden');
+      resultado.classList.add('hidden');
+
+      // Llamada al Backend (Google Apps Script)
+      google.script.run
+        .withSuccessHandler(onSuccess)
+        .withFailureHandler(onFailure)
+        .generarObra({ prompt: prompt });
+    }
+
+    function onSuccess(res) {
+      document.getElementById('loading').classList.add('hidden');
+      const resultado = document.getElementById('resultadoContainer');
+      const btn = document.getElementById('btnGenerar');
+      
+      if (res.success) {
+        document.getElementById('imgResultado').src = res.data.imageUrl;
+        // Asignar PDF si existe
+        if(res.data.pdfUrl) {
+            document.getElementById('btnPdf').href = res.data.pdfUrl;
+            document.getElementById('btnPdf').classList.remove('disabled');
+        }
         
-        fetchedArtworks.sort((a, b) => {
-          const dateA = a.createdAt?.seconds || 0;
-          const dateB = b.createdAt?.seconds || 0;
-          return dateB - dateA; 
-        });
+        resultado.classList.remove('hidden');
+        resultado.scrollIntoView({ behavior: 'smooth' });
         
-        setArtworks(fetchedArtworks);
-        setIsLoading(false);
-        setFetchError(null);
-      }, (error) => {
-        console.error("Error al escuchar cambios en Firestore:", error);
-        setFetchError(`Error al obtener datos: ${error.message}`);
-        setIsLoading(false);
-      });
+        // Reset botón
+        btn.disabled = false;
+        btn.classList.remove('hidden');
+        btn.innerText = "GENERAR OTRA OBRA";
+      } else {
+        alert("Error: " + res.error);
+        btn.disabled = false;
+        btn.classList.remove('hidden');
+      }
+    }
 
-      return () => unsubscribe();
+    function onFailure(err) {
+      document.getElementById('loading').classList.add('hidden');
+      const btn = document.getElementById('btnGenerar');
+      btn.disabled = false;
+      btn.classList.remove('hidden');
+      alert("Error de conexión: " + err.message);
+    }
+  </script>
 
-    }, [db, userId, isAuthReady, view]); 
-
-    const renderView = () => {
-      if (!isAuthReady) {
-        return (
-          <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-            <svg className="animate-spin h-10 w-10 text-indigo-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class
+</body>
+</html>
